@@ -1,0 +1,259 @@
+---
+title: "Skeleton"
+description: "Display placeholder loading states while content is being fetched"
+---
+
+## Introduction
+
+Skeleton components provide visual placeholders for content that is still loading. They improve perceived performance by showing users where content will appear, reducing the feeling of waiting.
+
+**When to use:**
+- Loading states for asynchronous content
+- Placeholder for images, text, or cards while fetching data
+- Creating smooth loading experiences
+- Reducing layout shift during content load
+
+## Installation
+
+Import the Skeleton component from `@poketto/ui`:
+
+```tsx
+import { Skeleton } from "@poketto/ui";
+```
+
+## Basic Usage
+
+A simple skeleton placeholder:
+
+```tsx
+<Skeleton className="w-[100px] h-[20px] rounded-full" />
+```
+
+## Examples
+
+### Text Skeleton
+
+Placeholder for text content:
+
+```tsx
+<div className="space-y-2">
+  <Skeleton className="h-4 w-[250px]" />
+  <Skeleton className="h-4 w-[200px]" />
+</div>
+```
+
+### Card Skeleton
+
+Placeholder for a card with image and text:
+
+```tsx
+function CardSkeleton() {
+  return (
+    <div className="flex flex-col space-y-3">
+      <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[250px]" />
+        <Skeleton className="h-4 w-[200px]" />
+      </div>
+    </div>
+  );
+}
+```
+
+### Avatar Skeleton
+
+Placeholder for user avatars:
+
+```tsx
+<div className="flex items-center space-x-4">
+  <Skeleton className="h-12 w-12 rounded-full" />
+  <div className="space-y-2">
+    <Skeleton className="h-4 w-[250px]" />
+    <Skeleton className="h-4 w-[200px]" />
+  </div>
+</div>
+```
+
+### List Skeleton
+
+Placeholder for a list of items:
+
+```tsx
+function ListSkeleton() {
+  return (
+    <div className="space-y-4">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center space-x-4">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <div className="space-y-2 flex-1">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### Table Skeleton
+
+Placeholder for table rows:
+
+```tsx
+function TableSkeleton() {
+  return (
+    <div className="space-y-2">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex space-x-4">
+          <Skeleton className="h-8 w-[100px]" />
+          <Skeleton className="h-8 w-[200px]" />
+          <Skeleton className="h-8 w-[150px]" />
+          <Skeleton className="h-8 w-[100px]" />
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### Conditional Rendering
+
+Show skeleton while loading, then show actual content:
+
+```tsx
+function UserProfile() {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [user, setUser] = React.useState(null);
+
+  React.useEffect(() => {
+    fetchUser().then((data) => {
+      setUser(data);
+      setIsLoading(false);
+    });
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center space-x-4">
+        <Skeleton className="h-12 w-12 rounded-full" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[250px]" />
+          <Skeleton className="h-4 w-[200px]" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center space-x-4">
+      <img src={user.avatar} className="h-12 w-12 rounded-full" />
+      <div>
+        <p className="font-medium">{user.name}</p>
+        <p className="text-sm text-muted-foreground">{user.email}</p>
+      </div>
+    </div>
+  );
+}
+```
+
+### Grid Skeleton
+
+Placeholder for grid layouts:
+
+```tsx
+function GridSkeleton() {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className="space-y-3">
+          <Skeleton className="h-[200px] w-full rounded-lg" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+### Form Skeleton
+
+Placeholder for forms:
+
+```tsx
+function FormSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[100px]" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[100px]" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[100px]" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+      <Skeleton className="h-10 w-[120px]" />
+    </div>
+  );
+}
+```
+
+## Props
+
+<ParamField path="className" type="string">
+  CSS classes to control the skeleton's size, shape, and styling. Use Tailwind utilities for dimensions and border radius.
+</ParamField>
+
+Extends all standard HTML div element props.
+
+## Best Practices
+
+<Check>**Do** match skeleton shapes to the content they represent</Check>
+<Check>**Do** use skeletons for predictable loading patterns</Check>
+<Check>**Do** combine multiple skeletons to represent complex layouts</Check>
+<Check>**Do** maintain consistent spacing and sizing with actual content</Check>
+<Check>**Do** use skeletons for perceived performance improvements</Check>
+
+<Warning>**Don't** use skeletons for very fast loading times (< 300ms) - content flash can be jarring</Warning>
+<Warning>**Don't** make skeletons too detailed - they should be simple placeholders</Warning>
+<Warning>**Don't** use different skeleton patterns for the same content type</Warning>
+<Warning>**Don't** forget to handle loading states properly</Warning>
+
+## Styling
+
+The Skeleton component has a default pulse animation and light background. Customize it with Tailwind classes:
+
+```tsx
+// Rounded skeleton
+<Skeleton className="h-12 w-12 rounded-full" />
+
+// Rectangular skeleton
+<Skeleton className="h-32 w-64 rounded-lg" />
+
+// Text line skeleton
+<Skeleton className="h-4 w-full" />
+
+// Custom opacity
+<Skeleton className="h-12 w-12 opacity-20" />
+```
+
+## Animation
+
+The skeleton uses the `animate-pulse` class for a subtle pulsing effect. You can customize or remove the animation:
+
+```tsx
+// No animation
+<Skeleton className="h-12 w-12 animate-none" />
+
+// Custom animation
+<Skeleton className="h-12 w-12 animate-pulse" />
+```
+
+## Accessibility
+
+Skeleton components are purely visual and don't require specific ARIA attributes. They are temporary placeholders that are replaced with actual content, which should have proper accessibility attributes.

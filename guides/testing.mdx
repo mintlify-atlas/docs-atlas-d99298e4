@@ -1,0 +1,353 @@
+---
+title: Testing
+description: Write tests for your components and application logic with Vitest
+---
+
+Poketto Stack uses Vitest and Testing Library for fast, reliable testing of components and application logic.
+
+## Setup
+
+Vitest is pre-configured in the project with coverage reporting:
+
+```json package.json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
+  }
+}
+```
+
+## Component testing
+
+Test components with Testing Library:
+
+```tsx
+import { render, screen } from "@testing-library/react"
+import { describe, expect, it } from "vitest"
+import { Button } from "@poketto/ui/button"
+
+describe("Button", () => {
+  it("renders with text", () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByText("Click me")).toBeInTheDocument()
+  })
+
+  it("applies variant classes", () => {
+    render(<Button variant="destructive">Delete</Button>)
+    const button = screen.getByText("Delete")
+    expect(button).toHaveClass("bg-destructive")
+  })
+
+  it("handles disabled state", () => {
+    render(<Button disabled>Disabled</Button>)
+    expect(screen.getByText("Disabled")).toBeDisabled()
+  })
+})
+```
+
+## User interactions
+
+Test user interactions with `userEvent`:
+
+```tsx
+import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import { describe, expect, it, vi } from "vitest"
+import { Button } from "@poketto/ui/button"
+
+describe("Button interactions", () => {
+  it("calls onClick when clicked", async () => {
+    const handleClick = vi.fn()
+    const user = userEvent.setup()
+
+    render(<Button onClick={handleClick}>Click me</Button>)
+    
+    await user.click(screen.getByText("Click me"))
+    
+    expect(handleClick).toHaveBeenCalledTimes(1)
+  })
+})
+```
+
+## Form testing
+
+Test forms with validation:
+
+```tsx
+import { render, screen, waitFor } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import { describe, expect, it, vi } from "vitest"
+import LoginForm from "./login-form"
+
+describe("LoginForm", () => {
+  it("displays validation errors", async () => {
+    const user = userEvent.setup()
+    render(<LoginForm />)
+
+    // Submit empty form
+    await user.click(screen.getByRole("button", { name: /sign in/i }))
+
+    // Check for validation errors
+    await waitFor(() => {
+      expect(screen.getByText(/invalid email/i)).toBeInTheDocument()
+      expect(screen.getByText(/password must be/i)).toBeInTheDocument()
+    })
+  })
+
+  it("submits form with valid data", async () => {
+    const user = userEvent.setup()
+    const handleSubmit = vi.fn()
+    
+    render(<LoginForm onSubmit={handleSubmit} />)
+
+    // Fill in form
+    await user.type(screen.getByLabelText(/email/i), "user@example.com")
+    await user.type(screen.getByLabelText(/password/i), "password123")
+    
+    // Submit
+    await user.click(screen.getByRole("button", { name: /sign in/i }))
+
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledWith({
+        email: "user@example.com",
+        password: "password123",
+      })
+    })
+  })
+})
+```
+
+## Async testing
+
+Test components with async data:
+
+```tsx
+import { render, screen, waitFor } from "@testing-library/react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { describe, expect, it, vi } from "vitest"
+import UserProfile from "./user-profile"
+
+// Mock API
+vi.mock("./api", () => ({
+  fetchUser: vi.fn(() =>
+    Promise.resolve({
+      id: "1",
+      name: "John Doe",
+      email: "john@example.com",
+    })
+  ),
+}))
+
+describe("UserProfile", () => {
+  it("displays user data after loading", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    })
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <UserProfile userId="1" />
+      </QueryClientProvider>
+    )
+
+    // Check loading state
+    expect(screen.getByText(/loading/i)).toBeInTheDocument()
+
+    // Wait for data to load
+    await waitFor(() => {
+      expect(screen.getByText("John Doe")).toBeInTheDocument()
+      expect(screen.getByText("john@example.com")).toBeInTheDocument()
+    })
+  })
+})
+```
+
+## Mocking
+
+### Mock modules
+
+```tsx
+import { vi } from "vitest"
+
+// Mock entire module
+vi.mock("./api", () => ({
+  fetchUser: vi.fn(),
+  createUser: vi.fn(),
+}))
+
+// Mock with implementation
+vi.mock("./api", () => ({
+  fetchUser: vi.fn(() => Promise.resolve({ id: "1", name: "John" })),
+}))
+```
+
+### Mock functions
+
+```tsx
+import { vi } from "vitest"
+
+const mockFn = vi.fn()
+
+// Check calls
+expect(mockFn).toHaveBeenCalled()
+expect(mockFn).toHaveBeenCalledTimes(2)
+expect(mockFn).toHaveBeenCalledWith("arg1", "arg2")
+
+// Mock return value
+mockFn.mockReturnValue("value")
+mockFn.mockResolvedValue("async value")
+
+// Mock implementation
+mockFn.mockImplementation((arg) => arg * 2)
+```
+
+## Snapshot testing
+
+Test component output with snapshots:
+
+```tsx
+import { render } from "@testing-library/react"
+import { describe, expect, it } from "vitest"
+import { Card, CardContent, CardHeader, CardTitle } from "@poketto/ui/card"
+
+describe("Card", () => {
+  it("matches snapshot", () => {
+    const { container } = render(
+      <Card>
+        <CardHeader>
+          <CardTitle>Title</CardTitle>
+        </CardHeader>
+        <CardContent>Content</CardContent>
+      </Card>
+    )
+    
+    expect(container).toMatchSnapshot()
+  })
+})
+```
+
+## Testing hooks
+
+Test custom hooks with `renderHook`:
+
+```tsx
+import { renderHook, waitFor } from "@testing-library/react"
+import { describe, expect, it } from "vitest"
+import { useCounter } from "./use-counter"
+
+describe("useCounter", () => {
+  it("increments counter", () => {
+    const { result } = renderHook(() => useCounter())
+
+    expect(result.current.count).toBe(0)
+
+    result.current.increment()
+
+    expect(result.current.count).toBe(1)
+  })
+
+  it("decrements counter", () => {
+    const { result } = renderHook(() => useCounter({ initialValue: 5 }))
+
+    result.current.decrement()
+
+    expect(result.current.count).toBe(4)
+  })
+})
+```
+
+## Coverage
+
+Run tests with coverage:
+
+```bash
+pnpm test:coverage
+```
+
+Configure coverage thresholds in `vite.config.ts`:
+
+```ts
+export default defineConfig({
+  test: {
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
+    },
+  },
+})
+```
+
+## Testing best practices
+
+<CardGroup cols={2}>
+  <Card title="Test user behavior" icon="user">
+    Test what users see and do, not implementation details
+  </Card>
+  <Card title="Use semantic queries" icon="search">
+    Prefer `getByRole`, `getByLabelText` over `getByTestId`
+  </Card>
+  <Card title="Mock external deps" icon="plug">
+    Mock APIs, timers, and external services
+  </Card>
+  <Card title="Keep tests isolated" icon="box">
+    Each test should be independent and not affect others
+  </Card>
+</CardGroup>
+
+## Common patterns
+
+### Test utilities
+
+Create reusable test utilities:
+
+```tsx test-utils.tsx
+import { render } from "@testing-library/react"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+
+export function renderWithProviders(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+    },
+  })
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      {ui}
+    </QueryClientProvider>
+  )
+}
+```
+
+Use in tests:
+
+```tsx
+import { renderWithProviders } from "./test-utils"
+
+it("renders with providers", () => {
+  renderWithProviders(<MyComponent />)
+  // Test your component
+})
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Component patterns" icon="cube" href="/advanced/component-patterns">
+    Learn best practices for component design
+  </Card>
+  <Card title="CI/CD" icon="rocket" href="/advanced/building">
+    Set up automated testing in CI
+  </Card>
+</CardGroup>

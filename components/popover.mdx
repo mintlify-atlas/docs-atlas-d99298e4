@@ -1,0 +1,325 @@
+---
+title: Popover
+description: A floating panel that appears above other content, triggered by a user action. Use for displaying rich content like forms, settings, or actions.
+---
+
+## Overview
+
+The Popover component displays rich content in a portal, floating above the page content. Unlike tooltips, popovers are triggered by click interactions and can contain interactive elements like forms, buttons, and links.
+
+Use popovers when you need to:
+- Display additional controls or settings without navigating away
+- Show forms or input fields in context
+- Present actions related to a specific element
+- Keep secondary UI tucked away until needed
+
+## Installation
+
+The Popover component is built on Radix UI primitives and available in the Poketto UI package.
+
+```tsx
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverAnchor,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+Popover uses a composition pattern with separate trigger and content components:
+
+```tsx
+import { Popover, PopoverTrigger, PopoverContent } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function BasicPopover() {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline">Open Popover</Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <div className="space-y-2">
+          <h4 className="font-medium leading-none">Dimensions</h4>
+          <p className="text-sm text-muted-foreground">
+            Set the dimensions for the layer.
+          </p>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+```
+
+## Examples
+
+### Popover with Form
+
+Popovers are ideal for inline editing or quick data entry:
+
+```tsx
+import { Popover, PopoverTrigger, PopoverContent } from "@poketto/ui";
+import { Button, Input, Label } from "@poketto/ui";
+
+export default function PopoverWithForm() {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline">Edit Profile</Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="font-medium leading-none">Profile Settings</h4>
+            <p className="text-sm text-muted-foreground">
+              Update your profile information.
+            </p>
+          </div>
+          <div className="grid gap-2">
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                defaultValue="Pedro Duarte"
+                className="col-span-2 h-8"
+              />
+            </div>
+            <div className="grid grid-cols-3 items-center gap-4">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                defaultValue="pedro@example.com"
+                className="col-span-2 h-8"
+              />
+            </div>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+```
+
+### Positioning Options
+
+Control where the popover appears relative to the trigger:
+
+```tsx
+import { Popover, PopoverTrigger, PopoverContent } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function PopoverPositions() {
+  return (
+    <div className="flex gap-4">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Top</Button>
+        </PopoverTrigger>
+        <PopoverContent side="top">
+          <p>This popover appears above the trigger.</p>
+        </PopoverContent>
+      </Popover>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Bottom</Button>
+        </PopoverTrigger>
+        <PopoverContent side="bottom">
+          <p>This popover appears below the trigger.</p>
+        </PopoverContent>
+      </Popover>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Left</Button>
+        </PopoverTrigger>
+        <PopoverContent side="left">
+          <p>This popover appears to the left.</p>
+        </PopoverContent>
+      </Popover>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Right</Button>
+        </PopoverTrigger>
+        <PopoverContent side="right">
+          <p>This popover appears to the right.</p>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+```
+
+### Alignment Control
+
+Align the popover content relative to the trigger:
+
+```tsx
+import { Popover, PopoverTrigger, PopoverContent } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function PopoverAlignment() {
+  return (
+    <div className="flex gap-4">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Align Start</Button>
+        </PopoverTrigger>
+        <PopoverContent align="start">
+          <p>Aligned to the start of the trigger.</p>
+        </PopoverContent>
+      </Popover>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Align Center</Button>
+        </PopoverTrigger>
+        <PopoverContent align="center">
+          <p>Centered on the trigger (default).</p>
+        </PopoverContent>
+      </Popover>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">Align End</Button>
+        </PopoverTrigger>
+        <PopoverContent align="end">
+          <p>Aligned to the end of the trigger.</p>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+```
+
+### Using PopoverAnchor
+
+The PopoverAnchor component lets you position the popover relative to a different element than the trigger:
+
+```tsx
+import { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function PopoverWithAnchor() {
+  return (
+    <Popover>
+      <PopoverAnchor asChild>
+        <div className="border rounded p-4">
+          <p>The popover will be positioned relative to this anchor element.</p>
+        </div>
+      </PopoverAnchor>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="mt-4">Open Popover</Button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <p>Positioned relative to the anchor, not the trigger.</p>
+      </PopoverContent>
+    </Popover>
+  );
+}
+```
+
+## Component API
+
+### Popover
+
+The root component that manages popover state.
+
+```tsx
+<Popover
+  defaultOpen?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  modal?: boolean
+>
+```
+
+**Props:**
+- `defaultOpen`: The initial open state (uncontrolled)
+- `open`: Controlled open state
+- `onOpenChange`: Callback when open state changes
+- `modal`: Whether to use modal behavior (default: `false`)
+
+### PopoverTrigger
+
+The button or element that toggles the popover.
+
+```tsx
+<PopoverTrigger asChild?: boolean>
+```
+
+**Props:**
+- `asChild`: Merge props with child element instead of rendering a button
+
+### PopoverContent
+
+The content container that appears when the popover is open.
+
+```tsx
+<PopoverContent
+  align?: "start" | "center" | "end"
+  side?: "top" | "right" | "bottom" | "left"
+  sideOffset?: number
+  alignOffset?: number
+  className?: string
+>
+```
+
+**Props:**
+- `align`: Alignment relative to trigger (default: `"center"`)
+- `side`: Which side of trigger to appear on (default: `"bottom"`)
+- `sideOffset`: Distance from trigger in pixels (default: `4`)
+- `alignOffset`: Offset along the alignment axis
+- `className`: Additional CSS classes
+
+**Default styling:**
+- Width: `w-72` (18rem)
+- Padding: `p-4`
+- Border: rounded with shadow
+- Animations: fade and zoom on open/close
+
+### PopoverAnchor
+
+An optional anchor element for positioning the popover independently from the trigger.
+
+```tsx
+<PopoverAnchor asChild?: boolean>
+```
+
+**Props:**
+- `asChild`: Merge props with child element
+
+## Accessibility
+
+The Popover component follows WAI-ARIA guidelines:
+
+- **Keyboard Navigation:**
+  - `Enter` or `Space` on trigger opens the popover
+  - `Escape` closes the popover
+  - Focus is trapped within the popover when open
+  - Focus returns to trigger on close
+
+- **Screen Readers:**
+  - Proper ARIA attributes for popover relationship
+  - Content is announced when opened
+  - State changes are communicated
+
+- **Focus Management:**
+  - Focus moves to popover content when opened
+  - Focus is trapped within popover
+  - Focus returns to trigger when closed
+
+- **Best Practices:**
+  - Use `asChild` on triggers to maintain semantic HTML
+  - Ensure interactive content is keyboard accessible
+  - Provide clear, concise content
+  - Avoid nesting popovers
+
+## Source
+
+View the source code on GitHub:
+- Component: `packages/ui/src/components/ui/popover.tsx:12-29`
+- Based on: [@radix-ui/react-popover](https://www.radix-ui.com/primitives/docs/components/popover)

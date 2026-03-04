@@ -1,0 +1,571 @@
+---
+title: '@poketto/tiptap'
+description: 'A beautiful, extensible rich text editor built on Tiptap with support for markdown, code blocks, images, and more'
+---
+
+## Overview
+
+`@poketto/tiptap` provides production-ready rich text editor components built on [Tiptap](https://tiptap.dev/). It includes multiple editor variants with different feature sets and styling options.
+
+## Features
+
+- 📝 Rich text formatting (bold, italic, underline, strike-through)
+- 🎨 Text colors and highlighting
+- 📋 Lists (ordered & unordered)
+- 🖼️ Image upload with drag & drop
+- 💻 Code blocks with syntax highlighting
+- 🔗 Link management with bubble menu
+- ↔️ Typography enhancements
+- ⌨️ Markdown shortcuts
+- 🎯 Placeholder support
+- 🌓 Dark mode compatible
+- ♿ Fully accessible
+
+## Installation
+
+```bash
+pnpm add @poketto/tiptap
+```
+
+<Note>
+  `@poketto/tiptap` requires `@poketto/ui` as a peer dependency.
+</Note>
+
+```bash
+pnpm add @poketto/ui
+```
+
+## Quick Start
+
+### Basic Usage
+
+```tsx
+import { MinimalTiptapEditor } from '@poketto/tiptap/minimal-tiptap'
+import '@poketto/tiptap/tiptap.css'
+import { useState } from 'react'
+
+export function Editor() {
+  const [content, setContent] = useState('')
+
+  return (
+    <MinimalTiptapEditor
+      value={content}
+      onChange={setContent}
+      placeholder="Start typing..."
+    />
+  )
+}
+```
+
+### Form Integration
+
+```tsx
+import { MinimalTiptapEditor } from '@poketto/tiptap/minimal-tiptap'
+import { useForm } from 'react-hook-form'
+import { Button } from '@poketto/ui/button'
+
+interface FormData {
+  content: string
+}
+
+export function ArticleForm() {
+  const { handleSubmit, setValue, watch } = useForm<FormData>()
+  const content = watch('content')
+
+  const onSubmit = (data: FormData) => {
+    console.log('Article content:', data.content)
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <MinimalTiptapEditor
+        value={content}
+        onChange={(value) => setValue('content', value as string)}
+        placeholder="Write your article..."
+      />
+      <Button type="submit">Publish</Button>
+    </form>
+  )
+}
+```
+
+## Available Editors
+
+`@poketto/tiptap` provides three editor variants:
+
+### MinimalTiptapEditor
+
+Full-featured editor with all formatting options:
+
+```tsx
+import { MinimalTiptapEditor } from '@poketto/tiptap/minimal-tiptap'
+```
+
+### MinimalTiptapOne
+
+Simplified editor with basic formatting:
+
+```tsx
+import { MinimalTiptapOne } from '@poketto/tiptap/minimal-tiptap-one'
+```
+
+### MinimalTiptapThree
+
+Compact editor for comments and short content:
+
+```tsx
+import { MinimalTiptapThree } from '@poketto/tiptap/minimal-tiptap-three'
+```
+
+## Props
+
+<ResponseField name="value" type="Content">
+  Editor content (HTML string, JSON, or plain text)
+</ResponseField>
+
+<ResponseField name="onChange" type="(value: Content) => void">
+  Callback when content changes
+</ResponseField>
+
+<ResponseField name="onBlur" type="(value: Content) => void">
+  Callback when editor loses focus
+</ResponseField>
+
+<ResponseField name="output" type="'html' | 'json' | 'text'" default="'html'">
+  Output format for content
+</ResponseField>
+
+<ResponseField name="placeholder" type="string">
+  Placeholder text when editor is empty
+</ResponseField>
+
+<ResponseField name="editorClassName" type="string">
+  Custom CSS class for the editor content area
+</ResponseField>
+
+<ResponseField name="className" type="string">
+  Custom CSS class for the editor container
+</ResponseField>
+
+<ResponseField name="editorContentClassName" type="string">
+  Custom CSS class for the EditorContent wrapper
+</ResponseField>
+
+<ResponseField name="throttleDelay" type="number" default="0">
+  Delay in milliseconds to throttle onChange events
+</ResponseField>
+
+<ResponseField name="editable" type="boolean" default="true">
+  Whether the editor is editable
+</ResponseField>
+
+<ResponseField name="autofocus" type="boolean | 'start' | 'end'" default="false">
+  Auto-focus behavior on mount
+</ResponseField>
+
+## Output Formats
+
+### HTML Output (Default)
+
+```tsx
+const [content, setContent] = useState('')
+
+<MinimalTiptapEditor
+  value={content}
+  onChange={setContent}
+  output="html"
+/>
+
+// Output: "<p>Hello <strong>world</strong></p>"
+```
+
+### JSON Output
+
+```tsx
+const [content, setContent] = useState({})
+
+<MinimalTiptapEditor
+  value={content}
+  onChange={setContent}
+  output="json"
+/>
+
+// Output: { type: 'doc', content: [...] }
+```
+
+### Plain Text Output
+
+```tsx
+const [content, setContent] = useState('')
+
+<MinimalTiptapEditor
+  value={content}
+  onChange={setContent}
+  output="text"
+/>
+
+// Output: "Hello world"
+```
+
+## Image Upload
+
+### Custom Upload Function
+
+The editor includes a configurable image upload handler:
+
+```tsx
+import { useMinimalTiptapEditor } from '@poketto/tiptap/minimal-tiptap'
+
+const editor = useMinimalTiptapEditor({
+  value: content,
+  onUpdate: setContent,
+  // Custom upload implementation
+  extensions: [
+    Image.configure({
+      uploadFn: async (file) => {
+        // Upload to your server/CDN
+        const formData = new FormData()
+        formData.append('file', file)
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+        
+        const { url } = await response.json()
+        return url // Return the uploaded image URL
+      },
+    }),
+  ],
+})
+```
+
+### Drag & Drop Images
+
+Images can be added via:
+- Drag and drop from file explorer
+- Paste from clipboard
+- Image toolbar button
+
+### Image Configuration
+
+The default configuration in the source:
+
+```tsx
+Image.configure({
+  allowedMimeTypes: ['image/*'],
+  maxFileSize: 5 * 1024 * 1024, // 5MB
+  allowBase64: true,
+  uploadFn: async (file) => {
+    // Default: convert to base64
+    const src = await fileToBase64(file)
+    return { id: randomId(), src }
+  },
+})
+```
+
+## Toolbar Customization
+
+### Custom Toolbar
+
+Create your own toolbar with specific actions:
+
+```tsx
+import { EditorContent, useEditor } from '@tiptap/react'
+import { StarterKit } from '@tiptap/starter-kit'
+import { Button } from '@poketto/ui/button'
+
+function CustomEditor() {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: '',
+  })
+
+  if (!editor) return null
+
+  return (
+    <div className="border rounded-lg">
+      <div className="border-b p-2 flex gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          data-active={editor.isActive('bold')}
+        >
+          Bold
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          data-active={editor.isActive('italic')}
+        >
+          Italic
+        </Button>
+      </div>
+      <EditorContent editor={editor} className="p-4" />
+    </div>
+  )
+}
+```
+
+## Code Blocks
+
+The editor includes syntax highlighting for code blocks:
+
+```tsx
+// Users can create code blocks with:
+// 1. Type ``` followed by language name
+// 2. Use the code block button in toolbar
+```
+
+Supported languages include JavaScript, TypeScript, Python, HTML, CSS, and more via [lowlight](https://github.com/wooorm/lowlight).
+
+## Advanced Usage
+
+### Controlled Editor with Throttling
+
+```tsx
+import { MinimalTiptapEditor } from '@poketto/tiptap/minimal-tiptap'
+import { useState, useEffect } from 'react'
+
+export function AutoSaveEditor() {
+  const [content, setContent] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    if (!content) return
+    
+    const timer = setTimeout(async () => {
+      setIsSaving(true)
+      await fetch('/api/save', {
+        method: 'POST',
+        body: JSON.stringify({ content }),
+      })
+      setIsSaving(false)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [content])
+
+  return (
+    <div>
+      <div className="mb-2 text-sm text-muted-foreground">
+        {isSaving ? 'Saving...' : 'Saved'}
+      </div>
+      <MinimalTiptapEditor
+        value={content}
+        onChange={setContent}
+        throttleDelay={500}
+      />
+    </div>
+  )
+}
+```
+
+### Read-Only Mode
+
+```tsx
+<MinimalTiptapEditor
+  value={content}
+  onChange={() => {}} // No-op
+  editable={false}
+  className="bg-muted"
+/>
+```
+
+### Character Counter
+
+```tsx
+import { useEditor } from '@tiptap/react'
+import { StarterKit } from '@tiptap/starter-kit'
+import { CharacterCount } from '@tiptap/extension-character-count'
+
+const limit = 280
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    CharacterCount.configure({ limit }),
+  ],
+})
+
+const percentage = editor
+  ? Math.round((100 / limit) * editor.storage.characterCount.characters())
+  : 0
+
+return (
+  <div>
+    <EditorContent editor={editor} />
+    <div className="text-sm text-muted-foreground">
+      {editor?.storage.characterCount.characters()} / {limit} characters
+    </div>
+  </div>
+)
+```
+
+## Styling
+
+### Custom Styles
+
+Import the base styles and override as needed:
+
+```tsx
+import '@poketto/tiptap/tiptap.css'
+
+// In your CSS file:
+.minimal-tiptap-editor {
+  min-height: 200px;
+}
+
+.minimal-tiptap-editor .ProseMirror {
+  padding: 1rem;
+}
+
+.minimal-tiptap-editor .ProseMirror:focus {
+  outline: none;
+}
+```
+
+### Dark Mode
+
+The editor automatically adapts to your theme:
+
+```tsx
+import { ThemeProvider } from 'next-themes'
+
+<ThemeProvider attribute="class">
+  <MinimalTiptapEditor
+    value={content}
+    onChange={setContent}
+  />
+</ThemeProvider>
+```
+
+## Keyboard Shortcuts
+
+- `Ctrl/Cmd + B` - Bold
+- `Ctrl/Cmd + I` - Italic
+- `Ctrl/Cmd + U` - Underline
+- `Ctrl/Cmd + Shift + S` - Strike-through
+- `Ctrl/Cmd + Shift + C` - Code
+- `Ctrl/Cmd + K` - Add link
+- `Ctrl/Cmd + Shift + 7` - Ordered list
+- `Ctrl/Cmd + Shift + 8` - Bullet list
+- `Ctrl/Cmd + Alt + 1-6` - Headings
+- `Ctrl/Cmd + Shift + >` - Blockquote
+- ` ``` ` - Code block
+- `---` - Horizontal rule
+
+## TypeScript
+
+Full TypeScript support:
+
+```tsx
+import type { 
+  MinimalTiptapProps,
+  UseMinimalTiptapEditorProps 
+} from '@poketto/tiptap/minimal-tiptap'
+import type { Content, Editor } from '@tiptap/react'
+
+const editorProps: MinimalTiptapProps = {
+  value: '',
+  onChange: (value: Content) => console.log(value),
+  output: 'html',
+  placeholder: 'Start typing...',
+}
+```
+
+## Examples
+
+### Comment System
+
+```tsx
+import { MinimalTiptapThree } from '@poketto/tiptap/minimal-tiptap-three'
+import { Button } from '@poketto/ui/button'
+import { useState } from 'react'
+
+export function CommentBox() {
+  const [comment, setComment] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async () => {
+    if (!comment) return
+    
+    setIsSubmitting(true)
+    await fetch('/api/comments', {
+      method: 'POST',
+      body: JSON.stringify({ content: comment }),
+    })
+    setComment('')
+    setIsSubmitting(false)
+  }
+
+  return (
+    <div className="space-y-2">
+      <MinimalTiptapThree
+        value={comment}
+        onChange={setComment}
+        placeholder="Add a comment..."
+        className="min-h-[100px]"
+      />
+      <div className="flex justify-end">
+        <Button 
+          onClick={handleSubmit} 
+          disabled={isSubmitting || !comment}
+        >
+          Post Comment
+        </Button>
+      </div>
+    </div>
+  )
+}
+```
+
+### Blog Post Editor
+
+```tsx
+import { MinimalTiptapEditor } from '@poketto/tiptap/minimal-tiptap'
+import { Input } from '@poketto/ui/input'
+import { Button } from '@poketto/ui/button'
+import { useState } from 'react'
+
+export function BlogEditor() {
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+
+  const handlePublish = async () => {
+    await fetch('/api/posts', {
+      method: 'POST',
+      body: JSON.stringify({ title, content }),
+    })
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-4 p-8">
+      <Input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Post title"
+        className="text-3xl font-bold border-none"
+      />
+      <MinimalTiptapEditor
+        value={content}
+        onChange={setContent}
+        placeholder="Tell your story..."
+        className="min-h-[500px]"
+      />
+      <div className="flex justify-end gap-2">
+        <Button variant="outline">Save Draft</Button>
+        <Button onClick={handlePublish}>Publish</Button>
+      </div>
+    </div>
+  )
+}
+```
+
+## Related Packages
+
+- [@poketto/ui](/packages/ui) - UI component library
+- [@poketto/pro-table](/packages/pro-table) - Data table components
+- [@poketto/cli](/packages/cli) - CLI tooling

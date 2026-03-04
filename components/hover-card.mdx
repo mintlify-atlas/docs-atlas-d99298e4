@@ -1,0 +1,356 @@
+---
+title: Hover Card
+description: A card that appears when hovering over an element. Use for displaying rich previews and contextual information on hover.
+---
+
+## Overview
+
+The Hover Card component displays rich content when users hover over or focus on an element. Unlike tooltips (which show brief text), hover cards can contain formatted content, images, and complex layouts.
+
+Use hover cards when you need to:
+- Show user profile previews
+- Display link previews or metadata
+- Provide rich context about an element
+- Show detailed information without navigation
+
+## Installation
+
+The Hover Card component is built on Radix UI primitives and available in the Poketto UI package.
+
+```tsx
+import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+Hover Card uses a composition pattern with separate trigger and content components:
+
+```tsx
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function BasicHoverCard() {
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <Button variant="link">@poketto</Button>
+      </HoverCardTrigger>
+      <HoverCardContent>
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold">@poketto</h4>
+          <p className="text-sm text-muted-foreground">
+            A modern stack for building beautiful web applications.
+          </p>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+```
+
+## Examples
+
+### User Profile Preview
+
+Hover cards are perfect for showing user profiles:
+
+```tsx
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@poketto/ui";
+import { Avatar, AvatarFallback, AvatarImage } from "@poketto/ui";
+import { CalendarDays } from "lucide-react";
+
+export default function UserProfileHoverCard() {
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <a
+          href="#"
+          className="text-sm font-medium underline underline-offset-4"
+        >
+          @nextjs
+        </a>
+      </HoverCardTrigger>
+      <HoverCardContent className="w-80">
+        <div className="flex justify-between space-x-4">
+          <Avatar>
+            <AvatarImage src="https://github.com/vercel.png" />
+            <AvatarFallback>VC</AvatarFallback>
+          </Avatar>
+          <div className="space-y-1">
+            <h4 className="text-sm font-semibold">@nextjs</h4>
+            <p className="text-sm text-muted-foreground">
+              The React Framework for the Web
+            </p>
+            <div className="flex items-center pt-2">
+              <CalendarDays className="mr-2 h-4 w-4 opacity-70" />
+              <span className="text-xs text-muted-foreground">
+                Joined December 2021
+              </span>
+            </div>
+          </div>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+```
+
+### Link Preview
+
+Show rich previews of links before users click:
+
+```tsx
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@poketto/ui";
+import { ExternalLink } from "lucide-react";
+
+export default function LinkPreviewHoverCard() {
+  return (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <a
+          href="https://radix-ui.com"
+          className="inline-flex items-center gap-1 text-sm font-medium underline underline-offset-4"
+        >
+          Radix UI
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      </HoverCardTrigger>
+      <HoverCardContent className="w-80">
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold">Radix UI</h4>
+          <p className="text-sm text-muted-foreground">
+            Unstyled, accessible components for building high-quality design
+            systems and web apps in React.
+          </p>
+          <div className="flex items-center pt-2">
+            <span className="text-xs text-muted-foreground">
+              radix-ui.com
+            </span>
+          </div>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+```
+
+### Positioning Options
+
+Control where the hover card appears relative to the trigger:
+
+```tsx
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function HoverCardPositions() {
+  return (
+    <div className="flex gap-4">
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button variant="outline">Top</Button>
+        </HoverCardTrigger>
+        <HoverCardContent side="top">
+          <p>This card appears above the trigger.</p>
+        </HoverCardContent>
+      </HoverCard>
+
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button variant="outline">Bottom</Button>
+        </HoverCardTrigger>
+        <HoverCardContent side="bottom">
+          <p>This card appears below the trigger.</p>
+        </HoverCardContent>
+      </HoverCard>
+
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button variant="outline">Left</Button>
+        </HoverCardTrigger>
+        <HoverCardContent side="left">
+          <p>This card appears to the left.</p>
+        </HoverCardContent>
+      </HoverCard>
+
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button variant="outline">Right</Button>
+        </HoverCardTrigger>
+        <HoverCardContent side="right">
+          <p>This card appears to the right.</p>
+        </HoverCardContent>
+      </HoverCard>
+    </div>
+  );
+}
+```
+
+### Alignment Control
+
+Align the hover card content relative to the trigger:
+
+```tsx
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function HoverCardAlignment() {
+  return (
+    <div className="flex gap-4">
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button variant="outline">Align Start</Button>
+        </HoverCardTrigger>
+        <HoverCardContent align="start">
+          <p>Aligned to the start of the trigger.</p>
+        </HoverCardContent>
+      </HoverCard>
+
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button variant="outline">Align Center</Button>
+        </HoverCardTrigger>
+        <HoverCardContent align="center">
+          <p>Centered on the trigger (default).</p>
+        </HoverCardContent>
+      </HoverCard>
+
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button variant="outline">Align End</Button>
+        </HoverCardTrigger>
+        <HoverCardContent align="end">
+          <p>Aligned to the end of the trigger.</p>
+        </HoverCardContent>
+      </HoverCard>
+    </div>
+  );
+}
+```
+
+### Custom Open Delay
+
+Control how long users must hover before the card appears:
+
+```tsx
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function HoverCardWithDelay() {
+  return (
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger asChild>
+        <Button variant="outline">Quick hover card</Button>
+      </HoverCardTrigger>
+      <HoverCardContent>
+        <p>This card appears quickly (200ms delay).</p>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+```
+
+## Component API
+
+### HoverCard
+
+The root component that manages hover card state.
+
+```tsx
+<HoverCard
+  defaultOpen?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  openDelay?: number
+  closeDelay?: number
+>
+```
+
+**Props:**
+- `defaultOpen`: The initial open state (uncontrolled)
+- `open`: Controlled open state
+- `onOpenChange`: Callback when open state changes
+- `openDelay`: Time in ms before card appears (default: `700`)
+- `closeDelay`: Time in ms before card closes (default: `300`)
+
+### HoverCardTrigger
+
+The element that triggers the hover card on hover or focus.
+
+```tsx
+<HoverCardTrigger asChild?: boolean>
+```
+
+**Props:**
+- `asChild`: Merge props with child element instead of rendering a button
+
+### HoverCardContent
+
+The content container that appears when hovering over the trigger.
+
+```tsx
+<HoverCardContent
+  align?: "start" | "center" | "end"
+  side?: "top" | "right" | "bottom" | "left"
+  sideOffset?: number
+  alignOffset?: number
+  className?: string
+>
+```
+
+**Props:**
+- `align`: Alignment relative to trigger (default: `"center"`)
+- `side`: Which side of trigger to appear on (default: `"bottom"`)
+- `sideOffset`: Distance from trigger in pixels (default: `4`)
+- `alignOffset`: Offset along the alignment axis
+- `className`: Additional CSS classes
+
+**Default styling:**
+- Width: `w-64` (16rem)
+- Padding: `p-4`
+- Border: rounded with shadow
+- Background: `bg-popover`
+- Text: `text-popover-foreground`
+- Animations: fade and zoom on open/close
+
+## Accessibility
+
+The Hover Card component follows WAI-ARIA guidelines:
+
+- **Keyboard Navigation:**
+  - Hover cards appear on focus as well as hover
+  - `Escape` closes the hover card
+  - Focus remains on the trigger element
+
+- **Screen Readers:**
+  - Content is announced when hover card appears
+  - Proper ARIA attributes for relationship
+  - State changes are communicated
+
+- **Focus Management:**
+  - Hover cards don't trap focus
+  - Trigger remains focusable
+  - Hovering over content keeps card open
+
+- **Best Practices:**
+  - Use `asChild` on triggers to maintain semantic HTML
+  - Keep content concise and scannable
+  - Don't put interactive elements in hover cards (use Popover instead)
+  - Ensure trigger text is meaningful
+  - Provide sufficient contrast for content
+  - Don't use hover cards for essential information (mobile users can't hover)
+
+## Hover Card vs Tooltip vs Popover
+
+- **Tooltip**: Brief text labels (1-2 lines). Appears on hover/focus. No interactive content.
+- **Hover Card**: Rich previews with formatted content. Appears on hover/focus. Limited interaction.
+- **Popover**: Interactive overlays with forms, buttons, etc. Appears on click. Full interaction.
+
+## Source
+
+View the source code on GitHub:
+- Component: `packages/ui/src/components/ui/hover-card.tsx:12-27`
+- Based on: [@radix-ui/react-hover-card](https://www.radix-ui.com/primitives/docs/components/hover-card)

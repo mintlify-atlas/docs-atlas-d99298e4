@@ -1,0 +1,361 @@
+---
+title: Pagination
+description: Navigation component for dividing content across multiple pages.
+---
+
+Pagination helps users navigate through large sets of content by breaking it into manageable pages.
+
+## Installation
+
+```tsx
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+<Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationPrevious href="#" />
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#">1</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#" isActive>
+        2
+      </PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#">3</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationNext href="#" />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
+```
+
+## Examples
+
+### With Ellipsis
+
+```tsx
+<Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationPrevious href="#" />
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#">1</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#" isActive>
+        2
+      </PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#">3</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationEllipsis />
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#">10</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationNext href="#" />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
+```
+
+### With Next.js Link
+
+```tsx
+import Link from "next/link";
+
+<Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationPrevious href="/posts?page=1" />
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="/posts?page=1">1</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="/posts?page=2" isActive>
+        2
+      </PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="/posts?page=3">3</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationNext href="/posts?page=3" />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
+```
+
+### Dynamic Pagination
+
+```tsx
+function DynamicPagination({ currentPage, totalPages }: { currentPage: number; totalPages: number }) {
+  const pages = [];
+  
+  // Always show first page
+  pages.push(1);
+  
+  // Show ellipsis if needed
+  if (currentPage > 3) {
+    pages.push('ellipsis-start');
+  }
+  
+  // Show pages around current page
+  for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+    pages.push(i);
+  }
+  
+  // Show ellipsis if needed
+  if (currentPage < totalPages - 2) {
+    pages.push('ellipsis-end');
+  }
+  
+  // Always show last page if there's more than one page
+  if (totalPages > 1) {
+    pages.push(totalPages);
+  }
+
+  return (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious 
+            href={currentPage > 1 ? `?page=${currentPage - 1}` : '#'}
+            className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+          />
+        </PaginationItem>
+        {pages.map((page, index) => (
+          <PaginationItem key={index}>
+            {typeof page === 'number' ? (
+              <PaginationLink href={`?page=${page}`} isActive={page === currentPage}>
+                {page}
+              </PaginationLink>
+            ) : (
+              <PaginationEllipsis />
+            )}
+          </PaginationItem>
+        ))}
+        <PaginationItem>
+          <PaginationNext 
+            href={currentPage < totalPages ? `?page=${currentPage + 1}` : '#'}
+            className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
+}
+
+// Usage
+<DynamicPagination currentPage={5} totalPages={20} />
+```
+
+### Compact Pagination
+
+```tsx
+<Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationPrevious href="#" />
+    </PaginationItem>
+    <PaginationItem>
+      <span className="text-sm text-muted-foreground">
+        Page 2 of 10
+      </span>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationNext href="#" />
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
+```
+
+### With Custom Sizes
+
+```tsx
+<Pagination>
+  <PaginationContent>
+    <PaginationItem>
+      <PaginationLink href="#" size="default">1</PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#" size="default" isActive>
+        2
+      </PaginationLink>
+    </PaginationItem>
+    <PaginationItem>
+      <PaginationLink href="#" size="default">3</PaginationLink>
+    </PaginationItem>
+  </PaginationContent>
+</Pagination>
+```
+
+### Server-Side Pagination
+
+```tsx
+import { useRouter, useSearchParams } from "next/navigation";
+
+function ServerPagination({ totalPages }: { totalPages: number }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get('page')) || 1;
+
+  const navigateToPage = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', page.toString());
+    router.push(`?${params.toString()}`);
+  };
+
+  return (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious 
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (currentPage > 1) navigateToPage(currentPage - 1);
+            }}
+          />
+        </PaginationItem>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <PaginationItem key={page}>
+            <PaginationLink
+              href="#"
+              isActive={page === currentPage}
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToPage(page);
+              }}
+            >
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+        <PaginationItem>
+          <PaginationNext 
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (currentPage < totalPages) navigateToPage(currentPage + 1);
+            }}
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
+}
+```
+
+## Component API
+
+### Pagination
+
+Root navigation container.
+
+**Props:**
+- Extends `React.ComponentProps<"nav">`
+- Automatically sets `aria-label="pagination"`
+
+### PaginationContent
+
+Unordered list container for pagination items.
+
+**Props:**
+- Extends `React.ComponentProps<"ul">`
+
+### PaginationItem
+
+Individual pagination item wrapper.
+
+**Props:**
+- Extends `React.ComponentProps<"li">`
+
+### PaginationLink
+
+Clickable page link.
+
+**Props:**
+- Extends `React.ComponentProps<"a">`
+- `isActive?: boolean` - Indicates the current page
+- `size?: ButtonProps["size"]` - Size variant (default: "icon")
+- Styled using button variants (outline when active, ghost otherwise)
+
+### PaginationPrevious
+
+Previous page navigation link.
+
+**Props:**
+- Extends `PaginationLink` props
+- `size` defaults to "default"
+- Automatically includes ChevronLeft icon and "Previous" text
+- Sets `aria-label="Go to previous page"`
+
+### PaginationNext
+
+Next page navigation link.
+
+**Props:**
+- Extends `PaginationLink` props
+- `size` defaults to "default"
+- Automatically includes ChevronRight icon and "Next" text
+- Sets `aria-label="Go to next page"`
+
+### PaginationEllipsis
+
+Indicates skipped pages.
+
+**Props:**
+- Extends `React.ComponentProps<"span">`
+- Renders a MoreHorizontal icon from lucide-react
+- Includes screen reader text "More pages"
+- Sets `aria-hidden` on the visual element
+
+## Composition Pattern
+
+The Pagination component follows this structure:
+
+```
+Pagination (nav)
+  └─ PaginationContent (ul)
+      ├─ PaginationItem (li)
+      │   └─ PaginationPrevious (a)
+      ├─ PaginationItem (li)
+      │   └─ PaginationLink (a)
+      ├─ PaginationItem (li)
+      │   └─ PaginationEllipsis (span)
+      └─ PaginationItem (li)
+          └─ PaginationNext (a)
+```
+
+## Accessibility
+
+- The root `Pagination` component renders a `<nav>` element with `aria-label="pagination"`
+- `PaginationContent` uses semantic `<ul>` for proper list structure
+- Active page is indicated with `aria-current="page"` on `PaginationLink`
+- Previous/Next buttons include descriptive `aria-label` attributes
+- `PaginationEllipsis` uses `aria-hidden` to hide decorative icon from screen readers
+- Screen reader text "More pages" provides context for ellipsis
+- Disabled states should use `pointer-events-none` and reduced opacity
+- Uses button styling from the Button component for consistent interaction states

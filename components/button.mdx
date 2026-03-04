@@ -1,0 +1,193 @@
+---
+title: Button
+description: A versatile button component with multiple variants and sizes for triggering actions.
+---
+
+## Introduction
+
+The Button component is a foundational UI element built on top of Radix UI's Slot primitive. It supports multiple visual variants, sizes, and can render as a child component using the `asChild` prop.
+
+## Installation
+
+The Button component is available as part of the `@poketto/ui` package:
+
+```tsx
+import { Button } from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+import { Button } from "@poketto/ui";
+
+export default function Example() {
+  return <Button>Click me</Button>;
+}
+```
+
+## Examples
+
+### Variants
+
+The Button component supports six different visual variants:
+
+```tsx
+import { Button } from "@poketto/ui";
+
+export default function ButtonVariants() {
+  return (
+    <div className="flex gap-4 flex-wrap">
+      <Button variant="default">Default</Button>
+      <Button variant="destructive">Destructive</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link</Button>
+    </div>
+  );
+}
+```
+
+### Sizes
+
+Buttons come in four different sizes:
+
+```tsx
+import { Button } from "@poketto/ui";
+
+export default function ButtonSizes() {
+  return (
+    <div className="flex items-center gap-4">
+      <Button size="sm">Small</Button>
+      <Button size="default">Default</Button>
+      <Button size="lg">Large</Button>
+      <Button size="icon">🔍</Button>
+    </div>
+  );
+}
+```
+
+### Icon Button
+
+Use the `icon` size for square buttons with icons:
+
+```tsx
+import { Button } from "@poketto/ui";
+import { Search } from "lucide-react";
+
+export default function IconButton() {
+  return (
+    <Button size="icon" variant="outline">
+      <Search />
+    </Button>
+  );
+}
+```
+
+### As Child (Polymorphic)
+
+Use the `asChild` prop to render the button as a different element:
+
+```tsx
+import { Button } from "@poketto/ui";
+import Link from "next/link";
+
+export default function ButtonAsChild() {
+  return (
+    <Button asChild>
+      <Link href="/dashboard">Go to Dashboard</Link>
+    </Button>
+  );
+}
+```
+
+### Disabled State
+
+```tsx
+import { Button } from "@poketto/ui";
+
+export default function DisabledButton() {
+  return <Button disabled>Disabled</Button>;
+}
+```
+
+### With Loading State
+
+```tsx
+import { Button } from "@poketto/ui";
+import { Loader2 } from "lucide-react";
+
+export default function LoadingButton() {
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  return (
+    <Button disabled={isLoading}>
+      {isLoading && <Loader2 className="animate-spin" />}
+      {isLoading ? "Loading..." : "Submit"}
+    </Button>
+  );
+}
+```
+
+## Props
+
+<ParamField path="variant" type="string" default="default">
+  The visual style variant of the button.
+  
+  Options: `"default"` | `"destructive"` | `"outline"` | `"secondary"` | `"ghost"` | `"link"`
+</ParamField>
+
+<ParamField path="size" type="string" default="default">
+  The size of the button.
+  
+  Options: `"default"` | `"sm"` | `"lg"` | `"icon"`
+</ParamField>
+
+<ParamField path="asChild" type="boolean" default="false">
+  When `true`, the button will render as a Slot component, allowing you to use it as a wrapper that merges props with its child element.
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  When `true`, disables the button and reduces opacity.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the button.
+</ParamField>
+
+<ParamField path="onClick" type="(event: React.MouseEvent<HTMLButtonElement>) => void">
+  Click event handler.
+</ParamField>
+
+The Button component also accepts all standard HTML button attributes (`type`, `name`, `value`, etc.).
+
+## Form Integration
+
+Buttons work seamlessly with forms and React Hook Form:
+
+```tsx
+import { Button } from "@poketto/ui";
+import { useForm } from "react-hook-form";
+
+interface FormData {
+  email: string;
+}
+
+export default function FormExample() {
+  const { handleSubmit, formState: { isSubmitting } } = useForm<FormData>();
+
+  const onSubmit = async (data: FormData) => {
+    // Handle form submission
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {/* Form fields */}
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Submitting..." : "Submit"}
+      </Button>
+    </form>
+  );
+}
+```

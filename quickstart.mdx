@@ -1,80 +1,189 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Get up and running with Poketto Stack in minutes. Clone the repository, install dependencies, and start building.
 ---
 
-## Get started in three steps
+Get started with Poketto Stack, a production-ready frontend boilerplate built with shadcn/ui, React, TypeScript, and Vite.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Clone the repository">
+    Clone the Poketto Stack repository to your local machine:
 
-### Step 1: Set up your local environment
+    ```bash
+    git clone https://github.com/TinsFox/poketto-stack.git
+    cd poketto-stack
+    ```
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Install dependencies">
+    Poketto Stack uses pnpm as its package manager. Install all dependencies:
 
-### Step 2: Deploy your changes
+    ```bash
+    pnpm install
+    ```
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    <Note>
+      Make sure you have pnpm installed. If not, install it with `npm install -g pnpm` or see the [Installation](/installation) guide for more details.
+    </Note>
+  </Step>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+  <Step title="Start the development server">
+    Launch the admin application in development mode:
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    ```bash
+    pnpm admin:dev
+    ```
 
-### Step 3: Go live
+    This runs the Vite development server with React Router. Open [http://localhost:5173](http://localhost:5173) in your browser to see your application.
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    <CodeGroup>
+    ```bash Admin App
+    pnpm admin:dev
+    ```
 
-## Next steps
+    ```bash All Apps (Monorepo)
+    pnpm dev
+    ```
 
-Now that you have your docs running, explore these key features:
+    ```bash Tauri Desktop App
+    pnpm tauri:dev
+    ```
+    </CodeGroup>
+  </Step>
 
-<CardGroup cols={2}>
+  <Step title="Explore with Storybook">
+    Poketto Stack includes Storybook for developing UI components in isolation:
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
+    ```bash
+    cd apps/admin
+    pnpm storybook
+    ```
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
+    Storybook will open at [http://localhost:6006](http://localhost:6006), where you can browse and interact with all UI components.
+  </Step>
+</Steps>
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
+## Project Structure
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
+Poketto Stack is organized as a monorepo with the following structure:
 
-</CardGroup>
+```
+poketto-stack/
+├── apps/
+│   ├── admin/          # Main admin application
+│   ├── api/            # API service
+│   ├── docs/           # Documentation site
+│   ├── tauri/          # Tauri desktop app
+│   └── website/        # Marketing website
+├── packages/
+│   ├── ui/             # shadcn/ui components
+│   ├── pro-table/      # Advanced table components
+│   ├── tiptap/         # Rich text editor
+│   └── cli/            # CLI tools
+└── package.json        # Root workspace configuration
+```
+
+## Create Your First Component
+
+Let's create a simple custom component using the shadcn/ui Button:
+
+<Steps>
+  <Step title="Create the component file">
+    Create a new file in `apps/admin/app/components/welcome-button.tsx`:
+
+    ```tsx apps/admin/app/components/welcome-button.tsx
+    import { Button } from "@poketto/ui/button";
+
+    export function WelcomeButton() {
+      return (
+        <Button onClick={() => alert("Welcome to Poketto Stack!")}>
+          Click me
+        </Button>
+      );
+    }
+    ```
+  </Step>
+
+  <Step title="Use the component">
+    Import and use your component in any route, for example in `apps/admin/app/routes/(main)/index.tsx`:
+
+    ```tsx
+    import { WelcomeButton } from "~/components/welcome-button";
+
+    export default function Home() {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <WelcomeButton />
+        </div>
+      );
+    }
+    ```
+  </Step>
+
+  <Step title="See it in action">
+    Your development server should automatically reload. Visit your app to see the new button in action!
+  </Step>
+</Steps>
+
+## Available Scripts
+
+Poketto Stack provides several npm scripts for common tasks:
+
+| Script | Description |
+|--------|-------------|
+| `pnpm dev` | Run all apps in development mode |
+| `pnpm admin:dev` | Run admin app only |
+| `pnpm admin:build` | Build admin app for production |
+| `pnpm storybook` | Launch Storybook component explorer |
+| `pnpm test` | Run tests in watch mode |
+| `pnpm test:coverage` | Run tests with coverage report |
+| `pnpm lint` | Lint code with Biome |
+| `pnpm format` | Format code with Biome |
+| `pnpm check` | Run Biome checks and auto-fix issues |
+
+## Working with UI Components
+
+Poketto Stack includes a comprehensive set of shadcn/ui components in the `@poketto/ui` package:
+
+```tsx Example: Using multiple components
+import { Button } from "@poketto/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@poketto/ui/card";
+import { Input } from "@poketto/ui/input";
+import { Label } from "@poketto/ui/label";
+
+export function LoginForm() {
+  return (
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Login</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" placeholder="Enter your email" />
+        </div>
+        <Button className="w-full">Sign In</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  All UI components are pre-configured with Tailwind CSS variants and support dark mode out of the box.
 </Note>
+
+## Next Steps
+
+Now that you have Poketto Stack running, explore these topics:
+
+- **Forms**: Learn how to build forms with React Hook Form and Zod validation
+- **State Management**: Understand Jotai atoms for global state
+- **Data Fetching**: Use TanStack Query for server state management
+- **Routing**: Explore React Router file-based routing
+- **Internationalization**: Add multi-language support with i18next
+- **Testing**: Write tests with Vitest and Testing Library
+
+<Warning>
+  Before deploying to production, make sure to set up environment variables and configure your build settings. See the [Installation](/installation) guide for details.
+</Warning>

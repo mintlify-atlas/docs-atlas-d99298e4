@@ -1,0 +1,543 @@
+---
+title: Sheet
+description: A slide-out panel that overlays the page. Use for navigation, forms, and detailed content that extends the primary interface.
+---
+
+## Overview
+
+The Sheet component (also known as a drawer or slide-out panel) displays content that slides in from the edge of the viewport. It overlays the page with a backdrop and can slide from any of the four sides.
+
+Use sheets when you need to:
+- Show navigation menus on mobile
+- Display forms without leaving the current page
+- Present detailed information or settings
+- Create multi-step workflows
+- Provide filtering or sorting options
+
+## Installation
+
+The Sheet component is built on Radix UI Dialog primitives and available in the Poketto UI package.
+
+```tsx
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+  SheetClose,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+Sheet uses a composition pattern with separate trigger and content components:
+
+```tsx
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function BasicSheet() {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline">Open Sheet</Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Sheet Title</SheetTitle>
+          <SheetDescription>
+            Make changes to your profile here. Click save when you're done.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="py-4">
+          <p>Your sheet content goes here.</p>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
+## Examples
+
+### Sheet with Form
+
+Sheets are ideal for forms that don't require a full page:
+
+```tsx
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+  SheetClose,
+} from "@poketto/ui";
+import { Button, Input, Label } from "@poketto/ui";
+
+export default function SheetWithForm() {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button>Edit Profile</Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Edit profile</SheetTitle>
+          <SheetDescription>
+            Make changes to your profile here. Click save when you're done.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="name" className="text-right">
+              Name
+            </Label>
+            <Input id="name" value="Pedro Duarte" className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="username" className="text-right">
+              Username
+            </Label>
+            <Input id="username" value="@peduarte" className="col-span-3" />
+          </div>
+        </div>
+        <SheetFooter>
+          <SheetClose asChild>
+            <Button type="submit">Save changes</Button>
+          </SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
+### Different Sides
+
+Sheets can slide in from any edge of the viewport:
+
+```tsx
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function SheetSides() {
+  return (
+    <div className="flex gap-2">
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline">Top</Button>
+        </SheetTrigger>
+        <SheetContent side="top">
+          <SheetHeader>
+            <SheetTitle>Sheet from Top</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            <p>This sheet slides in from the top.</p>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline">Bottom</Button>
+        </SheetTrigger>
+        <SheetContent side="bottom">
+          <SheetHeader>
+            <SheetTitle>Sheet from Bottom</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            <p>This sheet slides in from the bottom.</p>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline">Left</Button>
+        </SheetTrigger>
+        <SheetContent side="left">
+          <SheetHeader>
+            <SheetTitle>Sheet from Left</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            <p>This sheet slides in from the left.</p>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline">Right</Button>
+        </SheetTrigger>
+        <SheetContent side="right">
+          <SheetHeader>
+            <SheetTitle>Sheet from Right</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            <p>This sheet slides in from the right (default).</p>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+```
+
+### Mobile Navigation
+
+A common use case for sheets is mobile navigation:
+
+```tsx
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+import { Menu } from "lucide-react";
+
+export default function MobileNav() {
+  const navItems = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/services", label: "Services" },
+    { href: "/contact", label: "Contact" },
+  ];
+
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" size="icon" className="md:hidden">
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Toggle menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left">
+        <SheetHeader>
+          <SheetTitle>Navigation</SheetTitle>
+        </SheetHeader>
+        <nav className="flex flex-col gap-4 py-4">
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="text-lg font-medium transition-colors hover:text-primary"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
+### Filters Sheet
+
+Use sheets for filter and sorting controls:
+
+```tsx
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetClose,
+} from "@poketto/ui";
+import { Button, Checkbox, Label } from "@poketto/ui";
+import { SlidersHorizontal } from "lucide-react";
+
+export default function FiltersSheet() {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline">
+          <SlidersHorizontal className="mr-2 h-4 w-4" />
+          Filters
+        </Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Filters</SheetTitle>
+        </SheetHeader>
+        <div className="grid gap-4 py-4">
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Category</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="electronics" />
+                <label htmlFor="electronics" className="text-sm font-medium">
+                  Electronics
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="clothing" />
+                <label htmlFor="clothing" className="text-sm font-medium">
+                  Clothing
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="books" />
+                <label htmlFor="books" className="text-sm font-medium">
+                  Books
+                </label>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-3">
+            <Label className="text-base font-semibold">Price Range</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="under-25" />
+                <label htmlFor="under-25" className="text-sm font-medium">
+                  Under $25
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="25-50" />
+                <label htmlFor="25-50" className="text-sm font-medium">
+                  $25 - $50
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="over-50" />
+                <label htmlFor="over-50" className="text-sm font-medium">
+                  Over $50
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <SheetFooter>
+          <SheetClose asChild>
+            <Button variant="outline">Clear</Button>
+          </SheetClose>
+          <SheetClose asChild>
+            <Button>Apply Filters</Button>
+          </SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
+### Controlled Sheet
+
+Control the sheet's open state programmatically:
+
+```tsx
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+import { useState } from "react";
+
+export default function ControlledSheet() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="space-y-4">
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>
+          <Button>Open Controlled Sheet</Button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Controlled Sheet</SheetTitle>
+          </SheetHeader>
+          <div className="py-4">
+            <p>This sheet's state is controlled externally.</p>
+            <Button onClick={() => setOpen(false)} className="mt-4">
+              Close from inside
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+      <Button onClick={() => setOpen(true)} variant="outline">
+        Open from outside
+      </Button>
+    </div>
+  );
+}
+```
+
+## Component API
+
+### Sheet
+
+The root component that manages sheet state.
+
+```tsx
+<Sheet
+  defaultOpen?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  modal?: boolean
+>
+```
+
+**Props:**
+- `defaultOpen`: The initial open state (uncontrolled)
+- `open`: Controlled open state
+- `onOpenChange`: Callback when open state changes
+- `modal`: Whether to use modal behavior (default: `true`)
+
+### SheetTrigger
+
+The button or element that opens the sheet.
+
+```tsx
+<SheetTrigger asChild?: boolean>
+```
+
+**Props:**
+- `asChild`: Merge props with child element instead of rendering a button
+
+### SheetContent
+
+The panel that slides in from the edge.
+
+```tsx
+<SheetContent
+  side?: "top" | "right" | "bottom" | "left"
+  className?: string
+>
+```
+
+**Props:**
+- `side`: Which edge to slide from (default: `"right"`)
+- `className`: Additional CSS classes
+
+**Default styling by side:**
+- `top`: Full width, slides from top with border bottom
+- `bottom`: Full width, slides from bottom with border top
+- `left`: Full height, `w-3/4 sm:max-w-sm`, slides from left with border right
+- `right`: Full height, `w-3/4 sm:max-w-sm`, slides from right with border left
+
+**Common styling:**
+- Padding: `p-6`
+- Background: `bg-background`
+- Shadow: `shadow-lg`
+- Animations: Smooth slide and fade transitions
+- Includes close button in top-right corner
+
+### SheetHeader
+
+Container for the sheet's header content (title and description).
+
+```tsx
+<SheetHeader className?: string>
+```
+
+**Default styling:**
+- Flexbox column layout
+- Spacing: `space-y-2`
+- Text alignment: centered on mobile, left on desktop
+
+### SheetFooter
+
+Container for the sheet's footer content (typically action buttons).
+
+```tsx
+<SheetFooter className?: string>
+```
+
+**Default styling:**
+- Flexbox layout
+- Column-reverse on mobile, row on desktop
+- Right-aligned on desktop
+- Spacing: `space-x-2` on desktop
+
+### SheetTitle
+
+The accessible title for the sheet.
+
+```tsx
+<SheetTitle className?: string>
+```
+
+**Props:**
+- `className`: Additional CSS classes
+
+**Default styling:**
+- Font: `text-lg font-semibold`
+- Color: `text-foreground`
+
+**Note:** Required for accessibility. Screen readers use this to announce the sheet.
+
+### SheetDescription
+
+The accessible description for the sheet.
+
+```tsx
+<SheetDescription className?: string>
+```
+
+**Props:**
+- `className`: Additional CSS classes
+
+**Default styling:**
+- Font: `text-sm`
+- Color: `text-muted-foreground`
+
+### SheetClose
+
+A button that closes the sheet.
+
+```tsx
+<SheetClose asChild?: boolean>
+```
+
+**Props:**
+- `asChild`: Merge props with child element
+
+**Note:** A close button is automatically included in the top-right corner of SheetContent.
+
+## Accessibility
+
+The Sheet component follows WAI-ARIA dialog guidelines:
+
+- **Keyboard Navigation:**
+  - `Escape` closes the sheet
+  - `Tab` cycles through focusable elements within the sheet
+  - Focus is trapped within the sheet when open
+  - Focus returns to trigger when closed
+
+- **Screen Readers:**
+  - Sheet has `role="dialog"`
+  - SheetTitle provides `aria-labelledby`
+  - SheetDescription provides `aria-describedby`
+  - Sheet state changes are announced
+  - Close button has accessible label
+
+- **Focus Management:**
+  - Focus moves into sheet when opened
+  - Focus is trapped within sheet
+  - Focus returns to trigger when closed
+  - Close button is keyboard accessible
+
+- **Best Practices:**
+  - Always include SheetTitle for accessibility
+  - Use SheetDescription for additional context
+  - Ensure all interactive elements are keyboard accessible
+  - Use `asChild` on triggers to maintain semantic HTML
+  - Consider mobile users when choosing sheet side
+  - Don't nest sheets
+  - Provide clear close mechanisms
+  - Use appropriate side based on content (left for navigation, right for forms)
+
+## Sheet vs Dialog vs Popover
+
+- **Sheet**: Slides from edge, best for mobile navigation, forms, and side panels. Typically modal.
+- **Dialog**: Centers on screen, best for confirmations, alerts, and important decisions. Always modal.
+- **Popover**: Anchored to trigger, best for contextual actions and information. Non-modal by default.
+
+## Source
+
+View the source code on GitHub:
+- Component: `packages/ui/src/components/ui/sheet.tsx:1-141`
+- Based on: [@radix-ui/react-dialog](https://www.radix-ui.com/primitives/docs/components/dialog)

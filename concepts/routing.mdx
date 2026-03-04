@@ -1,0 +1,430 @@
+---
+title: Routing
+description: How Poketto Stack uses React Router 7's file-based routing, loaders, actions, and type generation for a type-safe navigation system
+---
+
+## React Router 7 Architecture
+
+Poketto Stack uses [React Router 7](https://reactrouter.com/) (formerly Remix) for routing. It provides:
+
+- **File-based routing**: Routes defined by folder structure
+- **Type-safe navigation**: Auto-generated route types
+- **Data loading**: Loaders fetch data before rendering
+- **Form handling**: Actions handle form submissions
+- **Nested layouts**: Shared UI across route groups
+
+## Route Structure
+
+Routes live in `apps/admin/app/routes/` with a folder-based convention:
+
+```
+app/routes/
+├── (admin)/              # Route group (parentheses = no URL segment)
+│   ├── layout.tsx        # Shared layout for all admin routes
+│   ├── dashboard/
+│   │   ├── overview/
+│   │   │   └── index.tsx     # /dashboard/overview
+│   │   ├── analysis/
+│   │   │   └── index.tsx     # /dashboard/analysis
+│   │   └── index.tsx         # /dashboard
+│   ├── settings/
+│   │   ├── profile/
+│   │   │   └── index.tsx     # /settings/profile
+│   │   └── layout.tsx        # Nested layout for settings
+│   └── charts/
+│       └── index.tsx          # /charts
+├── (external)/           # Public routes (login, signup)
+│   ├── login/
+│   │   └── index.tsx         # /login
+│   └── sign-up/
+│       └── index.tsx         # /sign-up
+└── (main)/              # Landing pages
+    └── index.tsx              # /
+```
+
+### Route Groups
+
+Parentheses in folder names create **route groups** that don't add URL segments:
+
+- `(admin)` → Groups authenticated routes, shares a layout
+- `(external)` → Groups public pages (login, signup)
+- `(main)` → Landing page and marketing content
+
+<Note>
+  Route groups let you organize routes and share layouts without affecting URLs. Both `/dashboard` and `/settings` are in the `(admin)` group but have different paths.
+</Note>
+
+## Layouts
+
+Layout files define shared UI that wraps child routes.
+
+### Root Layout
+
+```tsx title="apps/admin/app/root.tsx"
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import { RootProviders } from "@/providers/root-providers";
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body className="antialiased bg-background">
+        <RootProviders>{children}</RootProviders>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return <Outlet />;
+}
+```
+
+The root layout:
+- Renders on **every page**
+- Sets up global providers (TanStack Query, Jotai, themes)
+- Injects `<Scripts>` and `<Links>` for hydration
+- Renders child routes via `<Outlet />`
+
+### Admin Layout
+
+```tsx title="apps/admin/app/routes/(admin)/layout.tsx"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@poketto/ui/sidebar";
+import { Outlet, redirect } from "react-router";
+import { AppSidebar } from "@/components/nav-sidebar/app-sidebar";
+import { authClient } from "@/lib/auth-client";
+
+export const clientLoader = async () => {
+  const session = await authClient.getSession();
+  if (!session.data) {
+    return redirect("/login");
+  }
+  return null;
+};
+
+export default function AdminLayout() {
+  return (
+    <SidebarProvider defaultOpen={true} storage="local">
+      <AppSidebar />
+      <SidebarInset className="w-full overflow-hidden">
+        <header className="flex h-16 items-center border-b bg-background px-4">
+          <SidebarTrigger />
+          {/* Search, theme switcher, etc. */}
+        </header>
+        <main className="p-4">
+          <Outlet />
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+```
+
+This layout:
+- **Protects routes**: The `clientLoader` redirects unauthenticated users to `/login`
+- **Shares UI**: Sidebar and header appear on all admin routes
+- **Nests routes**: Child routes render inside `<Outlet />`
+
+## Loaders
+
+Loaders fetch data **before** a route renders. They run on navigation, ensuring components receive data immediately.
+
+### Client Loader Example
+
+```tsx
+export const clientLoader = async () => {
+  const session = await authClient.getSession();
+  if (!session.data) {
+    return redirect("/login");
+  }
+  return null;
+};
+```
+
+This loader:
+1. Checks if the user is authenticated
+2. Redirects to `/login` if not
+3. Returns `null` if authenticated (layout can render)
+
+### Loader with Data Fetching
+
+Here's how you'd fetch data for a user profile page:
+
+```tsx
+import type { Route } from "./+types/profile";
+
+export async function clientLoader({ params }: Route.LoaderArgs) {
+  const userId = params.userId;
+  const user = await $fetch(`/api/users/${userId}`);
+  return { user };
+}
+
+export default function ProfilePage({ loaderData }: Route.ComponentProps) {
+  const { user } = loaderData;
+
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+```
+
+<Tip>
+  Loaders are **type-safe**. The `Route.LoaderArgs` and `Route.ComponentProps` types are auto-generated based on your route structure.
+</Tip>
+
+## Actions
+
+Actions handle form submissions and mutations. They run when a `<Form>` component submits.
+
+```tsx
+import { Form, redirect } from "react-router";
+import type { Route } from "./+types/create-user";
+
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  const name = formData.get("name");
+  const email = formData.get("email");
+
+  const user = await $fetch("/api/users", {
+    method: "POST",
+    body: { name, email },
+  });
+
+  return redirect(`/users/${user.id}`);
+}
+
+export default function CreateUserPage() {
+  return (
+    <Form method="post">
+      <input name="name" placeholder="Name" />
+      <input name="email" placeholder="Email" />
+      <button type="submit">Create User</button>
+    </Form>
+  );
+}
+```
+
+<AccordionGroup>
+  <Accordion title="Why use actions instead of event handlers?">
+    Actions work **without JavaScript**. If JS fails to load, forms still submit to the server. This is progressive enhancement.
+    
+    Actions also handle:
+    - Preventing double submissions
+    - Managing loading states
+    - Revalidating data after mutations
+  </Accordion>
+</AccordionGroup>
+
+## Type Generation
+
+React Router 7 generates route types automatically:
+
+```tsx
+import type { Route } from "./+types/index";
+
+export async function clientLoader({ params }: Route.LoaderArgs) {
+  // `params` is typed based on your route structure
+}
+
+export default function Component({ loaderData }: Route.ComponentProps) {
+  // `loaderData` matches your loader's return type
+}
+```
+
+Types are generated from:
+- Route parameters (e.g., `/users/:userId` → `params.userId: string`)
+- Loader return values
+- Action arguments
+
+Run type generation:
+
+```bash
+pnpm admin:build
+# or
+react-router typegen
+```
+
+<Warning>
+  If you see type errors after creating new routes, run `react-router typegen` to regenerate types.
+</Warning>
+
+## Navigation
+
+### Link Component
+
+```tsx
+import { Link } from "react-router";
+
+<Link to="/dashboard">Dashboard</Link>
+<Link to="/settings/profile">Profile</Link>
+```
+
+### Programmatic Navigation
+
+```tsx
+import { useNavigate } from "react-router";
+
+function LoginPage() {
+  const navigate = useNavigate();
+
+  const handleSuccess = () => {
+    navigate("/dashboard", { replace: true });
+  };
+
+  return <button onClick={handleSuccess}>Login</button>;
+}
+```
+
+### Button as Link
+
+Use the `asChild` pattern to style links as buttons:
+
+```tsx
+import { Link } from "react-router";
+import { Button } from "@poketto/ui/button";
+
+<Button asChild>
+  <Link to="/dashboard">Go to Dashboard</Link>
+</Button>
+```
+
+## Configuration
+
+React Router config lives in `react-router.config.ts`:
+
+```ts title="apps/admin/react-router.config.ts"
+import type { Config } from "@react-router/dev/config";
+
+export default {
+  // Server-side render by default, to enable SPA mode set this to `false`
+  ssr: false,
+} satisfies Config;
+```
+
+Poketto Stack uses **SPA mode** (`ssr: false`), which:
+- Generates a static `index.html`
+- Client-side renders all routes
+- Can be deployed to static hosts (Cloudflare Pages, Vercel, Netlify)
+
+<Accordion title="Switching to SSR">
+  To enable server-side rendering:
+  
+  1. Change `ssr: true` in config
+  2. Deploy to a Node.js or edge runtime (Cloudflare Workers, Vercel Functions)
+  3. Update loaders to `loader` instead of `clientLoader`
+  
+  SSR improves initial page load and SEO but requires a server runtime.
+</Accordion>
+
+## Error Boundaries
+
+Handle errors at the route level:
+
+```tsx title="apps/admin/app/root.tsx"
+import { isRouteErrorResponse } from "react-router";
+import type { Route } from "./+types/root";
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
+
+  if (isRouteErrorResponse(error)) {
+    message = error.status === 404 ? "404" : "Error";
+    details = error.status === 404
+      ? "The requested page could not be found."
+      : error.statusText || details;
+  } else if (error instanceof Error) {
+    details = error.message;
+  }
+
+  return (
+    <div className="p-4">
+      <h1>{message}</h1>
+      <p>{details}</p>
+    </div>
+  );
+}
+```
+
+Error boundaries catch:
+- 404s (route not found)
+- Loader errors (failed data fetching)
+- Action errors (failed mutations)
+- Component errors (runtime exceptions)
+
+## Protected Routes Pattern
+
+Authenticate routes with loaders:
+
+```tsx
+import { redirect } from "react-router";
+import { authClient } from "@/lib/auth-client";
+
+export const clientLoader = async () => {
+  const session = await authClient.getSession();
+  if (!session.data) {
+    return redirect("/login");
+  }
+  return { user: session.data.user };
+};
+
+export default function ProtectedPage({ loaderData }: Route.ComponentProps) {
+  return <div>Welcome, {loaderData.user.name}!</div>;
+}
+```
+
+## Search Params
+
+Access and update URL search parameters:
+
+```tsx
+import { useSearchParams } from "react-router";
+
+function FilteredList() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const status = searchParams.get("status") || "all";
+  const page = Number(searchParams.get("page")) || 1;
+
+  const updateFilters = (newStatus: string) => {
+    setSearchParams({ status: newStatus, page: "1" });
+  };
+
+  return (
+    <div>
+      <button onClick={() => updateFilters("active")}>Active</button>
+      <button onClick={() => updateFilters("inactive")}>Inactive</button>
+      <p>Current status: {status}, Page: {page}</p>
+    </div>
+  );
+}
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Colocate loaders with routes" icon="folder">
+    Keep data fetching logic in the same file as the component. This makes it easy to see what data a route needs.
+  </Card>
+  
+  <Card title="Use layout loaders for shared data" icon="layer-group">
+    Fetch user data, permissions, or settings in layout loaders so all child routes have access.
+  </Card>
+  
+  <Card title="Prefer actions over event handlers" icon="hand-pointer">
+    Use `<Form>` and `action` functions for mutations. This enables progressive enhancement and better UX.
+  </Card>
+  
+  <Card title="Leverage route groups" icon="object-group">
+    Organize routes logically without affecting URLs. Group admin routes, public routes, and landing pages separately.
+  </Card>
+</CardGroup>

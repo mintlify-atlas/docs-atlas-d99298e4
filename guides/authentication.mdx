@@ -1,0 +1,452 @@
+---
+title: Authentication
+description: Implement secure authentication with Better Auth
+---
+
+Poketto Stack uses Better Auth for authentication, providing a complete auth solution with session management, social providers, and email verification.
+
+## Setup
+
+Better Auth is pre-configured in the admin app with email/password authentication:
+
+```tsx
+import { betterAuth } from "better-auth"
+
+export const auth = betterAuth({
+  database: {
+    // Database configuration
+  },
+  emailAndPassword: {
+    enabled: true,
+  },
+})
+```
+
+## Sign up
+
+Create a registration form:
+
+```tsx
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@poketto/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@poketto/ui/form"
+import { Input } from "@poketto/ui/input"
+import { useAuth } from "@/lib/auth"
+
+const signUpSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+})
+
+export default function SignUpForm() {
+  const { signUp } = useAuth()
+  
+  const form = useForm<z.infer<typeof signUpSchema>>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  })
+
+  async function onSubmit(values: z.infer<typeof signUpSchema>) {
+    try {
+      await signUp.email({
+        email: values.email,
+        password: values.password,
+        name: values.name,
+      })
+      // Redirect to dashboard or show success message
+    } catch (error) {
+      form.setError("root", {
+        message: "Failed to create account. Please try again.",
+      })
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="John Doe" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="you@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {form.formState.errors.root && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Creating account..." : "Sign up"}
+        </Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+## Sign in
+
+Create a login form:
+
+```tsx
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@poketto/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@poketto/ui/form"
+import { Input } from "@poketto/ui/input"
+import { useAuth } from "@/lib/auth"
+
+const signInSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1, "Password is required"),
+})
+
+export default function SignInForm() {
+  const { signIn } = useAuth()
+  
+  const form = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  })
+
+  async function onSubmit(values: z.infer<typeof signInSchema>) {
+    try {
+      await signIn.email({
+        email: values.email,
+        password: values.password,
+      })
+      // Redirect to dashboard
+    } catch (error) {
+      form.setError("root", {
+        message: "Invalid email or password",
+      })
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="you@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {form.formState.errors.root && (
+          <p className="text-sm text-destructive">
+            {form.formState.errors.root.message}
+          </p>
+        )}
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
+        </Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+## Protected routes
+
+Protect routes that require authentication:
+
+```tsx
+import { redirect } from "react-router"
+import type { Route } from "./+types/dashboard"
+
+export async function loader({ context }: Route.LoaderArgs) {
+  const session = await context.auth.api.getSession({
+    headers: context.request.headers,
+  })
+
+  if (!session) {
+    throw redirect("/sign-in")
+  }
+
+  return { user: session.user }
+}
+
+export default function Dashboard({ loaderData }: Route.ComponentProps) {
+  return (
+    <div>
+      <h1>Welcome, {loaderData.user.name}!</h1>
+    </div>
+  )
+}
+```
+
+## Session management
+
+### Get current user
+
+```tsx
+import { useAuth } from "@/lib/auth"
+
+export default function UserProfile() {
+  const { session, user } = useAuth()
+
+  if (!session) {
+    return <div>Please sign in</div>
+  }
+
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <p>{user.email}</p>
+    </div>
+  )
+}
+```
+
+### Sign out
+
+```tsx
+import { Button } from "@poketto/ui/button"
+import { useAuth } from "@/lib/auth"
+
+export default function SignOutButton() {
+  const { signOut } = useAuth()
+
+  const handleSignOut = async () => {
+    await signOut()
+    // Redirect to home or sign in page
+  }
+
+  return (
+    <Button onClick={handleSignOut} variant="outline">
+      Sign out
+    </Button>
+  )
+}
+```
+
+## Social authentication
+
+Add OAuth providers like GitHub, Google, or Discord:
+
+```tsx
+export const auth = betterAuth({
+  database: {
+    // Database configuration
+  },
+  socialProviders: {
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    },
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    },
+  },
+})
+```
+
+Then add social sign-in buttons:
+
+```tsx
+import { Button } from "@poketto/ui/button"
+import { useAuth } from "@/lib/auth"
+import { Github } from "lucide-react"
+
+export default function SocialSignIn() {
+  const { signIn } = useAuth()
+
+  return (
+    <div className="space-y-2">
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => signIn.social({ provider: "github" })}
+      >
+        <Github className="mr-2 h-4 w-4" />
+        Continue with GitHub
+      </Button>
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => signIn.social({ provider: "google" })}
+      >
+        <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+          {/* Google icon */}
+        </svg>
+        Continue with Google
+      </Button>
+    </div>
+  )
+}
+```
+
+## Password reset
+
+Implement password reset functionality:
+
+```tsx
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@poketto/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@poketto/ui/form"
+import { Input } from "@poketto/ui/input"
+import { useAuth } from "@/lib/auth"
+
+const resetSchema = z.object({
+  email: z.string().email(),
+})
+
+export default function ForgotPasswordForm() {
+  const { forgetPassword } = useAuth()
+  
+  const form = useForm<z.infer<typeof resetSchema>>({
+    resolver: zodResolver(resetSchema),
+    defaultValues: { email: "" },
+  })
+
+  async function onSubmit(values: z.infer<typeof resetSchema>) {
+    try {
+      await forgetPassword({ email: values.email })
+      // Show success message
+    } catch (error) {
+      form.setError("root", {
+        message: "Failed to send reset email",
+      })
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="you@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full">
+          Send reset link
+        </Button>
+      </form>
+    </Form>
+  )
+}
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Secure passwords" icon="lock">
+    Enforce strong password requirements (min 8 chars, complexity)
+  </Card>
+  <Card title="Rate limiting" icon="shield">
+    Implement rate limiting on auth endpoints to prevent brute force
+  </Card>
+  <Card title="Session security" icon="key">
+    Use secure, httpOnly cookies for session tokens
+  </Card>
+  <Card title="Email verification" icon="envelope">
+    Verify email addresses before granting full access
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Forms" icon="square-check" href="/guides/forms">
+    Build robust auth forms with validation
+  </Card>
+  <Card title="Routing" icon="route" href="/concepts/routing">
+    Implement protected routes and redirects
+  </Card>
+</CardGroup>

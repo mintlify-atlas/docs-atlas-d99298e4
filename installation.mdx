@@ -1,0 +1,407 @@
+---
+title: Installation
+description: Complete installation guide for Poketto Stack with prerequisites, setup instructions, and troubleshooting tips.
+---
+
+This guide will walk you through setting up Poketto Stack from scratch, including all prerequisites and environment configuration.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed on your system:
+
+<Steps>
+  <Step title="Node.js">
+    Poketto Stack requires Node.js version 18 or higher. Check your current version:
+
+    ```bash
+    node --version
+    ```
+
+    <Note>
+      We recommend using Node.js v20 or later for the best performance and compatibility.
+    </Note>
+
+    If you need to install or update Node.js:
+
+    <Tabs>
+      <Tab title="macOS">
+        ```bash
+        # Using Homebrew
+        brew install node@20
+
+        # Or use nvm (recommended)
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        nvm install 20
+        nvm use 20
+        ```
+      </Tab>
+
+      <Tab title="Windows">
+        Download the installer from [nodejs.org](https://nodejs.org/) or use:
+
+        ```bash
+        # Using winget
+        winget install OpenJS.NodeJS.LTS
+
+        # Or use nvm-windows
+        # Download from: https://github.com/coreybutler/nvm-windows
+        nvm install 20
+        nvm use 20
+        ```
+      </Tab>
+
+      <Tab title="Linux">
+        ```bash
+        # Using nvm (recommended)
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        nvm install 20
+        nvm use 20
+
+        # Or using apt (Ubuntu/Debian)
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="pnpm">
+    Poketto Stack uses pnpm v9.15.9 as specified in the `packageManager` field. Install it globally:
+
+    ```bash
+    npm install -g pnpm@9.15.9
+    ```
+
+    Or install the latest version and let the project use its specified version via Corepack:
+
+    ```bash
+    # Enable Corepack (comes with Node.js 16.13+)
+    corepack enable
+    corepack prepare pnpm@9.15.9 --activate
+    ```
+
+    Verify the installation:
+
+    ```bash
+    pnpm --version
+    ```
+
+    <Note>
+      The project will automatically use pnpm 9.15.9 if you have Corepack enabled, even if you have a different version installed globally.
+    </Note>
+  </Step>
+
+  <Step title="Git">
+    You'll need Git to clone the repository:
+
+    ```bash
+    git --version
+    ```
+
+    If Git is not installed, download it from [git-scm.com](https://git-scm.com/).
+  </Step>
+</Steps>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Clone the repository">
+    Clone Poketto Stack from GitHub:
+
+    ```bash
+    git clone https://github.com/TinsFox/poketto-stack.git
+    cd poketto-stack
+    ```
+
+    Or use GitHub CLI:
+
+    ```bash
+    gh repo clone TinsFox/poketto-stack
+    cd poketto-stack
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    Install all workspace dependencies with a single command:
+
+    ```bash
+    pnpm install
+    ```
+
+    This installs dependencies for:
+    - Root workspace packages
+    - All applications in `apps/` (admin, api, docs, tauri, website)
+    - All packages in `packages/` (ui, pro-table, tiptap, cli)
+
+    <Note>
+      The first installation may take 2-5 minutes depending on your internet connection and machine performance.
+    </Note>
+  </Step>
+
+  <Step title="Set up environment variables">
+    The admin application uses environment variables for configuration. Create a `.env` file:
+
+    ```bash
+    cd apps/admin
+    cp .env.example .env
+    ```
+
+    Edit `apps/admin/.env` with your configuration:
+
+    ```bash apps/admin/.env
+    VITE_APP_NAME="Vite Boilerplate"
+    VITE_API_URL=http://localhost:5173/
+    VITE_ENABLE_DEVTOOLS=false
+    VITE_EDITOR=cursor
+    ```
+
+    <Tabs>
+      <Tab title="Required Variables">
+        | Variable | Description | Default |
+        |----------|-------------|----------|
+        | `VITE_APP_NAME` | Application name displayed in the UI | `"Vite Boilerplate"` |
+        | `VITE_API_URL` | Backend API URL | `http://localhost:5173/` |
+      </Tab>
+
+      <Tab title="Optional Variables">
+        | Variable | Description | Default |
+        |----------|-------------|----------|
+        | `VITE_ENABLE_DEVTOOLS` | Enable React Query DevTools | `false` |
+        | `VITE_EDITOR` | Default code editor for click-to-component | `cursor` |
+      </Tab>
+    </Tabs>
+
+    <Note>
+      The `prepare` script in `apps/admin/package.json` automatically copies `.env.example` to `.env` if it doesn't exist.
+    </Note>
+  </Step>
+
+  <Step title="Verify installation">
+    Run the development server to ensure everything is set up correctly:
+
+    ```bash
+    # From the root directory
+    pnpm admin:dev
+    ```
+
+    You should see output similar to:
+
+    ```
+    VITE v6.3.4  ready in 1234 ms
+
+    ➜  Local:   http://localhost:5173/
+    ➜  Network: use --host to expose
+    ➜  press h + enter to show help
+    ```
+
+    Open [http://localhost:5173](http://localhost:5173) in your browser. You should see the Poketto Stack admin interface.
+  </Step>
+</Steps>
+
+## Post-Installation Setup
+
+### Install Git Hooks
+
+Poketto Stack uses Lefthook for Git hooks to maintain code quality:
+
+```bash
+pnpm prepare
+```
+
+This installs hooks for:
+- Pre-commit: Runs linting and formatting on staged files
+- Commit-msg: Validates commit messages follow conventional commits format
+
+### Configure Your Editor
+
+#### VS Code
+
+The project includes VS Code settings in `.vscode/settings.json`. Install the recommended extensions:
+
+1. Open the project in VS Code
+2. When prompted, click "Install" for recommended extensions
+3. Or manually install:
+   - Biome (for linting and formatting)
+   - Tailwind CSS IntelliSense
+   - TypeScript and JavaScript Language Features
+
+#### Other Editors
+
+Install Biome extension/plugin for your editor:
+- **WebStorm/IntelliJ**: Install Biome plugin from marketplace
+- **Vim/Neovim**: Use `biomejs/biome` LSP server
+- **Cursor/VSCodium**: Install Biome extension
+
+## Workspace Structure
+
+Poketto Stack is a monorepo managed by pnpm workspaces and Turbo:
+
+```yaml pnpm-workspace.yaml
+packages:
+  - 'apps/*'
+  - 'packages/*'
+```
+
+### Applications (`apps/`)
+
+- **admin**: Main admin dashboard (React Router + Vite)
+- **api**: API service (Cloudflare Workers)
+- **docs**: Documentation site (VitePress)
+- **tauri**: Desktop application (Tauri + React)
+- **website**: Marketing website
+
+### Packages (`packages/`)
+
+- **@poketto/ui**: shadcn/ui components library
+- **@poketto/pro-table**: Advanced data table components
+- **@poketto/tiptap**: Rich text editor based on Tiptap
+- **@poketto/cli**: Command-line tools
+
+## Troubleshooting
+
+### Port Already in Use
+
+If port 5173 is already in use:
+
+```bash
+# Kill the process using port 5173 (macOS/Linux)
+lsof -ti:5173 | xargs kill -9
+
+# Windows
+netstat -ano | findstr :5173
+taskkill /PID <PID> /F
+```
+
+Or specify a different port:
+
+```bash
+pnpm admin:dev --port 3000
+```
+
+### pnpm Installation Fails
+
+<Warning>
+  If you see EACCES permission errors, **do not** use `sudo`. This indicates a Node.js installation issue.
+</Warning>
+
+**Solution**: Reinstall Node.js using nvm to avoid permission issues:
+
+```bash
+# Uninstall current Node.js
+# Then install via nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nvm install 20
+nvm use 20
+
+# Now install pnpm
+npm install -g pnpm
+```
+
+### Module Not Found Errors
+
+If you encounter module resolution errors:
+
+```bash
+# Clear pnpm cache and reinstall
+pnpm store prune
+rm -rf node_modules
+rm pnpm-lock.yaml
+pnpm install
+```
+
+### Storybook Won't Start
+
+If Storybook fails to start:
+
+```bash
+# Navigate to admin app
+cd apps/admin
+
+# Clear Storybook cache
+rm -rf node_modules/.cache/storybook
+
+# Rebuild Storybook
+pnpm build-storybook
+pnpm storybook
+```
+
+### Type Errors
+
+If you see TypeScript errors:
+
+```bash
+# Generate React Router types
+cd apps/admin
+pnpm run react-router typegen
+
+# Or rebuild the project
+pnpm build
+```
+
+### Biome/Linting Issues
+
+If formatting or linting fails:
+
+```bash
+# Run Biome check with auto-fix
+pnpm check
+
+# Or format manually
+pnpm format
+pnpm lint
+```
+
+## Development Workflow
+
+### Running Multiple Apps
+
+```bash
+# Run all apps simultaneously
+pnpm dev
+
+# Or run specific apps
+pnpm admin:dev    # Admin dashboard
+pnpm api:dev      # API service
+pnpm docs:dev     # Documentation
+pnpm tauri:dev    # Desktop app
+```
+
+### Building for Production
+
+```bash
+# Build admin app
+pnpm admin:build
+
+# Build all apps
+pnpm build
+
+# Build Storybook
+cd apps/admin
+pnpm build-storybook
+```
+
+### Running Tests
+
+```bash
+# Run tests in watch mode
+pnpm test
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Run tests with UI
+pnpm test:ui
+```
+
+## Next Steps
+
+Now that you have Poketto Stack installed:
+
+1. Follow the [Quickstart](/quickstart) guide to build your first component
+2. Explore the example routes in `apps/admin/app/routes/`
+3. Check out the UI components in Storybook
+4. Read the [Contributing Guide](https://github.com/TinsFox/poketto-stack/blob/main/CONTRIBUTING.md)
+
+<Note>
+  For more examples and advanced usage, visit the [official documentation](https://poketto-stack.pages.dev) or explore the [source code](https://github.com/TinsFox/poketto-stack).
+</Note>

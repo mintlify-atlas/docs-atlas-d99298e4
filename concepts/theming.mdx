@@ -1,0 +1,453 @@
+---
+title: Theming System
+description: CSS variables, Tailwind configuration, and design tokens that power Poketto Stack's flexible theming system
+---
+
+## Design Token Architecture
+
+Poketto Stack uses **CSS custom properties** (variables) as the foundation for theming. This approach provides:
+
+- **Runtime theme switching**: Change themes without rebuilding CSS
+- **Dark mode support**: Automatic dark mode with a single class toggle
+- **Type-safe values**: Tailwind config references CSS variables
+- **Framework agnostic**: Works with any CSS-in-JS or utility framework
+
+## CSS Variables Structure
+
+All theme tokens are defined in `packages/ui/src/globals.css`:
+
+```css title="packages/ui/src/globals.css"
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 215 20.2% 65.1%;
+    --radius: 0.5rem;
+    
+    /* Sidebar tokens */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --ring: 216 34% 17%;
+    
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+```
+
+### Why HSL Format?
+
+Colors are stored as **HSL space-separated values** without the `hsl()` wrapper:
+
+```css
+/* ✅ Correct */
+--primary: 222.2 47.4% 11.2%;
+
+/* ❌ Wrong */
+--primary: hsl(222.2, 47.4%, 11.2%);
+```
+
+<Accordion title="Why this format?">
+  The space-separated format allows Tailwind to apply opacity modifiers:
+  
+  ```tsx
+  // Tailwind can inject opacity between the values
+  className="bg-primary/50" // → hsl(222.2 47.4% 11.2% / 0.5)
+  ```
+  
+  If you used `hsl(...)`, Tailwind couldn't parse and modify the alpha channel.
+</Accordion>
+
+## Tailwind Configuration
+
+The Tailwind config maps CSS variables to utility classes:
+
+```ts title="packages/ui/tailwind.config.ts"
+import type { Config } from "tailwindcss";
+import animatePlugin from "tailwindcss-animate";
+
+export default {
+  darkMode: ["class"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+    },
+  },
+  plugins: [animatePlugin],
+} satisfies Config;
+```
+
+### Config Inheritance
+
+Apps extend the base config to include package source paths:
+
+```ts title="apps/admin/tailwind.config.ts"
+import uiConfig from "@poketto/ui/tailwind.config.ts";
+import type { Config } from "tailwindcss";
+
+export default {
+  ...uiConfig,
+  content: [
+    // Include UI package components
+    "../../packages/ui/src/**/*.{js,ts,jsx,tsx}",
+    "../../packages/pro-table/src/**/*.{js,ts,jsx,tsx}",
+    // Include app files
+    "./app/**/*.{ts,tsx}",
+  ],
+} satisfies Config;
+```
+
+<Warning>
+  You must include package paths in `content` for Tailwind to scan them for class names. Otherwise, styles won't be generated.
+</Warning>
+
+## Color System
+
+### Semantic Color Tokens
+
+Colors are **semantic**, not presentational:
+
+<CardGroup cols={2}>
+  <Card title="background / foreground" icon="square">
+    Default page background and text colors
+  </Card>
+  
+  <Card title="primary / primary-foreground" icon="star">
+    Primary brand color for buttons, links, important actions
+  </Card>
+  
+  <Card title="secondary / secondary-foreground" icon="circle">
+    Secondary brand color for less prominent elements
+  </Card>
+  
+  <Card title="muted / muted-foreground" icon="eye-slash">
+    Subdued backgrounds and text for less important content
+  </Card>
+  
+  <Card title="accent / accent-foreground" icon="palette">
+    Accent color for highlights, hover states
+  </Card>
+  
+  <Card title="destructive / destructive-foreground" icon="triangle-exclamation">
+    Dangerous actions like delete buttons, error states
+  </Card>
+  
+  <Card title="border / input / ring" icon="border-all">
+    Border colors, form inputs, focus rings
+  </Card>
+  
+  <Card title="card / card-foreground" icon="rectangle">
+    Card backgrounds and text
+  </Card>
+</CardGroup>
+
+### Usage in Components
+
+Always use semantic tokens, not hardcoded colors:
+
+```tsx
+// ✅ Good - Uses theme tokens
+<div className="bg-background text-foreground border-border">
+  <h1 className="text-primary">Title</h1>
+  <p className="text-muted-foreground">Subtitle</p>
+</div>
+
+// ❌ Bad - Hardcoded colors break theming
+<div className="bg-white text-black border-gray-200">
+  <h1 className="text-blue-600">Title</h1>
+  <p className="text-gray-500">Subtitle</p>
+</div>
+```
+
+## Dark Mode Implementation
+
+Dark mode is controlled by a single `.dark` class on the root element:
+
+```tsx title="apps/admin/app/root.tsx"
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body className="antialiased bg-background">
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          {children}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+The `ThemeProvider` adds/removes the `.dark` class:
+
+```tsx
+// When dark mode is active:
+<html class="dark">
+```
+
+This triggers the `.dark` selector in `globals.css`, swapping all variable values.
+
+### Theme Switcher Component
+
+Users can toggle themes with a switcher component:
+
+```tsx
+import { useTheme } from "next-themes";
+import { Button } from "@poketto/ui/button";
+
+export function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+    >
+      {theme === "dark" ? "🌞" : "🌙"}
+    </Button>
+  );
+}
+```
+
+## Border Radius System
+
+Border radius scales from a single `--radius` variable:
+
+```css
+:root {
+  --radius: 0.5rem; /* Base radius */
+}
+```
+
+Tailwind utilities reference this:
+
+```ts
+borderRadius: {
+  lg: "var(--radius)",      // 0.5rem
+  md: "calc(var(--radius) - 2px)",  // 0.375rem
+  sm: "calc(var(--radius) - 4px)",  // 0.25rem
+}
+```
+
+Usage:
+
+```tsx
+<Card className="rounded-lg">     {/* Uses --radius */}
+<Button className="rounded-md">  {/* Uses --radius - 2px */}
+```
+
+### Customizing Radius
+
+Change `--radius` to update all components:
+
+```css
+:root {
+  --radius: 0rem; /* Sharp corners everywhere */
+}
+
+:root {
+  --radius: 1rem; /* Very rounded */
+}
+```
+
+## Custom Animations
+
+Custom keyframes extend Tailwind's animation system:
+
+```ts title="tailwind.config.ts"
+theme: {
+  extend: {
+    keyframes: {
+      "accordion-down": {
+        from: { height: "0" },
+        to: { height: "var(--radix-accordion-content-height)" },
+      },
+      "accordion-up": {
+        from: { height: "var(--radix-accordion-content-height)" },
+        to: { height: "0" },
+      },
+      "slide-left": {
+        from: { transform: "translateX(20px)", opacity: "0" },
+        to: { transform: "translateX(0px)", opacity: "1" },
+      },
+    },
+    animation: {
+      "accordion-down": "accordion-down 0.2s ease-out",
+      "accordion-up": "accordion-up 0.2s ease-out",
+      "slide-left": "slide-left 0.3s ease-out",
+    },
+  },
+}
+```
+
+Usage:
+
+```tsx
+<div className="animate-slide-left">Slides in from right</div>
+```
+
+## Customizing Your Theme
+
+<Steps>
+  <Step title="Choose your color palette">
+    Use a tool like [Realtime Colors](https://realtimecolors.com/) or [Coolors](https://coolors.co/) to generate HSL values.
+  </Step>
+  
+  <Step title="Update CSS variables">
+    Edit `packages/ui/src/globals.css` with your new values:
+    
+    ```css
+    :root {
+      --primary: 262 83% 58%; /* Purple brand color */
+      --primary-foreground: 0 0% 100%;
+    }
+    ```
+  </Step>
+  
+  <Step title="Add dark mode values">
+    Define complementary dark mode colors:
+    
+    ```css
+    .dark {
+      --primary: 262 83% 68%; /* Lighter purple for dark mode */
+      --primary-foreground: 0 0% 100%;
+    }
+    ```
+  </Step>
+  
+  <Step title="Test across components">
+    Check buttons, cards, and other components to ensure consistency.
+  </Step>
+</Steps>
+
+## Typography System
+
+While Poketto Stack doesn't define custom font tokens, you can extend Tailwind:
+
+```ts title="tailwind.config.ts"
+theme: {
+  extend: {
+    fontFamily: {
+      sans: ['Inter', 'system-ui', 'sans-serif'],
+      mono: ['JetBrains Mono', 'monospace'],
+    },
+    fontSize: {
+      'xs': ['0.75rem', { lineHeight: '1rem' }],
+      'sm': ['0.875rem', { lineHeight: '1.25rem' }],
+      'base': ['1rem', { lineHeight: '1.5rem' }],
+      'lg': ['1.125rem', { lineHeight: '1.75rem' }],
+      'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+    },
+  },
+}
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use semantic tokens" icon="palette">
+    Reference `bg-primary` instead of `bg-blue-600` so themes update automatically.
+  </Card>
+  
+  <Card title="Test both themes" icon="moon">
+    Always verify components look good in light and dark mode.
+  </Card>
+  
+  <Card title="Maintain contrast ratios" icon="eye">
+    Ensure foreground/background pairs meet WCAG accessibility standards.
+  </Card>
+  
+  <Card title="Extend, don't replace" icon="plus">
+    Add new tokens rather than removing existing ones to avoid breaking components.
+  </Card>
+</CardGroup>

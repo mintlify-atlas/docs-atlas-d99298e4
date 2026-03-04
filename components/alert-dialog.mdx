@@ -1,0 +1,286 @@
+---
+title: "Alert Dialog"
+description: "Display important modal alerts that interrupt the user and require a decision"
+---
+
+## Introduction
+
+Alert Dialogs are modal dialogs specifically designed for important warnings, confirmations, or critical decisions that interrupt the user's workflow. Unlike regular dialogs, Alert Dialogs are more assertive and typically require explicit user action.
+
+**When to use:**
+- Confirm destructive actions (delete, remove, etc.)
+- Display critical warnings that require acknowledgment
+- Request important decisions that can't be easily undone
+- Show blocking error messages
+
+## Installation
+
+Import the AlertDialog components from `@poketto/ui`:
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+A basic alert dialog for confirming a destructive action:
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <button>Delete Account</button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This action cannot be undone. This will permanently delete your
+        account and remove your data from our servers.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction>Continue</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+## Examples
+
+### Delete Confirmation
+
+Confirm before deleting an item:
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <button variant="destructive">Delete Project</button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Delete project?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This will permanently delete the project and all associated data.
+        This action cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction onClick={() => handleDelete()}>
+        Delete
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+### Controlled Alert Dialog
+
+Control the alert dialog state programmatically:
+
+```tsx
+function ControlledAlertDialog() {
+  const [open, setOpen] = React.useState(false);
+
+  const handleConfirm = () => {
+    // Perform action
+    console.log("Confirmed");
+    setOpen(false);
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <button>Show Alert</button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirm Action</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to proceed with this action?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirm}>
+            Confirm
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+```
+
+### Warning Dialog
+
+Warn users about potential consequences:
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <button>Discard Changes</button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
+      <AlertDialogDescription>
+        You have unsaved changes. If you leave now, your changes will be lost.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Keep Editing</AlertDialogCancel>
+      <AlertDialogAction onClick={() => navigate("/")}>
+        Discard Changes
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+### Async Action Confirmation
+
+Handle async operations in the action handler:
+
+```tsx
+function AsyncAlertDialog() {
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    try {
+      await deleteAccount();
+      // Handle success
+    } catch (error) {
+      // Handle error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button>Delete Account</button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirm} disabled={isLoading}>
+            {isLoading ? "Deleting..." : "Delete"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+```
+
+## Components
+
+### AlertDialog
+
+<ParamField path="open" type="boolean">
+  Controlled open state of the alert dialog.
+</ParamField>
+
+<ParamField path="onOpenChange" type="(open: boolean) => void">
+  Event handler called when the open state changes.
+</ParamField>
+
+<ParamField path="defaultOpen" type="boolean">
+  The initial open state for uncontrolled usage.
+</ParamField>
+
+### AlertDialogTrigger
+
+<ParamField path="asChild" type="boolean" default="false">
+  When true, the trigger will not render its own button and will pass props to its child element.
+</ParamField>
+
+### AlertDialogContent
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the dialog content.
+</ParamField>
+
+### AlertDialogHeader, AlertDialogFooter
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the container.
+</ParamField>
+
+### AlertDialogTitle
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the title.
+</ParamField>
+
+### AlertDialogDescription
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the description.
+</ParamField>
+
+### AlertDialogAction
+
+<ParamField path="onClick" type="() => void">
+  Event handler for the confirm action.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply. Inherits button variant styles.
+</ParamField>
+
+### AlertDialogCancel
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply. Inherits outline button variant styles.
+</ParamField>
+
+## Best Practices
+
+<Check>**Do** use alert dialogs for destructive or irreversible actions</Check>
+<Check>**Do** clearly explain the consequences of the action</Check>
+<Check>**Do** make the cancel action easy to identify</Check>
+<Check>**Do** use descriptive action labels ("Delete Account" instead of "OK")</Check>
+<Check>**Do** always include both cancel and action buttons</Check>
+
+<Warning>**Don't** use alert dialogs for every confirmation - they should be reserved for important decisions</Warning>
+<Warning>**Don't** use vague or unclear language in the description</Warning>
+<Warning>**Don't** make the destructive action the default focused button</Warning>
+<Warning>**Don't** nest alert dialogs</Warning>
+
+## Differences from Dialog
+
+While Alert Dialog and Dialog look similar, there are key differences:
+
+- **Alert Dialog** requires explicit user action (cannot be dismissed by clicking outside)
+- **Alert Dialog** is for critical decisions and warnings
+- **Dialog** is for general content and forms
+- **Dialog** can be dismissed by clicking outside or pressing Esc
+
+## Accessibility
+
+- Automatically traps focus within the alert dialog
+- Requires explicit action to close (cannot dismiss with Esc or outside click)
+- Properly announces the alert to screen readers
+- Action and Cancel buttons are keyboard navigable
+- Restores focus to the trigger element when closed

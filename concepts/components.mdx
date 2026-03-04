@@ -1,0 +1,395 @@
+---
+title: Component Architecture
+description: How Poketto Stack structures components using shadcn/ui, Radix primitives, and the cn() utility for flexible, accessible UI building blocks
+---
+
+## Component Philosophy
+
+Poketto Stack's component architecture is built on **composition over configuration**. Components are not installed via npm—they're copied into your codebase and live in `packages/ui/src/components/`, giving you full control to customize them.
+
+### Why This Approach?
+
+- **Ownership**: Components belong to your project, not a third-party library
+- **Customization**: Modify any component without forking or ejecting
+- **Transparency**: See exactly how components work—no magic abstractions
+- **Type safety**: Components are TypeScript-first with full IntelliSense support
+
+## Architecture Layers
+
+Components are built on three foundational layers:
+
+```
+┌─────────────────────────────┐
+│   Your Components           │  ← Business logic + UI
+├─────────────────────────────┤
+│   shadcn/ui Components      │  ← Styled, composed components
+├─────────────────────────────┤
+│   Radix UI Primitives       │  ← Headless, accessible components
+├─────────────────────────────┤
+│   React                      │  ← Foundation
+└─────────────────────────────┘
+```
+
+### Layer 1: Radix UI Primitives
+
+Radix provides unstyled, accessible components that handle complex interactions:
+
+```tsx
+import * as React from "react";
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+```
+
+These primitives give you:
+- **Accessibility**: ARIA attributes, keyboard navigation, focus management
+- **Behavior**: Complex state management (opening, closing, animations)
+- **Flexibility**: No opinions about styling
+
+### Layer 2: shadcn/ui Components
+
+shadcn/ui wraps Radix primitives with Tailwind styling and consistent design tokens. These live in `packages/ui/src/components/ui/`:
+
+```tsx title="packages/ui/src/components/ui/button.tsx"
+import { Slot } from "@radix-ui/react-slot";
+import { type VariantProps, cva } from "class-variance-authority";
+import * as React from "react";
+import { cn } from "@poketto/ui/lib/utils";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3 text-xs",
+        lg: "h-10 rounded-md px-8",
+        icon: "h-9 w-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+);
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
+);
+Button.displayName = "Button";
+
+export { Button, buttonVariants };
+```
+
+### Layer 3: Your Components
+
+Build application-specific components by composing primitives:
+
+```tsx title="packages/ui/src/components/copy-button.tsx"
+import { Button } from "./ui/button";
+import type { ButtonProps } from "./ui/button";
+import { cn } from "@poketto/ui/lib/utils";
+import { ClipboardIcon, CheckIcon } from "lucide-react";
+import * as React from "react";
+import { toast } from "sonner";
+
+interface CopyButtonProps extends ButtonProps {
+  value: string;
+}
+
+export function CopyButton({
+  value,
+  className,
+  size = "icon",
+  variant = "ghost",
+  ...props
+}: CopyButtonProps) {
+  const [hasCopied, setHasCopied] = React.useState(false);
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      setHasCopied(false);
+    }, 2000);
+  }, [hasCopied]);
+
+  return (
+    <Button
+      size="icon"
+      variant={variant}
+      className={cn(
+        "relative z-10 h-6 w-6 text-zinc-5 [&_svg]:h-3 [&_svg]:w-3",
+        className
+      )}
+      onClick={() => {
+        if (!navigator.clipboard) {
+          toast.error("Clipboard API not available");
+          throw new Error("Clipboard API not available");
+        }
+        if (!value) {
+          toast.error("Text is empty");
+          throw new Error("Text is empty");
+        }
+        navigator.clipboard.writeText(value);
+        setHasCopied(true);
+      }}
+      {...props}
+    >
+      <span className="sr-only">Copy</span>
+      {hasCopied ? <CheckIcon /> : <ClipboardIcon />}
+    </Button>
+  );
+}
+```
+
+## The `cn()` Utility
+
+The `cn()` function is the secret sauce that makes className composition clean and predictable:
+
+```ts title="packages/ui/src/lib/utils.ts"
+import type { ClassValue } from "clsx";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+### What Does It Do?
+
+1. **clsx**: Combines class strings, handles conditionals and objects
+2. **tailwind-merge**: Intelligently merges Tailwind classes, resolving conflicts
+
+<CodeGroup>
+```tsx Without cn()
+// Later classes don't override earlier ones correctly
+<div className="px-4 px-6"> // Both classes apply!
+```
+
+```tsx With cn()
+// tailwind-merge resolves conflicts intelligently
+cn("px-4", "px-6") // → "px-6" ✅
+```
+</CodeGroup>
+
+### Conditional Styling
+
+```tsx
+cn(
+  "base-classes",
+  isActive && "active-classes",
+  {
+    "error-classes": hasError,
+    "success-classes": isSuccess,
+  }
+)
+```
+
+### Component Composition
+
+```tsx
+function Card({ className, ...props }) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg border bg-card text-card-foreground shadow-sm",
+        className // User overrides apply last
+      )}
+      {...props}
+    />
+  );
+}
+
+// Usage
+<Card className="max-w-md" /> // Merges with base classes
+```
+
+## Class Variance Authority (CVA)
+
+For components with multiple visual variants, use `cva` to define a variant API:
+
+```tsx
+import { cva, type VariantProps } from "class-variance-authority";
+
+const buttonVariants = cva(
+  // Base classes applied to all variants
+  "inline-flex items-center justify-center rounded-md font-medium",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground",
+        outline: "border border-input bg-background hover:bg-accent",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        sm: "h-8 px-3 text-xs",
+        lg: "h-10 px-8",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+
+type ButtonProps = VariantProps<typeof buttonVariants>;
+
+// Usage
+<Button variant="destructive" size="sm" />
+```
+
+### Why CVA?
+
+- **Type safety**: Variants are fully typed
+- **Composability**: Combine multiple variant dimensions
+- **Default values**: Fallback to sensible defaults
+- **IntelliSense**: Autocomplete for all variant options
+
+## Package Exports Strategy
+
+The UI package exports individual components for tree-shaking:
+
+```json title="packages/ui/package.json"
+{
+  "exports": {
+    "./button": "./src/components/ui/button.tsx",
+    "./card": "./src/components/ui/card.tsx",
+    "./dialog": "./src/components/ui/dialog.tsx",
+    "./utils": "./src/lib/utils.ts"
+  }
+}
+```
+
+This allows importing exactly what you need:
+
+```tsx
+import { Button } from "@poketto/ui/button";
+import { Card, CardHeader, CardContent } from "@poketto/ui/card";
+import { cn } from "@poketto/ui/utils";
+```
+
+<Warning>
+  Avoid barrel exports like `./src/index.ts` that re-export everything. This prevents tree-shaking and increases bundle size.
+</Warning>
+
+## Composition Patterns
+
+### The `asChild` Pattern
+
+Many components support `asChild` to merge with child elements:
+
+```tsx
+import { Slot } from "@radix-ui/react-slot";
+
+function Button({ asChild, ...props }) {
+  const Comp = asChild ? Slot : "button";
+  return <Comp {...props} />;
+}
+
+// Renders as a button
+<Button>Click me</Button>
+
+// Renders as a Link but looks like a Button
+<Button asChild>
+  <Link to="/dashboard">Dashboard</Link>
+</Button>
+```
+
+This pattern keeps styling separate from semantics.
+
+### Compound Components
+
+Related components share context:
+
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from "@poketto/ui/card";
+
+<Card>
+  <CardHeader>
+    <CardTitle>Analytics</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p>Your data here</p>
+  </CardContent>
+</Card>
+```
+
+Each sub-component has default styles that work together, but can be customized independently.
+
+## Customizing Components
+
+Since components live in your codebase, customization is straightforward:
+
+<Steps>
+  <Step title="Locate the component">
+    Find it in `packages/ui/src/components/ui/`
+  </Step>
+  
+  <Step title="Modify directly">
+    Change colors, spacing, variants—anything you want
+    
+    ```tsx
+    // Add a new variant
+    const buttonVariants = cva("...", {
+      variants: {
+        variant: {
+          default: "...",
+          custom: "bg-purple-500 text-white hover:bg-purple-600", // ← New!
+        },
+      },
+    });
+    ```
+  </Step>
+  
+  <Step title="Use everywhere">
+    Changes apply across all apps in the monorepo instantly
+    
+    ```tsx
+    <Button variant="custom">My Custom Button</Button>
+    ```
+  </Step>
+</Steps>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Keep components simple" icon="atom">
+    Each component should do one thing well. Compose simple components to build complex UIs.
+  </Card>
+  
+  <Card title="Use semantic HTML" icon="code">
+    Leverage the `asChild` pattern to maintain semantic markup while applying styles.
+  </Card>
+  
+  <Card title="Design tokens first" icon="palette">
+    Reference theme variables (`bg-primary`, `text-foreground`) instead of hardcoding colors.
+  </Card>
+  
+  <Card title="Extend, don't modify" icon="plus">
+    When you need a variant, add it to the CVA config rather than creating a new component.
+  </Card>
+</CardGroup>

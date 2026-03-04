@@ -1,0 +1,325 @@
+---
+title: Internationalization
+description: Add multi-language support to your application with i18next
+---
+
+Poketto Stack includes i18next for internationalization, making it easy to support multiple languages in your application.
+
+## Setup
+
+The i18next configuration is already set up in the admin app. Translation files are located in `apps/admin/locales/`:
+
+```
+locales/
+├── en/
+│   ├── common.json
+│   ├── auth.json
+│   ├── navigation.json
+│   └── ...
+└── zh-CN/
+    ├── common.json
+    ├── auth.json
+    └── ...
+```
+
+## Translation files
+
+Translations are organized by namespace. Here's an example from `locales/en/common.json`:
+
+```json
+{
+  "select_language": "Select a language",
+  "languages": {
+    "english": "English",
+    "french": "French",
+    "german": "German",
+    "spanish": "Spanish",
+    "chinese": "Chinese"
+  },
+  "themes": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "update": "Update",
+  "search": "Search",
+  "documentation": "Documentation"
+}
+```
+
+## Using translations
+
+### Basic usage
+
+Use the `useTranslation` hook to access translations:
+
+```tsx
+import { useTranslation } from "react-i18next"
+
+export default function MyComponent() {
+  const { t } = useTranslation()
+
+  return (
+    <div>
+      <h1>{t("common:select_language")}</h1>
+      <button>{t("common:update")}</button>
+    </div>
+  )
+}
+```
+
+### Nested translations
+
+Access nested keys using dot notation:
+
+```tsx
+const { t } = useTranslation()
+
+return (
+  <div>
+    <p>{t("common:languages.english")}</p>
+    <p>{t("common:themes.dark")}</p>
+  </div>
+)
+```
+
+### With variables
+
+Pass variables to translations:
+
+```json
+{
+  "welcome": "Welcome, {{name}}!",
+  "items_count": "You have {{count}} items"
+}
+```
+
+```tsx
+const { t } = useTranslation()
+
+return (
+  <div>
+    <h1>{t("common:welcome", { name: "John" })}</h1>
+    <p>{t("common:items_count", { count: 5 })}</p>
+  </div>
+)
+```
+
+### Pluralization
+
+i18next automatically handles pluralization:
+
+```json
+{
+  "items": "{{count}} item",
+  "items_other": "{{count}} items"
+}
+```
+
+```tsx
+const { t } = useTranslation()
+
+return (
+  <div>
+    <p>{t("common:items", { count: 1 })}</p> {/* "1 item" */}
+    <p>{t("common:items", { count: 5 })}</p> {/* "5 items" */}
+  </div>
+)
+```
+
+## Language switcher
+
+Create a language switcher component:
+
+```tsx
+import { useTranslation } from "react-i18next"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@poketto/ui/select"
+
+const languages = [
+  { code: "en", name: "English" },
+  { code: "zh-CN", name: "中文" },
+  { code: "es", name: "Español" },
+  { code: "fr", name: "Français" },
+]
+
+export default function LanguageSwitcher() {
+  const { i18n } = useTranslation()
+
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng)
+  }
+
+  return (
+    <Select value={i18n.language} onValueChange={changeLanguage}>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {languages.map((lang) => (
+          <SelectItem key={lang.code} value={lang.code}>
+            {lang.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+}
+```
+
+## Adding a new language
+
+<Steps>
+  <Step title="Create translation files">
+    Create a new directory in `locales/` with your language code:
+    
+    ```bash
+    mkdir -p apps/admin/locales/fr
+    ```
+  </Step>
+  
+  <Step title="Add translation files">
+    Copy the English translation files and translate them:
+    
+    ```bash
+    cp apps/admin/locales/en/*.json apps/admin/locales/fr/
+    ```
+    
+    Then translate the content of each file:
+    
+    ```json locales/fr/common.json
+    {
+      "select_language": "Sélectionnez une langue",
+      "update": "Mettre à jour",
+      "search": "Rechercher"
+    }
+    ```
+  </Step>
+  
+  <Step title="Update i18n config">
+    Add the new language to your i18n configuration:
+    
+    ```tsx
+    i18n
+      .use(Backend)
+      .use(LanguageDetector)
+      .init({
+        supportedLngs: ["en", "zh-CN", "fr"],
+        fallbackLng: "en",
+        // ...
+      })
+    ```
+  </Step>
+  
+  <Step title="Add to language switcher">
+    Update your language switcher to include the new language:
+    
+    ```tsx
+    const languages = [
+      { code: "en", name: "English" },
+      { code: "zh-CN", name: "中文" },
+      { code: "fr", name: "Français" },
+    ]
+    ```
+  </Step>
+</Steps>
+
+## Namespaces
+
+Organize translations by feature using namespaces:
+
+```tsx
+// Use a specific namespace
+const { t } = useTranslation("auth")
+
+return (
+  <div>
+    <h1>{t("sign_in.title")}</h1>
+    <p>{t("sign_in.description")}</p>
+  </div>
+)
+
+// Use multiple namespaces
+const { t } = useTranslation(["auth", "common"])
+
+return (
+  <div>
+    <h1>{t("auth:sign_in.title")}</h1>
+    <button>{t("common:update")}</button>
+  </div>
+)
+```
+
+## Language detection
+
+i18next automatically detects the user's preferred language from:
+
+1. URL query string (`?lng=en`)
+2. Local storage
+3. Browser language
+4. Fallback language
+
+You can customize this behavior in your i18n configuration.
+
+## TypeScript support
+
+For type-safe translations, create a types file:
+
+```tsx i18n.d.ts
+import "react-i18next"
+import type common from "./locales/en/common.json"
+import type auth from "./locales/en/auth.json"
+
+declare module "react-i18next" {
+  interface CustomTypeOptions {
+    defaultNS: "common"
+    resources: {
+      common: typeof common
+      auth: typeof auth
+    }
+  }
+}
+```
+
+Now you get autocomplete and type checking:
+
+```tsx
+// ✅ Type-safe
+t("common:update")
+
+// ❌ Type error
+t("common:invalid_key")
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use namespaces" icon="folder">
+    Organize translations by feature for better maintainability
+  </Card>
+  <Card title="Avoid hardcoded text" icon="ban">
+    All user-facing text should come from translation files
+  </Card>
+  <Card title="Context matters" icon="comment">
+    Provide context in translation keys: `button.save` vs `modal.title`
+  </Card>
+  <Card title="Test all languages" icon="check">
+    Regularly test your app in different languages
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/guides/authentication">
+    Add localized auth flows
+  </Card>
+  <Card title="Components" icon="cube" href="/components/overview">
+    All components support i18n
+  </Card>
+</CardGroup>

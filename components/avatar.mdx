@@ -1,0 +1,263 @@
+---
+title: Avatar
+description: Display user profile images with automatic fallback support using Radix UI primitives.
+---
+
+The Avatar component displays user profile pictures with automatic fallback handling. Built on Radix UI's Avatar primitive, it gracefully handles loading states and missing images.
+
+## Installation
+
+```bash
+npm install @poketto/ui
+```
+
+## Import
+
+```tsx
+import { Avatar, AvatarImage, AvatarFallback } from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+<Avatar>
+  <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+  <AvatarFallback>CN</AvatarFallback>
+</Avatar>
+```
+
+## Examples
+
+### With Fallback Text
+
+```tsx
+<Avatar>
+  <AvatarImage src="/avatars/user.jpg" alt="John Doe" />
+  <AvatarFallback>JD</AvatarFallback>
+</Avatar>
+```
+
+The fallback is displayed when the image fails to load or while it's loading.
+
+### Different Sizes
+
+```tsx
+<div className="flex items-center gap-4">
+  <Avatar className="h-8 w-8">
+    <AvatarImage src="/avatars/user.jpg" />
+    <AvatarFallback>SM</AvatarFallback>
+  </Avatar>
+  
+  <Avatar className="h-10 w-10">
+    <AvatarImage src="/avatars/user.jpg" />
+    <AvatarFallback>MD</AvatarFallback>
+  </Avatar>
+  
+  <Avatar className="h-16 w-16">
+    <AvatarImage src="/avatars/user.jpg" />
+    <AvatarFallback>LG</AvatarFallback>
+  </Avatar>
+  
+  <Avatar className="h-24 w-24">
+    <AvatarImage src="/avatars/user.jpg" />
+    <AvatarFallback>XL</AvatarFallback>
+  </Avatar>
+</div>
+```
+
+### Fallback Only
+
+```tsx
+<Avatar>
+  <AvatarFallback>AB</AvatarFallback>
+</Avatar>
+```
+
+Useful for users without profile pictures.
+
+### With Icons
+
+```tsx
+import { User } from "lucide-react";
+
+<Avatar>
+  <AvatarImage src="/avatars/user.jpg" />
+  <AvatarFallback>
+    <User className="h-4 w-4" />
+  </AvatarFallback>
+</Avatar>
+```
+
+### User List
+
+```tsx
+const users = [
+  { name: "Alice Johnson", avatar: "/avatars/alice.jpg", initials: "AJ" },
+  { name: "Bob Smith", avatar: "/avatars/bob.jpg", initials: "BS" },
+  { name: "Carol White", avatar: "/avatars/carol.jpg", initials: "CW" },
+];
+
+<div className="flex gap-2">
+  {users.map((user) => (
+    <Avatar key={user.name}>
+      <AvatarImage src={user.avatar} alt={user.name} />
+      <AvatarFallback>{user.initials}</AvatarFallback>
+    </Avatar>
+  ))}
+</div>
+```
+
+### Grouped Avatars (Stack)
+
+```tsx
+<div className="flex -space-x-4">
+  <Avatar className="border-2 border-background">
+    <AvatarImage src="/avatars/user1.jpg" />
+    <AvatarFallback>U1</AvatarFallback>
+  </Avatar>
+  <Avatar className="border-2 border-background">
+    <AvatarImage src="/avatars/user2.jpg" />
+    <AvatarFallback>U2</AvatarFallback>
+  </Avatar>
+  <Avatar className="border-2 border-background">
+    <AvatarImage src="/avatars/user3.jpg" />
+    <AvatarFallback>U3</AvatarFallback>
+  </Avatar>
+  <Avatar className="border-2 border-background">
+    <AvatarFallback>+5</AvatarFallback>
+  </Avatar>
+</div>
+```
+
+## Component API
+
+### Avatar
+
+The root container for the avatar component.
+
+**Props:** Extends `Radix UI Avatar.Root` props
+
+- `className`: Additional CSS classes
+- All Radix UI Avatar.Root props
+
+**Default styles:**
+- Size: `h-10 w-10` (40px)
+- Shape: Rounded full (circular)
+- Overflow: Hidden
+- Flex display with shrink-0
+
+### AvatarImage
+
+The image element within the avatar.
+
+**Props:** Extends `Radix UI Avatar.Image` props
+
+- `src`: Image source URL
+- `alt`: Alternative text for accessibility
+- `className`: Additional CSS classes
+- All Radix UI Avatar.Image props
+
+**Default styles:**
+- Aspect ratio: Square
+- Size: Full width and height of container
+
+### AvatarFallback
+
+The fallback content shown when the image is unavailable or loading.
+
+**Props:** Extends `Radix UI Avatar.Fallback` props
+
+- `className`: Additional CSS classes
+- `children`: Fallback content (typically initials or an icon)
+- All Radix UI Avatar.Fallback props
+
+**Default styles:**
+- Background: Muted
+- Layout: Centered flex
+- Shape: Rounded full (circular)
+- Size: Full width and height of container
+
+## Advanced Usage
+
+### With Status Indicator
+
+```tsx
+<div className="relative inline-block">
+  <Avatar>
+    <AvatarImage src="/avatars/user.jpg" />
+    <AvatarFallback>JD</AvatarFallback>
+  </Avatar>
+  <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-500 ring-2 ring-background" />
+</div>
+```
+
+### Custom Fallback Background
+
+```tsx
+<Avatar>
+  <AvatarImage src="/avatars/user.jpg" />
+  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+    JD
+  </AvatarFallback>
+</Avatar>
+```
+
+### Square Avatar
+
+```tsx
+<Avatar className="rounded-md">
+  <AvatarImage src="/avatars/user.jpg" />
+  <AvatarFallback className="rounded-md">JD</AvatarFallback>
+</Avatar>
+```
+
+### Dynamic Avatar Component
+
+```tsx
+interface UserAvatarProps {
+  user: {
+    name: string;
+    avatar?: string;
+  };
+  size?: "sm" | "md" | "lg";
+}
+
+function UserAvatar({ user, size = "md" }: UserAvatarProps) {
+  const sizeClasses = {
+    sm: "h-8 w-8 text-xs",
+    md: "h-10 w-10 text-sm",
+    lg: "h-16 w-16 text-lg",
+  };
+
+  const initials = user.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  return (
+    <Avatar className={sizeClasses[size]}>
+      <AvatarImage src={user.avatar} alt={user.name} />
+      <AvatarFallback>{initials}</AvatarFallback>
+    </Avatar>
+  );
+}
+```
+
+## Accessibility
+
+- Always provide an `alt` attribute for `AvatarImage`
+- Use meaningful fallback text (initials are recommended)
+- The component automatically handles loading and error states
+- Powered by Radix UI for built-in accessibility features
+- Consider adding tooltips with full names for better UX
+
+## Integration with Radix UI
+
+This component is built on `@radix-ui/react-avatar`, which provides:
+
+- Automatic image loading state management
+- Graceful fallback handling
+- Optimized rendering performance
+- Built-in accessibility features

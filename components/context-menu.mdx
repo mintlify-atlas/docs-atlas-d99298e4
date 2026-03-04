@@ -1,0 +1,476 @@
+---
+title: Context Menu
+description: A menu triggered by right-clicking or long-pressing. Use for providing contextual actions related to specific elements.
+---
+
+## Overview
+
+The Context Menu component displays a menu when users right-click (or long-press on touch devices) on an element. It provides contextual actions relevant to the clicked element, similar to native OS context menus.
+
+Use context menus when you need to:
+- Provide element-specific actions
+- Offer quick access to common operations
+- Create a familiar, OS-like interaction pattern
+- Show actions that don't fit in the primary UI
+
+## Installation
+
+The Context Menu component is built on Radix UI primitives and available in the Poketto UI package.
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuCheckboxItem,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+Context Menu uses a composition pattern with a trigger and content:
+
+```tsx
+import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "@poketto/ui";
+
+export default function BasicContextMenu() {
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger className="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+        Right click here
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem>Edit</ContextMenuItem>
+        <ContextMenuItem>Duplicate</ContextMenuItem>
+        <ContextMenuItem>Delete</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+```
+
+## Examples
+
+### Full-Featured Context Menu
+
+A comprehensive example showing all available components:
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuCheckboxItem,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+} from "@poketto/ui";
+import { useState } from "react";
+
+export default function FullContextMenu() {
+  const [showBookmarks, setShowBookmarks] = useState(true);
+  const [showReadingList, setShowReadingList] = useState(false);
+  const [person, setPerson] = useState("pedro");
+
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger className="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+        Right click here
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-64">
+        <ContextMenuItem inset>
+          Back
+          <ContextMenuShortcut>⌘[</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem inset disabled>
+          Forward
+          <ContextMenuShortcut>⌘]</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem inset>
+          Reload
+          <ContextMenuShortcut>⌘R</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger inset>More Tools</ContextMenuSubTrigger>
+          <ContextMenuSubContent className="w-48">
+            <ContextMenuItem>
+              Save Page As...
+              <ContextMenuShortcut>⇧⌘S</ContextMenuShortcut>
+            </ContextMenuItem>
+            <ContextMenuItem>Create Shortcut...</ContextMenuItem>
+            <ContextMenuItem>Name Window...</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem>Developer Tools</ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSeparator />
+        <ContextMenuCheckboxItem
+          checked={showBookmarks}
+          onCheckedChange={setShowBookmarks}
+        >
+          Show Bookmarks Bar
+          <ContextMenuShortcut>⌘⇧B</ContextMenuShortcut>
+        </ContextMenuCheckboxItem>
+        <ContextMenuCheckboxItem
+          checked={showReadingList}
+          onCheckedChange={setShowReadingList}
+        >
+          Show Reading List
+        </ContextMenuCheckboxItem>
+        <ContextMenuSeparator />
+        <ContextMenuRadioGroup value={person} onValueChange={setPerson}>
+          <ContextMenuLabel inset>People</ContextMenuLabel>
+          <ContextMenuSeparator />
+          <ContextMenuRadioItem value="pedro">Pedro Duarte</ContextMenuRadioItem>
+          <ContextMenuRadioItem value="colm">Colm Tuite</ContextMenuRadioItem>
+        </ContextMenuRadioGroup>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+```
+
+### File Operations Context Menu
+
+A practical example for file management:
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+} from "@poketto/ui";
+import { File } from "lucide-react";
+
+export default function FileContextMenu() {
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger className="flex items-center gap-2 rounded-md border p-4">
+        <File className="h-4 w-4" />
+        <span className="text-sm">document.pdf</span>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem>
+          Open
+          <ContextMenuShortcut>⌘O</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem>Open With...</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem>
+          Copy
+          <ContextMenuShortcut>⌘C</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem>
+          Cut
+          <ContextMenuShortcut>⌘X</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem>
+          Paste
+          <ContextMenuShortcut>⌘V</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem>Rename</ContextMenuItem>
+        <ContextMenuItem className="text-destructive">
+          Delete
+          <ContextMenuShortcut>⌫</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem>Get Info</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+```
+
+### Image Context Menu
+
+Context menu for image operations:
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+} from "@poketto/ui";
+
+export default function ImageContextMenu() {
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <img
+          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe"
+          alt="Sample"
+          className="h-[200px] w-[300px] rounded-md object-cover"
+        />
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem>View Image</ContextMenuItem>
+        <ContextMenuItem>Copy Image</ContextMenuItem>
+        <ContextMenuItem>Copy Image Address</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem>Save Image As...</ContextMenuItem>
+        <ContextMenuItem>Open Image in New Tab</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem>Search Image with Google</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+```
+
+### Nested Submenus
+
+Create hierarchical menus with submenus:
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+  ContextMenuSeparator,
+} from "@poketto/ui";
+
+export default function NestedContextMenu() {
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger className="flex h-[150px] w-[300px] items-center justify-center rounded-md border border-dashed text-sm">
+        Right click for nested menu
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem>New File</ContextMenuItem>
+        <ContextMenuItem>New Folder</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuSub>
+          <ContextMenuSubTrigger>Share</ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem>Email</ContextMenuItem>
+            <ContextMenuItem>Messages</ContextMenuItem>
+            <ContextMenuItem>Notes</ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger>More Tools</ContextMenuSubTrigger>
+          <ContextMenuSubContent>
+            <ContextMenuItem>Compress</ContextMenuItem>
+            <ContextMenuItem>Encrypt</ContextMenuItem>
+            <ContextMenuSub>
+              <ContextMenuSubTrigger>Convert</ContextMenuSubTrigger>
+              <ContextMenuSubContent>
+                <ContextMenuItem>to PDF</ContextMenuItem>
+                <ContextMenuItem>to Image</ContextMenuItem>
+                <ContextMenuItem>to Text</ContextMenuItem>
+              </ContextMenuSubContent>
+            </ContextMenuSub>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+```
+
+## Component API
+
+### ContextMenu
+
+The root component that manages context menu state.
+
+```tsx
+<ContextMenu
+  defaultOpen?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  modal?: boolean
+>
+```
+
+**Props:**
+- `defaultOpen`: The initial open state (uncontrolled)
+- `open`: Controlled open state
+- `onOpenChange`: Callback when open state changes
+- `modal`: Whether to use modal behavior (default: `true`)
+
+### ContextMenuTrigger
+
+The area that triggers the context menu on right-click or long-press.
+
+```tsx
+<ContextMenuTrigger asChild?: boolean disabled?: boolean>
+```
+
+**Props:**
+- `asChild`: Merge props with child element
+- `disabled`: Prevent the context menu from opening
+
+### ContextMenuContent
+
+The container for context menu items.
+
+```tsx
+<ContextMenuContent
+  className?: string
+  alignOffset?: number
+  sideOffset?: number
+>
+```
+
+**Props:**
+- `className`: Additional CSS classes
+- `alignOffset`: Offset from ideal alignment
+- `sideOffset`: Distance from trigger
+
+**Default styling:**
+- Min width: `min-w-[8rem]`
+- Padding: `p-1`
+- Border: rounded with shadow
+- Animations: fade and zoom on open/close
+
+### ContextMenuItem
+
+An actionable menu item.
+
+```tsx
+<ContextMenuItem
+  disabled?: boolean
+  onSelect?: (event: Event) => void
+  inset?: boolean
+>
+```
+
+**Props:**
+- `disabled`: Disable the item
+- `onSelect`: Callback when item is selected
+- `inset`: Add left padding for alignment with checkboxes/radios
+
+### ContextMenuCheckboxItem
+
+A menu item with a checkbox.
+
+```tsx
+<ContextMenuCheckboxItem
+  checked?: boolean | 'indeterminate'
+  onCheckedChange?: (checked: boolean) => void
+>
+```
+
+**Props:**
+- `checked`: The checked state
+- `onCheckedChange`: Callback when checked state changes
+
+### ContextMenuRadioGroup & ContextMenuRadioItem
+
+Radio button group for mutually exclusive options.
+
+```tsx
+<ContextMenuRadioGroup
+  value?: string
+  onValueChange?: (value: string) => void
+>
+  <ContextMenuRadioItem value="option1">Option 1</ContextMenuRadioItem>
+  <ContextMenuRadioItem value="option2">Option 2</ContextMenuRadioItem>
+</ContextMenuRadioGroup>
+```
+
+### ContextMenuLabel
+
+A non-interactive label for grouping items.
+
+```tsx
+<ContextMenuLabel inset?: boolean>
+```
+
+**Props:**
+- `inset`: Add left padding for alignment
+
+### ContextMenuSeparator
+
+A visual separator between menu items.
+
+```tsx
+<ContextMenuSeparator />
+```
+
+### ContextMenuShortcut
+
+Displays keyboard shortcuts (visual only, doesn't handle key events).
+
+```tsx
+<ContextMenuShortcut>⌘K</ContextMenuShortcut>
+```
+
+### ContextMenuSub, ContextMenuSubTrigger, ContextMenuSubContent
+
+Components for creating nested submenus.
+
+```tsx
+<ContextMenuSub>
+  <ContextMenuSubTrigger>More Options</ContextMenuSubTrigger>
+  <ContextMenuSubContent>
+    {/* Nested items */}
+  </ContextMenuSubContent>
+</ContextMenuSub>
+```
+
+## Accessibility
+
+The Context Menu component follows WAI-ARIA menu guidelines:
+
+- **Keyboard Navigation:**
+  - `Enter` or `Space` activates the focused item
+  - `Arrow Down` moves focus to next item
+  - `Arrow Up` moves focus to previous item
+  - `Arrow Right` opens submenu
+  - `Arrow Left` closes submenu
+  - `Escape` closes the menu
+  - `Tab` moves out of the menu
+
+- **Screen Readers:**
+  - Proper ARIA roles and attributes
+  - Menu structure is announced
+  - Item states (checked, disabled) are communicated
+  - Keyboard shortcuts are announced
+
+- **Focus Management:**
+  - Focus moves to menu when opened
+  - Focus is trapped within menu
+  - Focus returns to trigger on close
+  - Focus moves through items with arrows
+
+- **Best Practices:**
+  - Group related items with separators
+  - Use labels for complex menus
+  - Show keyboard shortcuts when available
+  - Disable items that aren't applicable
+  - Use `inset` prop for visual alignment
+  - Keep menu hierarchies shallow (max 2-3 levels)
+  - Don't duplicate actions available elsewhere
+
+## Source
+
+View the source code on GitHub:
+- Component: `packages/ui/src/components/ui/context-menu.tsx:1-199`
+- Based on: [@radix-ui/react-context-menu](https://www.radix-ui.com/primitives/docs/components/context-menu)

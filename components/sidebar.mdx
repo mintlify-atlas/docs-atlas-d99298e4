@@ -1,0 +1,368 @@
+---
+title: Sidebar
+description: A collapsible navigation component for application layouts with mobile support and multiple variants.
+---
+
+## Introduction
+
+The Sidebar component provides a comprehensive navigation solution for applications. It features collapsible behavior, mobile responsiveness, multiple visual variants, and keyboard shortcuts. Built with extensive sub-components for menus, headers, footers, and more.
+
+Ideal for dashboards, admin panels, documentation sites, and any application requiring persistent navigation.
+
+## Installation
+
+```tsx
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  useSidebar,
+} from "@poketto/ui";
+```
+
+## Usage
+
+Basic sidebar setup requires wrapping your layout with `SidebarProvider`:
+
+```tsx
+<SidebarProvider>
+  <Sidebar>
+    <SidebarContent>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton>
+            <Home />
+            <span>Home</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton>
+            <Settings />
+            <span>Settings</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarContent>
+  </Sidebar>
+  <main>
+    <SidebarTrigger />
+    {/* Your app content */}
+  </main>
+</SidebarProvider>
+```
+
+## Examples
+
+### Complete Application Layout
+
+Full sidebar implementation with all sections:
+
+```tsx
+import { Home, Settings, Users, HelpCircle } from "lucide-react";
+
+function AppLayout({ children }) {
+  return (
+    <SidebarProvider defaultOpen={true}>
+      <Sidebar>
+        <SidebarHeader>
+          <h2 className="px-2 text-lg font-semibold">My App</h2>
+        </SidebarHeader>
+        
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Home">
+                    <Home />
+                    <span>Home</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Users">
+                    <Users />
+                    <span>Users</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          
+          <SidebarSeparator />
+          
+          <SidebarGroup>
+            <SidebarGroupLabel>Settings</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Settings">
+                    <Settings />
+                    <span>Settings</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Help">
+                    <HelpCircle />
+                    <span>Help</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <User />
+                <span>John Doe</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
+      
+      <SidebarInset>
+        <header className="flex h-16 items-center gap-2 border-b px-4">
+          <SidebarTrigger />
+          <h1>Page Title</h1>
+        </header>
+        <div className="p-4">
+          {children}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+```
+
+### Floating Variant
+
+Sidebar with floating appearance:
+
+```tsx
+<SidebarProvider>
+  <Sidebar variant="floating">
+    <SidebarContent>
+      {/* Sidebar content */}
+    </SidebarContent>
+  </Sidebar>
+  <main>{/* Content */}</main>
+</SidebarProvider>
+```
+
+### Icon-Only Collapsible
+
+Sidebar that collapses to icons:
+
+```tsx
+<SidebarProvider>
+  <Sidebar collapsible="icon">
+    <SidebarContent>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton tooltip="Dashboard">
+            <LayoutDashboard />
+            <span>Dashboard</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarContent>
+  </Sidebar>
+  <main>{/* Content */}</main>
+</SidebarProvider>
+```
+
+### With Sub-Menus
+
+Nested navigation structure:
+
+```tsx
+<SidebarMenu>
+  <SidebarMenuItem>
+    <SidebarMenuButton>
+      <Folder />
+      <span>Projects</span>
+    </SidebarMenuButton>
+    <SidebarMenuSub>
+      <SidebarMenuSubItem>
+        <SidebarMenuSubButton>
+          <span>Project Alpha</span>
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+      <SidebarMenuSubItem>
+        <SidebarMenuSubButton>
+          <span>Project Beta</span>
+        </SidebarMenuSubButton>
+      </SidebarMenuSubItem>
+    </SidebarMenuSub>
+  </SidebarMenuItem>
+</SidebarMenu>
+```
+
+### Active State
+
+Highlight the current page:
+
+```tsx
+<SidebarMenu>
+  <SidebarMenuItem>
+    <SidebarMenuButton isActive={pathname === '/dashboard'}>
+      <LayoutDashboard />
+      <span>Dashboard</span>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+  <SidebarMenuItem>
+    <SidebarMenuButton isActive={pathname === '/settings'}>
+      <Settings />
+      <span>Settings</span>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+</SidebarMenu>
+```
+
+### Controlled Sidebar
+
+Manage sidebar state externally:
+
+```tsx
+function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  return (
+    <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
+      <Sidebar>
+        {/* Sidebar content */}
+      </Sidebar>
+      <main>
+        <button onClick={() => setSidebarOpen(!sidebarOpen)}>
+          Toggle Sidebar
+        </button>
+      </main>
+    </SidebarProvider>
+  );
+}
+```
+
+### Using useSidebar Hook
+
+Access sidebar state in components:
+
+```tsx
+function SidebarStatus() {
+  const { state, isMobile, toggleSidebar } = useSidebar();
+  
+  return (
+    <div>
+      <p>State: {state}</p>
+      <p>Mobile: {isMobile ? 'Yes' : 'No'}</p>
+      <button onClick={toggleSidebar}>Toggle</button>
+    </div>
+  );
+}
+```
+
+## Props
+
+### SidebarProvider
+
+Context provider that manages sidebar state.
+
+<ParamField path="defaultOpen" type="boolean" default={true}>
+  Initial open state of the sidebar.
+</ParamField>
+
+<ParamField path="open" type="boolean">
+  Controlled open state. Use with `onOpenChange`.
+</ParamField>
+
+<ParamField path="onOpenChange" type="(open: boolean) => void">
+  Callback when sidebar open state changes.
+</ParamField>
+
+<ParamField path="storage" type="'cookie' | 'local'" default="cookie">
+  Where to persist sidebar state. Uses cookies or localStorage.
+</ParamField>
+
+### Sidebar
+
+Main sidebar component.
+
+<ParamField path="side" type="'left' | 'right'" default="left">
+  Which side of the screen the sidebar appears on.
+</ParamField>
+
+<ParamField path="variant" type="'sidebar' | 'floating' | 'inset'" default="sidebar">
+  Visual variant of the sidebar. `floating` adds padding and border, `inset` creates an inset appearance.
+</ParamField>
+
+<ParamField path="collapsible" type="'offcanvas' | 'icon' | 'none'" default="offcanvas">
+  Collapse behavior. `offcanvas` hides completely, `icon` shows only icons, `none` prevents collapsing.
+</ParamField>
+
+### SidebarMenuButton
+
+Button component for menu items.
+
+<ParamField path="isActive" type="boolean">
+  Whether this menu item is currently active/selected.
+</ParamField>
+
+<ParamField path="tooltip" type="string | TooltipContentProps">
+  Tooltip to show when sidebar is collapsed. Shown on hover in icon mode.
+</ParamField>
+
+<ParamField path="variant" type="'default' | 'outline'" default="default">
+  Visual variant of the button.
+</ParamField>
+
+<ParamField path="size" type="'default' | 'sm' | 'lg'" default="default">
+  Size variant of the button.
+</ParamField>
+
+<ParamField path="asChild" type="boolean">
+  Render as a child component (useful for links).
+</ParamField>
+
+### useSidebar Hook
+
+Returns sidebar context:
+
+<ParamField path="state" type="'expanded' | 'collapsed'">
+  Current visual state of the sidebar.
+</ParamField>
+
+<ParamField path="open" type="boolean">
+  Whether sidebar is open.
+</ParamField>
+
+<ParamField path="setOpen" type="(open: boolean) => void">
+  Function to control sidebar open state.
+</ParamField>
+
+<ParamField path="isMobile" type="boolean">
+  Whether the current viewport is mobile.
+</ParamField>
+
+<ParamField path="toggleSidebar" type="() => void">
+  Function to toggle sidebar open/closed.
+</ParamField>
+
+## Keyboard Shortcuts
+
+- **Cmd+B** (Mac) or **Ctrl+B** (Windows/Linux): Toggle sidebar
+
+## Accessibility
+
+- Mobile-responsive with Sheet component on small screens
+- Keyboard shortcut for quick access
+- Proper ARIA attributes for navigation
+- Tooltips in icon mode for collapsed state
+- Focus management and keyboard navigation
+- Screen reader friendly with semantic HTML

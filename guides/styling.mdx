@@ -1,0 +1,277 @@
+---
+title: Styling guide
+description: Master Tailwind CSS utilities and styling conventions in Poketto Stack
+---
+
+Poketto Stack uses Tailwind CSS for styling, with a carefully configured design system that ensures consistency across all components and applications.
+
+## Tailwind CSS basics
+
+### Utility-first approach
+
+Tailwind CSS uses utility classes that map directly to CSS properties:
+
+```tsx
+<div className="flex items-center gap-4 p-6 bg-white rounded-lg shadow-md">
+  <img src="avatar.jpg" className="w-12 h-12 rounded-full" />
+  <div>
+    <h3 className="text-lg font-semibold">John Doe</h3>
+    <p className="text-sm text-gray-600">Software Engineer</p>
+  </div>
+</div>
+```
+
+### Responsive design
+
+Use responsive prefixes to apply styles at specific breakpoints:
+
+```tsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {/* Content */}
+</div>
+```
+
+Breakpoints:
+- `sm`: 640px
+- `md`: 768px
+- `lg`: 1024px
+- `xl`: 1280px
+- `2xl`: 1536px
+
+## The cn utility
+
+The `cn()` utility function combines `clsx` and `tailwind-merge` for conditional classes:
+
+```tsx
+import { cn } from "@poketto/ui/utils"
+
+interface ButtonProps {
+  variant?: "default" | "outline"
+  size?: "sm" | "md" | "lg"
+  className?: string
+}
+
+function Button({ variant = "default", size = "md", className }: ButtonProps) {
+  return (
+    <button
+      className={cn(
+        // Base styles
+        "inline-flex items-center justify-center rounded-md font-medium transition-colors",
+        // Variant styles
+        variant === "default" && "bg-primary text-primary-foreground hover:bg-primary/90",
+        variant === "outline" && "border border-input bg-background hover:bg-accent",
+        // Size styles
+        size === "sm" && "h-9 px-3 text-sm",
+        size === "md" && "h-10 px-4 text-sm",
+        size === "lg" && "h-11 px-8 text-base",
+        // Custom className
+        className
+      )}
+    >
+      Button
+    </button>
+  )
+}
+```
+
+## Design tokens
+
+Poketto Stack uses CSS variables for themeable design tokens:
+
+### Colors
+
+```tsx
+// Background colors
+<div className="bg-background" /> // Main background
+<div className="bg-card" /> // Card background
+<div className="bg-popover" /> // Popover background
+
+// Text colors
+<p className="text-foreground" /> // Main text
+<p className="text-muted-foreground" /> // Muted text
+<p className="text-card-foreground" /> // Card text
+
+// Semantic colors
+<div className="bg-primary text-primary-foreground" />
+<div className="bg-secondary text-secondary-foreground" />
+<div className="bg-destructive text-destructive-foreground" />
+<div className="bg-accent text-accent-foreground" />
+```
+
+### Border and radius
+
+```tsx
+// Borders
+<div className="border border-border" />
+<div className="border-input" /> // For form inputs
+
+// Border radius
+<div className="rounded-lg" /> // Uses theme radius
+```
+
+## Dark mode
+
+Dark mode is supported out of the box. Use the `dark:` prefix:
+
+```tsx
+<div className="bg-white dark:bg-gray-900">
+  <h1 className="text-gray-900 dark:text-white">
+    Dark mode title
+  </h1>
+  <p className="text-gray-600 dark:text-gray-400">
+    Dark mode text
+  </p>
+</div>
+```
+
+<Tip>
+  Prefer using semantic tokens like `bg-background` and `text-foreground` which automatically adapt to dark mode.
+</Tip>
+
+## Common patterns
+
+### Card layout
+
+```tsx
+<div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+  <div className="flex flex-col space-y-1.5 p-6">
+    <h3 className="text-2xl font-semibold">Card Title</h3>
+    <p className="text-sm text-muted-foreground">Card Description</p>
+  </div>
+  <div className="p-6 pt-0">
+    {/* Card content */}
+  </div>
+  <div className="flex items-center p-6 pt-0">
+    {/* Card footer */}
+  </div>
+</div>
+```
+
+### Form field
+
+```tsx
+<div className="grid w-full max-w-sm items-center gap-1.5">
+  <label htmlFor="email" className="text-sm font-medium">
+    Email
+  </label>
+  <input
+    type="email"
+    id="email"
+    placeholder="Email"
+    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+  />
+</div>
+```
+
+### Button group
+
+```tsx
+<div className="inline-flex rounded-md shadow-sm" role="group">
+  <button className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-l-lg hover:bg-gray-100">
+    Left
+  </button>
+  <button className="px-4 py-2 text-sm font-medium border-t border-b border-gray-200 hover:bg-gray-100">
+    Middle
+  </button>
+  <button className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-r-lg hover:bg-gray-100">
+    Right
+  </button>
+</div>
+```
+
+### Loading skeleton
+
+```tsx
+<div className="space-y-3">
+  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse w-5/6" />
+  <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded animate-pulse w-4/6" />
+</div>
+```
+
+## Custom styles
+
+When you need custom CSS, use Tailwind's `@layer` directive:
+
+```css app/globals.css
+@layer components {
+  .prose-custom {
+    @apply prose prose-gray dark:prose-invert max-w-none;
+    @apply prose-headings:font-semibold prose-headings:text-foreground;
+    @apply prose-p:text-muted-foreground;
+    @apply prose-a:text-primary prose-a:no-underline hover:prose-a:underline;
+  }
+}
+```
+
+Then use it in your components:
+
+```tsx
+<article className="prose-custom">
+  {/* Markdown content */}
+</article>
+```
+
+## Typography
+
+Poketto Stack uses Inter font with Tailwind's typography utilities:
+
+```tsx
+<div>
+  <h1 className="text-4xl font-bold">Heading 1</h1>
+  <h2 className="text-3xl font-semibold">Heading 2</h2>
+  <h3 className="text-2xl font-semibold">Heading 3</h3>
+  <h4 className="text-xl font-semibold">Heading 4</h4>
+  <p className="text-base">Body text</p>
+  <p className="text-sm text-muted-foreground">Small text</p>
+</div>
+```
+
+## Animation
+
+Tailwind Animate provides pre-built animations:
+
+```tsx
+// Fade in
+<div className="animate-in fade-in duration-500">
+  Content
+</div>
+
+// Slide in from bottom
+<div className="animate-in slide-in-from-bottom-4 duration-500">
+  Content
+</div>
+
+// Spin (for loading)
+<div className="animate-spin">
+  <LoaderIcon />
+</div>
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use semantic tokens" icon="palette">
+    Prefer `bg-background` over `bg-white` for theme consistency
+  </Card>
+  <Card title="Mobile-first" icon="mobile">
+    Start with mobile styles, add breakpoints as needed
+  </Card>
+  <Card title="Consistent spacing" icon="ruler">
+    Use Tailwind's spacing scale (4px increments)
+  </Card>
+  <Card title="Avoid arbitrary values" icon="ban">
+    Use design tokens instead of `w-[237px]`
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Theming" icon="paintbrush" href="/concepts/theming">
+    Learn how to customize the theme
+  </Card>
+  <Card title="Components" icon="cube" href="/concepts/components">
+    Understand component patterns
+  </Card>
+</CardGroup>

@@ -1,0 +1,365 @@
+---
+title: Tooltip
+description: A floating text label that appears when hovering over or focusing an element. Use for providing helpful hints or additional context.
+---
+
+## Overview
+
+The Tooltip component displays brief, informative text when users hover over or focus on an element. Tooltips appear after a short delay and disappear when the user moves away.
+
+Use tooltips when you need to:
+- Provide helpful hints about UI elements
+- Explain the purpose of icon-only buttons
+- Show keyboard shortcuts
+- Display additional context without cluttering the interface
+
+## Installation
+
+The Tooltip component is built on Radix UI primitives and available in the Poketto UI package.
+
+```tsx
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+Tooltips require a `TooltipProvider` wrapper to configure default behavior. Wrap your app or tooltip group with the provider:
+
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function BasicTooltip() {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">Hover me</Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>This is a helpful tooltip</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+```
+
+## Examples
+
+### Icon Button with Tooltip
+
+Tooltips are essential for icon-only buttons to ensure accessibility:
+
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+import { Settings, Save, Download } from "lucide-react";
+
+export default function IconButtonTooltips() {
+  return (
+    <TooltipProvider>
+      <div className="flex gap-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Settings</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Save className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Save changes</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Download className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Download file</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  );
+}
+```
+
+### Tooltip with Keyboard Shortcut
+
+Show keyboard shortcuts to help users discover faster workflows:
+
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function TooltipWithShortcut() {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">Save</Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="flex items-center gap-2">
+            <span>Save changes</span>
+            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+              <span className="text-xs">⌘</span>S
+            </kbd>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+```
+
+### Positioning Options
+
+Control where the tooltip appears relative to the trigger:
+
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function TooltipPositions() {
+  return (
+    <TooltipProvider>
+      <div className="flex gap-4">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Top</Button>
+          </TooltipTrigger>
+          <TooltipContent side="top">
+            <p>Tooltip on top</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Bottom</Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <p>Tooltip on bottom</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Left</Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <p>Tooltip on left</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Right</Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <p>Tooltip on right</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  );
+}
+```
+
+### Custom Delay
+
+Adjust the delay before tooltips appear:
+
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function TooltipWithCustomDelay() {
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant="outline">Quick tooltip (300ms)</Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>This appears after a shorter delay</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+```
+
+### Multiple Tooltips with Shared Provider
+
+Wrap multiple tooltips in a single provider for consistent behavior:
+
+```tsx
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+
+export default function MultipleTooltips() {
+  return (
+    <TooltipProvider>
+      <div className="flex gap-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">First</Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>First tooltip</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Second</Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Second tooltip</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline">Third</Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Third tooltip</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  );
+}
+```
+
+## Component API
+
+### TooltipProvider
+
+Provides context for all tooltips within it. Typically wraps your app or a group of tooltips.
+
+```tsx
+<TooltipProvider
+  delayDuration?: number
+  skipDelayDuration?: number
+  disableHoverableContent?: boolean
+>
+```
+
+**Props:**
+- `delayDuration`: Time in ms before tooltip appears (default: `700`)
+- `skipDelayDuration`: Time in ms to skip delay when moving between tooltips (default: `300`)
+- `disableHoverableContent`: Prevent tooltip from staying open when hovering over it
+
+### Tooltip
+
+The root component that manages tooltip state.
+
+```tsx
+<Tooltip
+  defaultOpen?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  delayDuration?: number
+>
+```
+
+**Props:**
+- `defaultOpen`: The initial open state (uncontrolled)
+- `open`: Controlled open state
+- `onOpenChange`: Callback when open state changes
+- `delayDuration`: Override the provider's delay for this tooltip
+
+### TooltipTrigger
+
+The element that triggers the tooltip on hover or focus.
+
+```tsx
+<TooltipTrigger asChild?: boolean>
+```
+
+**Props:**
+- `asChild`: Merge props with child element instead of rendering a button
+
+### TooltipContent
+
+The content container that appears when the tooltip is triggered.
+
+```tsx
+<TooltipContent
+  side?: "top" | "right" | "bottom" | "left"
+  sideOffset?: number
+  align?: "start" | "center" | "end"
+  alignOffset?: number
+  className?: string
+>
+```
+
+**Props:**
+- `side`: Which side of trigger to appear on (default: `"top"`)
+- `sideOffset`: Distance from trigger in pixels (default: `4`)
+- `align`: Alignment relative to trigger (default: `"center"`)
+- `alignOffset`: Offset along the alignment axis
+- `className`: Additional CSS classes
+
+**Default styling:**
+- Background: `bg-primary`
+- Text: `text-primary-foreground`
+- Padding: `px-3 py-1.5`
+- Font size: `text-xs`
+- Border radius: rounded
+- Animations: fade and zoom on open/close
+
+## Accessibility
+
+The Tooltip component follows WAI-ARIA guidelines:
+
+- **Keyboard Navigation:**
+  - Tooltips appear on focus as well as hover
+  - `Escape` closes the tooltip
+  - No keyboard interaction required for tooltips
+
+- **Screen Readers:**
+  - Uses `aria-describedby` to link tooltip to trigger
+  - Content is announced when tooltip appears
+  - Does not interrupt screen reader flow
+
+- **Focus Management:**
+  - Tooltips don't receive focus
+  - Tooltips don't trap focus
+  - Hovering over tooltip content keeps it open
+
+- **Best Practices:**
+  - Keep tooltip content concise (1-2 lines)
+  - Don't put critical information in tooltips
+  - Don't put interactive elements in tooltips (use Popover instead)
+  - Always provide tooltips for icon-only buttons
+  - Use `asChild` to maintain semantic HTML
+  - Don't use tooltips for essential information
+
+## Source
+
+View the source code on GitHub:
+- Component: `packages/ui/src/components/ui/tooltip.tsx:12-28`
+- Based on: [@radix-ui/react-tooltip](https://www.radix-ui.com/primitives/docs/components/tooltip)

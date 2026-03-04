@@ -1,0 +1,251 @@
+---
+title: Creating components
+description: Learn how to create new components in Poketto Stack
+---
+
+Poketto Stack uses shadcn/ui components as a foundation. You can add new components from the shadcn/ui library or create custom ones that integrate with the design system.
+
+## Adding shadcn/ui components
+
+The easiest way to add new components is using the shadcn/ui CLI:
+
+<Steps>
+  <Step title="Navigate to your app">
+    Navigate to the app or package where you want to add the component.
+    
+    ```bash
+    cd apps/admin
+    ```
+  </Step>
+  
+  <Step title="Add the component">
+    Use the shadcn/ui CLI to add a component.
+    
+    ```bash
+    npx shadcn@latest add [component-name]
+    ```
+    
+    For example, to add the Collapsible component:
+    
+    ```bash
+    npx shadcn@latest add collapsible
+    ```
+    
+    <Note>
+      This will install any required dependencies and create the component file in `app/components/ui/`.
+    </Note>
+  </Step>
+  
+  <Step title="Import and use">
+    Import the component in your page or component.
+    
+    ```tsx
+    import {
+      Collapsible,
+      CollapsibleContent,
+      CollapsibleTrigger,
+    } from "@/components/ui/collapsible"
+    
+    export default function MyComponent() {
+      return (
+        <Collapsible>
+          <CollapsibleTrigger>Toggle</CollapsibleTrigger>
+          <CollapsibleContent>
+            Content goes here
+          </CollapsibleContent>
+        </Collapsible>
+      )
+    }
+    ```
+  </Step>
+</Steps>
+
+## Creating custom components
+
+When creating custom components, follow these patterns to integrate with the design system:
+
+### Using the cn utility
+
+The `cn()` utility from `@poketto/ui/utils` combines Tailwind classes with `clsx` and `tailwind-merge`:
+
+```tsx
+import { cn } from "@poketto/ui/utils"
+
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "default" | "outlined"
+}
+
+export function CustomCard({ className, variant = "default", ...props }: CardProps) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg p-6",
+        variant === "default" && "bg-card text-card-foreground shadow-sm",
+        variant === "outlined" && "border border-border",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+```
+
+### Using Class Variance Authority
+
+For components with multiple variants, use CVA:
+
+```tsx
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@poketto/ui/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-primary text-primary-foreground",
+        secondary: "border-transparent bg-secondary text-secondary-foreground",
+        destructive: "border-transparent bg-destructive text-destructive-foreground",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+export function Badge({ className, variant, ...props }: BadgeProps) {
+  return <div className={cn(badgeVariants({ variant }), className)} {...props} />
+}
+```
+
+## Adding to the UI package
+
+To make a component available across all apps in the monorepo:
+
+<Steps>
+  <Step title="Create the component">
+    Create your component in `packages/ui/src/components/ui/`.
+    
+    ```tsx packages/ui/src/components/ui/status-badge.tsx
+    import { cva, type VariantProps } from "class-variance-authority"
+    import { cn } from "../../lib/utils"
+    
+    const statusBadgeVariants = cva(
+      "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
+      {
+        variants: {
+          status: {
+            success: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+            warning: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+            error: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+            info: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+          },
+        },
+        defaultVariants: {
+          status: "info",
+        },
+      }
+    )
+    
+    export interface StatusBadgeProps
+      extends React.HTMLAttributes<HTMLSpanElement>,
+        VariantProps<typeof statusBadgeVariants> {}
+    
+    export function StatusBadge({ className, status, ...props }: StatusBadgeProps) {
+      return <span className={cn(statusBadgeVariants({ status }), className)} {...props} />
+    }
+    ```
+  </Step>
+  
+  <Step title="Add to package exports">
+    Add the component to `packages/ui/package.json` exports:
+    
+    ```json
+    {
+      "exports": {
+        "./status-badge": "./src/components/ui/status-badge.tsx",
+        ...
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Use in your app">
+    Import and use the component in any app:
+    
+    ```tsx
+    import { StatusBadge } from "@poketto/ui/status-badge"
+    
+    export default function MyPage() {
+      return (
+        <div>
+          <StatusBadge status="success">Active</StatusBadge>
+          <StatusBadge status="warning">Pending</StatusBadge>
+          <StatusBadge status="error">Failed</StatusBadge>
+        </div>
+      )
+    }
+    ```
+  </Step>
+</Steps>
+
+## Component testing
+
+Test your components with Vitest and Testing Library:
+
+```tsx
+import { render, screen } from "@testing-library/react"
+import { describe, expect, it } from "vitest"
+import { StatusBadge } from "./status-badge"
+
+describe("StatusBadge", () => {
+  it("renders with success variant", () => {
+    render(<StatusBadge status="success">Active</StatusBadge>)
+    expect(screen.getByText("Active")).toBeInTheDocument()
+  })
+
+  it("applies custom className", () => {
+    render(
+      <StatusBadge status="info" className="custom-class">
+        Info
+      </StatusBadge>
+    )
+    const badge = screen.getByText("Info")
+    expect(badge).toHaveClass("custom-class")
+  })
+})
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use semantic tokens" icon="palette">
+    Use CSS variables like `bg-primary` instead of hardcoded colors for theme consistency.
+  </Card>
+  <Card title="Support dark mode" icon="moon">
+    Always include dark mode classes: `bg-white dark:bg-gray-900`.
+  </Card>
+  <Card title="Make it composable" icon="puzzle-piece">
+    Break complex components into smaller, reusable pieces.
+  </Card>
+  <Card title="Type everything" icon="code">
+    Export proper TypeScript interfaces for all props.
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Styling guide" icon="paintbrush" href="/guides/styling">
+    Learn Tailwind CSS patterns and conventions
+  </Card>
+  <Card title="Component concepts" icon="cube" href="/concepts/components">
+    Understand the component architecture
+  </Card>
+</CardGroup>

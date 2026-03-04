@@ -1,0 +1,522 @@
+---
+title: '@poketto/pro-table'
+description: 'Production-ready data table components with search, filtering, sorting, and pagination built on TanStack Table'
+---
+
+## Overview
+
+`@poketto/pro-table` provides powerful, feature-rich table components for React applications. Built on [TanStack Table v8](https://tanstack.com/table/v8), it offers two main components:
+
+- **DataTable** - Low-level table primitives for full customization
+- **ProTable** - High-level table with built-in features (search, filters, pagination)
+
+## Features
+
+- ✅ Server-side pagination, sorting, and filtering
+- 🔍 Built-in search functionality
+- 📌 Column pinning (left/right)
+- 👁️ Column visibility toggles
+- ⚡ Optimized for large datasets
+- 🎨 Fully customizable styling
+- 📱 Responsive design
+- ♿ Accessible by default
+
+## Installation
+
+```bash
+pnpm add @poketto/pro-table
+```
+
+<Note>
+  `@poketto/pro-table` requires `@poketto/ui` as a peer dependency.
+</Note>
+
+```bash
+pnpm add @poketto/ui
+```
+
+## Quick Start
+
+### Basic ProTable Example
+
+```tsx
+import { ProTable } from '@poketto/pro-table/pro-table'
+import type { ColumnDef } from '@poketto/pro-table/pro-table'
+
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+}
+
+const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+  },
+  {
+    accessorKey: 'role',
+    header: 'Role',
+  },
+]
+
+export function UsersTable() {
+  const [data, setData] = useState<User[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+    total: 0,
+  })
+
+  const fetchData = async () => {
+    setIsLoading(true)
+    const response = await fetch('/api/users')
+    const result = await response.json()
+    setData(result.data)
+    setPagination(prev => ({ ...prev, total: result.total }))
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [pagination.pageIndex, pagination.pageSize])
+
+  return (
+    <ProTable
+      columns={columns}
+      data={data}
+      isLoading={isLoading}
+      pagination={{
+        ...pagination,
+        onPageChange: (pageIndex) => 
+          setPagination(prev => ({ ...prev, pageIndex })),
+        onPageSizeChange: (pageSize) => 
+          setPagination(prev => ({ ...prev, pageSize, pageIndex: 0 })),
+      }}
+      onRefresh={fetchData}
+    />
+  )
+}
+```
+
+## ProTable Component
+
+### Props
+
+<ResponseField name="columns" type="ColumnDef<TData>[]" required>
+  Array of column definitions
+</ResponseField>
+
+<ResponseField name="data" type="TData[]" required>
+  Array of data items to display
+</ResponseField>
+
+<ResponseField name="isLoading" type="boolean" required>
+  Loading state of the table
+</ResponseField>
+
+<ResponseField name="pagination" type="PaginationProps">
+  Pagination configuration:
+  - `pageIndex: number` - Current page (0-indexed)
+  - `pageSize: number` - Items per page
+  - `total: number` - Total number of items
+  - `onPageChange: (page: number) => void`
+  - `onPageSizeChange: (size: number) => void`
+  - `quickJump?: boolean` - Enable page jump input
+</ResponseField>
+
+<ResponseField name="toolbar" type="React.ReactNode">
+  Custom toolbar component rendered above the table
+</ResponseField>
+
+<ResponseField name="initialState" type="TableOptions['initialState']">
+  Initial table state (sorting, filters, etc.)
+</ResponseField>
+
+<ResponseField name="onRefresh" type="() => void">
+  Callback when refresh button is clicked
+</ResponseField>
+
+<ResponseField name="onSearch" type="(params: SearchParams) => void">
+  Callback when search is performed
+</ResponseField>
+
+<ResponseField name="enableSearch" type="boolean" default="true">
+  Enable/disable search functionality
+</ResponseField>
+
+## Column Definition
+
+### Basic Column
+
+```tsx
+import type { ColumnDef } from '@poketto/pro-table/pro-table'
+
+const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'User Name',
+  },
+]
+```
+
+### Custom Header
+
+```tsx
+import { DataTableColumnHeader } from '@poketto/pro-table/data-table'
+
+const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'name',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
+  },
+]
+```
+
+### Custom Cell Rendering
+
+```tsx
+const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.getValue('status')
+      return (
+        <Badge variant={status === 'active' ? 'default' : 'secondary'}>
+          {status}
+        </Badge>
+      )
+    },
+  },
+]
+```
+
+### Column Pinning
+
+```tsx
+const columns: ColumnDef<User>[] = [
+  {
+    id: 'select',
+    pinned: 'left',
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      />
+    ),
+  },
+  {
+    id: 'actions',
+    pinned: 'right',
+    cell: ({ row }) => <ActionsMenu row={row} />,
+  },
+]
+```
+
+### Column Search
+
+Enable search on specific columns:
+
+```tsx
+const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    search: {
+      placeholder: 'Search by name...',
+    },
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+    search: true, // Use default placeholder
+  },
+]
+```
+
+### Column Width
+
+```tsx
+const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'id',
+    header: 'ID',
+    width: 80,
+  },
+  {
+    accessorKey: 'description',
+    header: 'Description',
+    width: 400,
+  },
+]
+```
+
+## Advanced Examples
+
+### With Faceted Filters
+
+```tsx
+import { DataTableFacetedFilter } from '@poketto/pro-table/data-table'
+
+const statusOptions = [
+  { label: 'Active', value: 'active' },
+  { label: 'Inactive', value: 'inactive' },
+  { label: 'Pending', value: 'pending' },
+]
+
+<ProTable
+  columns={columns}
+  data={data}
+  isLoading={isLoading}
+  toolbar={
+    <DataTableFacetedFilter
+      column={table.getColumn('status')}
+      title="Status"
+      options={statusOptions}
+    />
+  }
+/>
+```
+
+### With Custom Toolbar
+
+```tsx
+import { Button } from '@poketto/ui/button'
+import { Input } from '@poketto/ui/input'
+
+function CustomToolbar({ table }) {
+  return (
+    <div className="flex items-center justify-between">
+      <Input
+        placeholder="Filter by name..."
+        value={table.getColumn('name')?.getFilterValue() ?? ''}
+        onChange={(e) => 
+          table.getColumn('name')?.setFilterValue(e.target.value)
+        }
+        className="max-w-sm"
+      />
+      <div className="flex gap-2">
+        <Button variant="outline">Export</Button>
+        <Button>Add User</Button>
+      </div>
+    </div>
+  )
+}
+
+<ProTable
+  columns={columns}
+  data={data}
+  isLoading={isLoading}
+  toolbar={<CustomToolbar table={table} />}
+/>
+```
+
+### Row Selection
+
+```tsx
+import { Checkbox } from '@poketto/ui/checkbox'
+
+const columns: ColumnDef<User>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  // ... other columns
+]
+
+function UsersTable() {
+  const table = useReactTable({
+    // ... config
+  })
+
+  const selectedRows = table.getFilteredSelectedRowModel().rows
+
+  return (
+    <div>
+      {selectedRows.length > 0 && (
+        <div className="flex items-center gap-2 mb-4">
+          <p>{selectedRows.length} row(s) selected</p>
+          <Button onClick={() => handleBulkDelete(selectedRows)}>
+            Delete Selected
+          </Button>
+        </div>
+      )}
+      <ProTable {...props} />
+    </div>
+  )
+}
+```
+
+### Server-Side Operations
+
+```tsx
+function UsersTable() {
+  const [data, setData] = useState<User[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+    total: 0,
+  })
+  const [search, setSearch] = useState<SearchParams>({})
+
+  const fetchData = async () => {
+    setIsLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: String(pagination.pageIndex),
+        pageSize: String(pagination.pageSize),
+        ...search,
+      })
+      const response = await fetch(`/api/users?${params}`)
+      const result = await response.json()
+      setData(result.data)
+      setPagination(prev => ({ ...prev, total: result.total }))
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [pagination.pageIndex, pagination.pageSize, search])
+
+  return (
+    <ProTable
+      columns={columns}
+      data={data}
+      isLoading={isLoading}
+      pagination={{
+        ...pagination,
+        onPageChange: (pageIndex) => 
+          setPagination(prev => ({ ...prev, pageIndex })),
+        onPageSizeChange: (pageSize) => 
+          setPagination(prev => ({ ...prev, pageSize, pageIndex: 0 })),
+      }}
+      onSearch={(params) => setSearch(params)}
+      onRefresh={fetchData}
+    />
+  )
+}
+```
+
+## DataTable Component
+
+For more control, use the low-level `DataTable` components:
+
+```tsx
+import {
+  DataTable,
+  DataTablePagination,
+  DataTableToolbar,
+  DataTableSearch,
+} from '@poketto/pro-table/data-table'
+import { useReactTable } from '@tanstack/react-table'
+
+function CustomTable() {
+  const table = useReactTable({
+    data,
+    columns,
+    // ... your table config
+  })
+
+  return (
+    <div className="space-y-4">
+      <DataTableSearch table={table} />
+      <DataTableToolbar table={table} />
+      <div className="rounded-md border">
+        <DataTable table={table} isLoading={isLoading} />
+        <DataTablePagination table={table} pagination={pagination} />
+      </div>
+    </div>
+  )
+}
+```
+
+## TypeScript
+
+Full type safety with TypeScript:
+
+```tsx
+import type { 
+  ColumnDef, 
+  ProTableProps,
+  SearchParams 
+} from '@poketto/pro-table/pro-table'
+
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+const columns: ColumnDef<User>[] = [
+  // Type-safe column definitions
+]
+
+const tableProps: ProTableProps<User, unknown> = {
+  columns,
+  data: users,
+  isLoading: false,
+}
+```
+
+## Styling
+
+All components accept `className` for custom styling:
+
+```tsx
+<ProTable
+  columns={columns}
+  data={data}
+  isLoading={isLoading}
+  className="custom-table"
+/>
+```
+
+## Performance Tips
+
+1. **Memoize columns** to prevent unnecessary re-renders:
+
+```tsx
+const columns = useMemo<ColumnDef<User>[]>(
+  () => [
+    // column definitions
+  ],
+  []
+)
+```
+
+2. **Use server-side pagination** for large datasets
+3. **Enable column virtualization** for tables with many columns
+4. **Debounce search inputs** to reduce API calls
+
+## Related Packages
+
+- [@poketto/ui](/packages/ui) - UI component library
+- [@poketto/tiptap](/packages/tiptap) - Rich text editor
+- [@poketto/cli](/packages/cli) - CLI tooling

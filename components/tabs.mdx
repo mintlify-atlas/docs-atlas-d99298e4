@@ -1,0 +1,306 @@
+---
+title: Tabs
+description: A set of layered sections of content that are displayed one at a time, allowing users to switch between different views.
+---
+
+## Introduction
+
+The Tabs component allows you to organize content into multiple panels, showing only one panel at a time. Built on Radix UI's Tabs primitive, it provides accessible, keyboard-navigable tab interfaces perfect for settings pages, product views, dashboards, and multi-step forms.
+
+## Installation
+
+```tsx
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@poketto/ui";
+```
+
+## Usage
+
+Basic tabs structure with three sections:
+
+```tsx
+<Tabs defaultValue="account">
+  <TabsList>
+    <TabsTrigger value="account">Account</TabsTrigger>
+    <TabsTrigger value="password">Password</TabsTrigger>
+    <TabsTrigger value="settings">Settings</TabsTrigger>
+  </TabsList>
+  <TabsContent value="account">
+    Account settings content
+  </TabsContent>
+  <TabsContent value="password">
+    Password settings content
+  </TabsContent>
+  <TabsContent value="settings">
+    General settings content
+  </TabsContent>
+</Tabs>
+```
+
+## Examples
+
+### Settings Tabs
+
+Common pattern for settings pages:
+
+```tsx
+<Tabs defaultValue="profile" className="w-full">
+  <TabsList>
+    <TabsTrigger value="profile">Profile</TabsTrigger>
+    <TabsTrigger value="account">Account</TabsTrigger>
+    <TabsTrigger value="notifications">Notifications</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="profile" className="space-y-4">
+    <div>
+      <h3 className="text-lg font-medium">Profile Settings</h3>
+      <p className="text-sm text-muted-foreground">
+        Manage your public profile information
+      </p>
+    </div>
+    <Input placeholder="Display name" />
+    <Textarea placeholder="Bio" />
+  </TabsContent>
+  
+  <TabsContent value="account" className="space-y-4">
+    <div>
+      <h3 className="text-lg font-medium">Account Settings</h3>
+      <p className="text-sm text-muted-foreground">
+        Update your account preferences
+      </p>
+    </div>
+    <Input type="email" placeholder="Email" />
+    <Input type="password" placeholder="New password" />
+  </TabsContent>
+  
+  <TabsContent value="notifications" className="space-y-4">
+    <div>
+      <h3 className="text-lg font-medium">Notification Preferences</h3>
+      <p className="text-sm text-muted-foreground">
+        Choose how you want to be notified
+      </p>
+    </div>
+    <div className="space-y-2">
+      <label className="flex items-center gap-2">
+        <input type="checkbox" /> Email notifications
+      </label>
+      <label className="flex items-center gap-2">
+        <input type="checkbox" /> Push notifications
+      </label>
+    </div>
+  </TabsContent>
+</Tabs>
+```
+
+### Product Information Tabs
+
+Display different product details:
+
+```tsx
+<Tabs defaultValue="description">
+  <TabsList>
+    <TabsTrigger value="description">Description</TabsTrigger>
+    <TabsTrigger value="specs">Specifications</TabsTrigger>
+    <TabsTrigger value="reviews">Reviews</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="description">
+    <p>Detailed product description goes here...</p>
+  </TabsContent>
+  
+  <TabsContent value="specs">
+    <dl className="space-y-2">
+      <div><dt className="font-semibold">Weight:</dt><dd>1.2kg</dd></div>
+      <div><dt className="font-semibold">Dimensions:</dt><dd>30x20x10cm</dd></div>
+    </dl>
+  </TabsContent>
+  
+  <TabsContent value="reviews">
+    <p>Customer reviews and ratings...</p>
+  </TabsContent>
+</Tabs>
+```
+
+### Controlled Tabs
+
+Manage tab state externally:
+
+```tsx
+function ControlledTabs() {
+  const [activeTab, setActiveTab] = useState("overview");
+  
+  return (
+    <div>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview">
+          Overview content
+        </TabsContent>
+        <TabsContent value="analytics">
+          Analytics data
+        </TabsContent>
+        <TabsContent value="reports">
+          Reports and insights
+        </TabsContent>
+      </Tabs>
+      
+      <p className="mt-4 text-sm text-muted-foreground">
+        Current tab: {activeTab}
+      </p>
+    </div>
+  );
+}
+```
+
+### Full-Width TabsList
+
+Stretch tabs across the full width:
+
+```tsx
+<Tabs defaultValue="all">
+  <TabsList className="grid w-full grid-cols-3">
+    <TabsTrigger value="all">All</TabsTrigger>
+    <TabsTrigger value="active">Active</TabsTrigger>
+    <TabsTrigger value="completed">Completed</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="all">
+    All items...
+  </TabsContent>
+  <TabsContent value="active">
+    Active items...
+  </TabsContent>
+  <TabsContent value="completed">
+    Completed items...
+  </TabsContent>
+</Tabs>
+```
+
+### Tabs with Cards
+
+Combine tabs with cards for rich layouts:
+
+```tsx
+<Tabs defaultValue="monthly">
+  <TabsList>
+    <TabsTrigger value="monthly">Monthly</TabsTrigger>
+    <TabsTrigger value="yearly">Yearly</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="monthly" className="space-y-4">
+    <Card>
+      <CardHeader>
+        <CardTitle>Starter</CardTitle>
+        <CardDescription>$9/month</CardDescription>
+      </CardHeader>
+      <CardContent>
+        Perfect for individuals
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="yearly" className="space-y-4">
+    <Card>
+      <CardHeader>
+        <CardTitle>Starter</CardTitle>
+        <CardDescription>$90/year (Save 17%)</CardDescription>
+      </CardHeader>
+      <CardContent>
+        Perfect for individuals
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+```
+
+## Props
+
+### Tabs
+
+The root tabs container.
+
+<ParamField path="defaultValue" type="string">
+  The value of the tab that should be active by default.
+</ParamField>
+
+<ParamField path="value" type="string">
+  The controlled value of the active tab. Use with `onValueChange`.
+</ParamField>
+
+<ParamField path="onValueChange" type="(value: string) => void">
+  Callback fired when the active tab changes.
+</ParamField>
+
+<ParamField path="orientation" type="'horizontal' | 'vertical'" default="horizontal">
+  The orientation of the tabs.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes for the tabs container.
+</ParamField>
+
+### TabsList
+
+Container for the tab triggers.
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default includes inline-flex layout, rounded background with muted styling.
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  TabsTrigger components.
+</ParamField>
+
+### TabsTrigger
+
+Clickable tab button.
+
+<ParamField path="value" type="string" required>
+  Unique identifier matching the corresponding TabsContent value.
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  When true, prevents user interaction with the trigger.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Active state automatically applies background and shadow.
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  The label content for the tab.
+</ParamField>
+
+### TabsContent
+
+Content panel for each tab.
+
+<ParamField path="value" type="string" required>
+  Unique identifier matching the corresponding TabsTrigger value.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default includes top margin and focus ring styles.
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  Content to display when this tab is active.
+</ParamField>
+
+## Accessibility
+
+- Built on Radix UI Tabs following WAI-ARIA tabs pattern
+- Keyboard navigation: `Tab` to focus tab list, `Arrow keys` to navigate between tabs, `Space` or `Enter` to activate
+- Automatic focus management when switching tabs
+- Screen reader support with proper ARIA roles and attributes
+- Active tab indicated visually with background color and shadow
+- Focus visible ring for keyboard navigation

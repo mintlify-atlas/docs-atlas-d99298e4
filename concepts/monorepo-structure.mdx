@@ -1,0 +1,248 @@
+---
+title: Monorepo Structure
+description: Understanding the Turborepo-powered monorepo architecture and how packages are organized in Poketto Stack
+---
+
+## Why a Monorepo?
+
+Poketto Stack uses a monorepo structure powered by **Turborepo** and **pnpm workspaces**. This architecture enables:
+
+- **Code sharing**: Share UI components, utilities, and configurations across multiple apps
+- **Atomic changes**: Update shared packages and see changes instantly across all apps
+- **Consistent tooling**: Single source of truth for dependencies and build configurations
+- **Optimized builds**: Turborepo's caching ensures you never rebuild the same code twice
+
+## Repository Structure
+
+The monorepo is organized into two main directories:
+
+```
+poketto-stack/
+├── apps/              # Applications that users interact with
+│   ├── admin/         # Main admin dashboard (React Router 7)
+│   ├── api/           # Backend API (Cloudflare Workers)
+│   ├── docs/          # Documentation site
+│   ├── tauri/         # Desktop app wrapper
+│   └── website/       # Marketing website
+├── packages/          # Shared code and components
+│   ├── ui/            # shadcn/ui component library
+│   ├── pro-table/     # Advanced table components
+│   ├── tiptap/        # Rich text editor
+│   └── cli/           # CLI tools
+├── turbo.json         # Turborepo configuration
+└── pnpm-workspace.yaml # Workspace definition
+```
+
+### Apps Directory
+
+Each app in `apps/` is a standalone application with its own `package.json`, build process, and deployment target:
+
+- **admin**: The main SPA built with React Router 7, showcasing all UI components
+- **api**: Serverless API built for Cloudflare Workers
+- **docs**: VitePress documentation site
+- **tauri**: Desktop application wrapper using Tauri
+- **website**: Marketing and landing pages
+
+### Packages Directory
+
+Packages are shared libraries consumed by apps. They use the `workspace:*` protocol for internal dependencies:
+
+```json title="apps/admin/package.json"
+{
+  "dependencies": {
+    "@poketto/ui": "workspace:*",
+    "@poketto/pro-table": "workspace:*",
+    "@poketto/tiptap": "workspace:*"
+  }
+}
+```
+
+<Note>
+  The `workspace:*` protocol tells pnpm to link to the local package instead of downloading from npm. This enables instant hot-reloading when you edit shared code.
+</Note>
+
+## Turborepo Configuration
+
+The `turbo.json` file defines task pipelines and caching strategies:
+
+```json title="turbo.json"
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    }
+  }
+}
+```
+
+### Key Task Configurations
+
+<AccordionGroup>
+  <Accordion title="build">
+    Caches build outputs in `dist/**` directories. Turborepo won't rebuild packages if source files haven't changed.
+  </Accordion>
+  
+  <Accordion title="check-types">
+    The `^check-types` dependency means packages must type-check their dependencies first. This catches type errors at package boundaries.
+  </Accordion>
+  
+  <Accordion title="dev">
+    Marked as `persistent` because dev servers run indefinitely. Caching is disabled since dev mode should always be fresh.
+  </Accordion>
+</AccordionGroup>
+
+## Workspace Protocol
+
+The `pnpm-workspace.yaml` defines which directories are part of the workspace:
+
+```yaml title="pnpm-workspace.yaml"
+packages:
+  - 'apps/*'
+  - 'packages/*'
+```
+
+This tells pnpm to treat all subdirectories in `apps/` and `packages/` as workspace members. When you run `pnpm install`, dependencies are hoisted to a shared `node_modules` at the root, with package-specific dependencies isolated.
+
+## Development Workflows
+
+### Running All Apps
+
+```bash
+pnpm dev
+```
+
+This executes the `dev` task across all packages in parallel. Turborepo orchestrates the execution order based on dependencies.
+
+### Running a Specific App
+
+```bash
+pnpm admin:dev
+```
+
+Runs only the admin app. The script uses Turbo's `--filter` flag:
+
+```json title="package.json"
+{
+  "scripts": {
+    "admin:dev": "turbo --filter admin dev"
+  }
+}
+```
+
+### Building for Production
+
+```bash
+pnpm admin:build
+```
+
+Builds the admin app and all its dependencies:
+
+1. Turborepo detects that `admin` depends on `@poketto/ui` and other packages
+2. Builds packages first (or uses cached builds)
+3. Builds the admin app with the updated packages
+
+## Adding New Packages
+
+<Steps>
+  <Step title="Create package directory">
+    ```bash
+    mkdir packages/my-package
+    cd packages/my-package
+    ```
+  </Step>
+  
+  <Step title="Initialize package.json">
+    ```json title="packages/my-package/package.json"
+    {
+      "name": "@poketto/my-package",
+      "version": "1.0.0",
+      "exports": {
+        "./utils": "./src/utils.ts"
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Install in consuming apps">
+    ```bash
+    pnpm add @poketto/my-package --filter admin
+    ```
+    
+    This adds `"@poketto/my-package": "workspace:*"` to admin's dependencies.
+  </Step>
+  
+  <Step title="Import and use">
+    ```tsx title="apps/admin/app/some-file.tsx"
+    import { myUtil } from "@poketto/my-package/utils";
+    ```
+  </Step>
+</Steps>
+
+## Why This Structure Works
+
+### Dependency Graph
+
+The monorepo creates a clear dependency graph:
+
+```
+app/admin → @poketto/ui → react, @radix-ui/*
+         → @poketto/pro-table
+         → @poketto/tiptap
+```
+
+Changes to `@poketto/ui` automatically trigger rebuilds in apps that depend on it, but unrelated apps (like `api`) are unaffected.
+
+### No Version Conflicts
+
+Because packages use `workspace:*`, there's no confusion about which version of a package you're using. You're always using the local, development version.
+
+### Faster CI/CD
+
+Turborepo's remote caching means CI jobs can skip rebuilding unchanged packages. If you only changed the API, the admin app's build is pulled from cache, saving minutes on every deploy.
+
+## Common Patterns
+
+### Extending Shared Configs
+
+The admin app extends the UI package's Tailwind config:
+
+```ts title="apps/admin/tailwind.config.ts"
+import uiConfig from "@poketto/ui/tailwind.config.ts";
+import type { Config } from "tailwindcss";
+
+export default {
+  ...uiConfig,
+  content: [
+    "../../packages/ui/src/**/*.{js,ts,jsx,tsx}",
+    "../../packages/pro-table/src/**/*.{js,ts,jsx,tsx}",
+    "./app/**/*.{ts,tsx}",
+  ],
+} satisfies Config;
+```
+
+This ensures design tokens and theme configurations are consistent while allowing app-specific overrides.
+
+### Package Exports
+
+Packages define precise exports to control their public API:
+
+```json title="packages/ui/package.json"
+{
+  "exports": {
+    "./button": "./src/components/ui/button.tsx",
+    "./card": "./src/components/ui/card.tsx",
+    "./utils": "./src/lib/utils.ts"
+  }
+}
+```
+
+Consumers can only import what's explicitly exported, preventing accidental coupling to internal implementation details.

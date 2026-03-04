@@ -1,0 +1,320 @@
+---
+title: Theme customization
+description: Customize colors, fonts, and design tokens to match your brand
+---
+
+Learn how to customize the theme to match your brand identity while maintaining the flexibility of the design system.
+
+## Color system
+
+Poketto Stack uses CSS variables for colors, making theme customization simple and dynamic.
+
+### Modifying theme colors
+
+Edit `app/globals.css` to change theme colors:
+
+```css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* ... other dark mode colors */
+  }
+}
+```
+
+### Color format
+
+Colors use HSL (Hue, Saturation, Lightness) format without the `hsl()` wrapper:
+
+```css
+/* Format: H S% L% */
+--primary: 221.2 83.2% 53.3%;
+```
+
+This allows for easy manipulation:
+
+```css
+/* Original color */
+background-color: hsl(var(--primary));
+
+/* With opacity */
+background-color: hsl(var(--primary) / 0.8);
+
+/* Darker shade */
+background-color: hsl(var(--primary) / 0.9);
+```
+
+## Brand colors
+
+Add your brand colors as custom CSS variables:
+
+```css
+:root {
+  /* Brand colors */
+  --brand-blue: 211 100% 50%;
+  --brand-purple: 262 83% 58%;
+  --brand-green: 142 71% 45%;
+  
+  /* Semantic mappings */
+  --primary: var(--brand-blue);
+  --accent: var(--brand-purple);
+}
+```
+
+Then use in Tailwind config:
+
+```ts
+theme: {
+  extend: {
+    colors: {
+      brand: {
+        blue: "hsl(var(--brand-blue))",
+        purple: "hsl(var(--brand-purple))",
+        green: "hsl(var(--brand-green))",
+      },
+    },
+  },
+}
+```
+
+## Typography
+
+### Custom fonts
+
+Add custom fonts via CDN or local files:
+
+```css globals.css
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+```
+
+Or use next/font or @fontsource for better performance:
+
+```bash
+pnpm add @fontsource/inter
+```
+
+```tsx
+import "@fontsource/inter/400.css"
+import "@fontsource/inter/600.css"
+import "@fontsource/inter/700.css"
+```
+
+### Font configuration
+
+Configure fonts in Tailwind:
+
+```ts
+theme: {
+  extend: {
+    fontFamily: {
+      sans: ["Inter", "system-ui", "sans-serif"],
+      display: ["Cal Sans", "sans-serif"],
+      mono: ["JetBrains Mono", "monospace"],
+    },
+  },
+}
+```
+
+## Border radius
+
+Adjust border radius globally:
+
+```css
+:root {
+  --radius: 0.5rem; /* Default: rounded-lg */
+}
+
+/* For sharper corners */
+:root {
+  --radius: 0.25rem; /* More subtle */
+}
+
+/* For rounder corners */
+:root {
+  --radius: 0.75rem; /* More rounded */
+}
+```
+
+## Creating themes
+
+Create multiple theme presets:
+
+```css
+/* Blue theme */
+[data-theme="blue"] {
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
+/* Purple theme */
+[data-theme="purple"] {
+  --primary: 262.1 83.3% 57.8%;
+  --primary-foreground: 210 40% 98%;
+}
+
+/* Green theme */
+[data-theme="green"] {
+  --primary: 142.1 76.2% 36.3%;
+  --primary-foreground: 355.7 100% 97.3%;
+}
+```
+
+Switch themes with JavaScript:
+
+```tsx
+export function ThemeSwitcher() {
+  const [theme, setTheme] = useState("blue")
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme)
+  }, [theme])
+
+  return (
+    <Select value={theme} onValueChange={setTheme}>
+      <SelectTrigger>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="blue">Blue</SelectItem>
+        <SelectItem value="purple">Purple</SelectItem>
+        <SelectItem value="green">Green</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
+```
+
+## Dark mode
+
+Dark mode is controlled by the `dark` class on the root element:
+
+```tsx
+import { useEffect, useState } from "react"
+
+type Theme = "light" | "dark" | "system"
+
+export function useTheme() {
+  const [theme, setTheme] = useState<Theme>("system")
+
+  useEffect(() => {
+    const root = window.document.documentElement
+    root.classList.remove("light", "dark")
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light"
+
+      root.classList.add(systemTheme)
+      return
+    }
+
+    root.classList.add(theme)
+  }, [theme])
+
+  return { theme, setTheme }
+}
+```
+
+## Component theming
+
+Override component styles with CSS variables:
+
+```css
+/* Custom button styles */
+.btn-custom {
+  --btn-bg: hsl(var(--primary));
+  --btn-fg: hsl(var(--primary-foreground));
+  --btn-hover-bg: hsl(var(--primary) / 0.9);
+  
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+}
+
+.btn-custom:hover {
+  background-color: var(--btn-hover-bg);
+}
+
+/* Card with custom background */
+.card-highlight {
+  --card-bg: hsl(var(--accent));
+  background-color: var(--card-bg);
+}
+```
+
+## Theme generator
+
+Use online tools to generate color schemes:
+
+- [Realtime Colors](https://realtimecolors.com/)
+- [UI Colors](https://uicolors.app/)
+- [Coolors](https://coolors.co/)
+
+Export as HSL and paste into your CSS variables.
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use variables" icon="variable">
+    Always use CSS variables for themeable properties
+  </Card>
+  <Card title="Test both modes" icon="sun-moon">
+    Ensure colors work in both light and dark mode
+  </Card>
+  <Card title="Maintain contrast" icon="eye">
+    Ensure sufficient contrast for accessibility (WCAG AA)
+  </Card>
+  <Card title="Document colors" icon="book">
+    Comment your color purposes in CSS
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Theming concepts" icon="palette" href="/concepts/theming">
+    Understand the theming architecture
+  </Card>
+  <Card title="Accessibility" icon="universal-access" href="/advanced/accessibility">
+    Ensure your theme is accessible
+  </Card>
+</CardGroup>

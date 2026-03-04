@@ -1,0 +1,201 @@
+---
+title: Badge
+description: A small label component for highlighting status, categories, or counts with multiple visual variants.
+---
+
+The Badge component is used to display small pieces of information with different visual styles to indicate status, categories, or other metadata.
+
+## Installation
+
+```bash
+npm install @poketto/ui
+```
+
+## Import
+
+```tsx
+import { Badge } from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+<Badge>Default</Badge>
+```
+
+## Variants
+
+The Badge component comes with four built-in variants:
+
+### Default
+
+```tsx
+<Badge variant="default">Default</Badge>
+```
+
+Primary badge with solid background and shadow.
+
+### Secondary
+
+```tsx
+<Badge variant="secondary">Secondary</Badge>
+```
+
+Secondary badge with muted styling.
+
+### Destructive
+
+```tsx
+<Badge variant="destructive">Destructive</Badge>
+```
+
+Destructive badge for errors or warnings.
+
+### Outline
+
+```tsx
+<Badge variant="outline">Outline</Badge>
+```
+
+Outline badge with transparent background.
+
+## Examples
+
+### Status Indicators
+
+```tsx
+<div className="flex gap-2">
+  <Badge variant="default">Active</Badge>
+  <Badge variant="secondary">Pending</Badge>
+  <Badge variant="destructive">Inactive</Badge>
+  <Badge variant="outline">Draft</Badge>
+</div>
+```
+
+### With Icons
+
+```tsx
+import { CheckCircle, Clock, XCircle } from "lucide-react";
+
+<div className="flex gap-2">
+  <Badge variant="default">
+    <CheckCircle className="mr-1 h-3 w-3" />
+    Completed
+  </Badge>
+  <Badge variant="secondary">
+    <Clock className="mr-1 h-3 w-3" />
+    In Progress
+  </Badge>
+  <Badge variant="destructive">
+    <XCircle className="mr-1 h-3 w-3" />
+    Failed
+  </Badge>
+</div>
+```
+
+### Notification Counts
+
+```tsx
+<div className="relative inline-block">
+  <Button>Messages</Button>
+  <Badge className="absolute -top-2 -right-2">3</Badge>
+</div>
+```
+
+### Category Tags
+
+```tsx
+<div className="flex flex-wrap gap-2">
+  <Badge variant="outline">React</Badge>
+  <Badge variant="outline">TypeScript</Badge>
+  <Badge variant="outline">Next.js</Badge>
+  <Badge variant="outline">Tailwind CSS</Badge>
+</div>
+```
+
+## Component API
+
+### Badge
+
+**Props:** Extends `React.HTMLAttributes<HTMLDivElement>`
+
+- `variant`: `"default"` | `"secondary"` | `"destructive"` | `"outline"` (default: `"default"`)
+- `className`: Additional CSS classes to apply
+- All standard div HTML attributes
+
+## Styling
+
+The Badge component uses `class-variance-authority` (cva) for variant management. Each variant applies specific styles:
+
+- **default**: Primary background with shadow, hover effect
+- **secondary**: Secondary background with muted colors, hover effect
+- **destructive**: Destructive/error background with shadow, hover effect
+- **outline**: Transparent background with border
+
+All variants include:
+- Inline-flex display for proper alignment with content
+- Rounded corners
+- Small padding (px-2.5, py-0.5)
+- Extra small font size with semibold weight
+- Focus ring for keyboard navigation
+- Smooth color transitions
+
+## Advanced Usage
+
+### Custom Styling
+
+```tsx
+<Badge className="rounded-full px-3 py-1">
+  Custom Style
+</Badge>
+```
+
+### Clickable Badges
+
+```tsx
+<Badge 
+  variant="outline" 
+  className="cursor-pointer hover:bg-accent"
+  onClick={() => console.log('Badge clicked')}
+>
+  Click me
+</Badge>
+```
+
+### Dynamic Variants
+
+```tsx
+function StatusBadge({ status }: { status: string }) {
+  const variant = {
+    active: "default",
+    pending: "secondary",
+    error: "destructive",
+    draft: "outline",
+  }[status] as "default" | "secondary" | "destructive" | "outline";
+
+  return <Badge variant={variant}>{status}</Badge>;
+}
+```
+
+### Combining with Other Components
+
+```tsx
+import { Card, CardHeader, CardTitle, Badge } from "@poketto/ui";
+
+<Card>
+  <CardHeader>
+    <div className="flex items-center justify-between">
+      <CardTitle>Project Name</CardTitle>
+      <Badge variant="default">New</Badge>
+    </div>
+  </CardHeader>
+</Card>
+```
+
+## Accessibility
+
+- The Badge component renders as a `div` element
+- Consider adding `role="status"` for dynamic content updates
+- Use semantic color meanings (destructive for errors, etc.)
+- Ensure sufficient color contrast for readability
+- When used as interactive elements, ensure keyboard accessibility

@@ -1,0 +1,239 @@
+---
+title: Table
+description: A responsive table component for displaying tabular data with semantic HTML structure.
+---
+
+The Table component provides a set of composable parts for building accessible, responsive data tables with proper semantic HTML structure.
+
+## Installation
+
+```bash
+npm install @poketto/ui
+```
+
+## Import
+
+```tsx
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+<Table>
+  <TableCaption>A list of your recent invoices.</TableCaption>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Invoice</TableHead>
+      <TableHead>Status</TableHead>
+      <TableHead>Method</TableHead>
+      <TableHead className="text-right">Amount</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>INV001</TableCell>
+      <TableCell>Paid</TableCell>
+      <TableCell>Credit Card</TableCell>
+      <TableCell className="text-right">$250.00</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>INV002</TableCell>
+      <TableCell>Pending</TableCell>
+      <TableCell>PayPal</TableCell>
+      <TableCell className="text-right">$150.00</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+## Examples
+
+### With Footer
+
+```tsx
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Product</TableHead>
+      <TableHead>Quantity</TableHead>
+      <TableHead className="text-right">Price</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow>
+      <TableCell>Widget A</TableCell>
+      <TableCell>5</TableCell>
+      <TableCell className="text-right">$50.00</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>Widget B</TableCell>
+      <TableCell>3</TableCell>
+      <TableCell className="text-right">$30.00</TableCell>
+    </TableRow>
+  </TableBody>
+  <TableFooter>
+    <TableRow>
+      <TableCell colSpan={2}>Total</TableCell>
+      <TableCell className="text-right">$80.00</TableCell>
+    </TableRow>
+  </TableFooter>
+</Table>
+```
+
+### With Row Selection State
+
+```tsx
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Name</TableHead>
+      <TableHead>Email</TableHead>
+      <TableHead>Role</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow data-state="selected">
+      <TableCell>Alice Johnson</TableCell>
+      <TableCell>alice@example.com</TableCell>
+      <TableCell>Admin</TableCell>
+    </TableRow>
+    <TableRow>
+      <TableCell>Bob Smith</TableCell>
+      <TableCell>bob@example.com</TableCell>
+      <TableCell>User</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+## Component API
+
+### Table
+
+The root table wrapper that provides automatic overflow handling.
+
+**Props:** Extends `React.HTMLAttributes<HTMLTableElement>`
+
+- `className`: Additional CSS classes
+- All standard table HTML attributes
+
+### TableHeader
+
+The table header section (thead).
+
+**Props:** Extends `React.HTMLAttributes<HTMLTableSectionElement>`
+
+- `className`: Additional CSS classes
+
+### TableBody
+
+The table body section (tbody).
+
+**Props:** Extends `React.HTMLAttributes<HTMLTableSectionElement>`
+
+- `className`: Additional CSS classes
+
+### TableFooter
+
+The table footer section (tfoot) with muted background styling.
+
+**Props:** Extends `React.HTMLAttributes<HTMLTableSectionElement>`
+
+- `className`: Additional CSS classes
+
+### TableRow
+
+A table row with hover effects and selection state support.
+
+**Props:** Extends `React.HTMLAttributes<HTMLTableRowElement>`
+
+- `className`: Additional CSS classes
+- `data-state`: Set to "selected" to highlight the row
+
+### TableHead
+
+A table header cell (th) with left alignment by default.
+
+**Props:** Extends `React.ThHTMLAttributes<HTMLTableCellElement>`
+
+- `className`: Additional CSS classes
+- All standard th HTML attributes
+
+### TableCell
+
+A table data cell (td).
+
+**Props:** Extends `React.TdHTMLAttributes<HTMLTableCellElement>`
+
+- `className`: Additional CSS classes
+- All standard td HTML attributes
+
+### TableCaption
+
+A table caption for accessibility and context.
+
+**Props:** Extends `React.HTMLAttributes<HTMLTableCaptionElement>`
+
+- `className`: Additional CSS classes
+
+## Advanced Usage
+
+### Responsive Table with Horizontal Scroll
+
+The Table component automatically wraps the table in a scrollable container:
+
+```tsx
+<Table>
+  <TableHeader>
+    <TableRow>
+      <TableHead>ID</TableHead>
+      <TableHead>Name</TableHead>
+      <TableHead>Email</TableHead>
+      <TableHead>Status</TableHead>
+      <TableHead>Created</TableHead>
+      <TableHead>Updated</TableHead>
+      <TableHead className="text-right">Actions</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {/* Rows will scroll horizontally on small screens */}
+  </TableBody>
+</Table>
+```
+
+### Custom Styling
+
+```tsx
+<Table className="border-2">
+  <TableHeader>
+    <TableRow className="bg-muted">
+      <TableHead className="font-bold">Column 1</TableHead>
+      <TableHead className="font-bold">Column 2</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    <TableRow className="hover:bg-accent">
+      <TableCell className="font-medium">Data 1</TableCell>
+      <TableCell>Data 2</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+## Accessibility
+
+- Uses semantic HTML table elements
+- Supports `TableCaption` for screen readers
+- Proper header associations with `th` elements
+- Keyboard accessible with standard table navigation
+- Row selection state is indicated with `data-state` attribute

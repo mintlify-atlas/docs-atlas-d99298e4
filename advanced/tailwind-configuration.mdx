@@ -1,0 +1,345 @@
+---
+title: Tailwind configuration
+description: Customize and extend Tailwind CSS for your application
+---
+
+Poketto Stack uses a centralized Tailwind configuration that can be extended by each app and package.
+
+## Configuration structure
+
+The Tailwind configuration is set up in `packages/ui/tailwind.config.ts` and extended by apps:
+
+```
+packages/ui/
+  ├── tailwind.config.ts    # Base configuration
+  ├── src/globals.css      # Base styles
+  └── postcss.config.cjs   # PostCSS config
+
+apps/admin/
+  └── tailwind.config.ts    # Extends base config
+```
+
+## Base configuration
+
+The base Tailwind config in `packages/ui/tailwind.config.ts`:
+
+```ts
+import type { Config } from "tailwindcss"
+
+const config: Config = {
+  darkMode: ["class"],
+  content: [
+    "./src/**/*.{ts,tsx}",
+  ],
+  theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+}
+
+export default config
+```
+
+## Extending in apps
+
+Apps can extend the base configuration:
+
+```ts apps/admin/tailwind.config.ts
+import type { Config } from "tailwindcss"
+import baseConfig from "@poketto/ui/tailwind.config"
+
+const config: Config = {
+  ...baseConfig,
+  content: [
+    "./app/**/*.{ts,tsx}",
+    "../../packages/ui/src/**/*.{ts,tsx}",
+  ],
+  theme: {
+    ...baseConfig.theme,
+    extend: {
+      ...baseConfig.theme?.extend,
+      // Add custom extensions here
+      colors: {
+        ...baseConfig.theme?.extend?.colors,
+        brand: {
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          // ... more shades
+        },
+      },
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+      },
+    },
+  },
+}
+
+export default config
+```
+
+## Custom colors
+
+Add custom color palettes:
+
+```ts
+theme: {
+  extend: {
+    colors: {
+      brand: {
+        50: "#f0f9ff",
+        100: "#e0f2fe",
+        200: "#bae6fd",
+        300: "#7dd3fc",
+        400: "#38bdf8",
+        500: "#0ea5e9",
+        600: "#0284c7",
+        700: "#0369a1",
+        800: "#075985",
+        900: "#0c4a6e",
+        950: "#082f49",
+      },
+    },
+  },
+}
+```
+
+Usage:
+
+```tsx
+<div className="bg-brand-500 text-white">
+  Branded component
+</div>
+```
+
+## Custom spacing
+
+Add custom spacing values:
+
+```ts
+theme: {
+  extend: {
+    spacing: {
+      '128': '32rem',
+      '144': '36rem',
+    },
+  },
+}
+```
+
+## Custom breakpoints
+
+Modify or add responsive breakpoints:
+
+```ts
+theme: {
+  screens: {
+    'xs': '475px',
+    'sm': '640px',
+    'md': '768px',
+    'lg': '1024px',
+    'xl': '1280px',
+    '2xl': '1536px',
+    '3xl': '1920px',
+  },
+}
+```
+
+## Typography plugin
+
+Add the Typography plugin for rich text content:
+
+```bash
+pnpm add -D @tailwindcss/typography
+```
+
+```ts tailwind.config.ts
+import typography from "@tailwindcss/typography"
+
+const config: Config = {
+  // ...
+  plugins: [
+    require("tailwindcss-animate"),
+    typography,
+  ],
+}
+```
+
+Usage:
+
+```tsx
+<article className="prose dark:prose-invert lg:prose-xl">
+  <h1>Article Title</h1>
+  <p>Article content with automatic typography styles.</p>
+</article>
+```
+
+## Custom utilities
+
+Add custom utility classes:
+
+```ts
+theme: {
+  extend: {
+    // Add in theme.extend for IntelliSense
+  },
+},
+plugins: [
+  require("tailwindcss-animate"),
+  function({ addUtilities }) {
+    addUtilities({
+      '.scrollbar-hide': {
+        '-ms-overflow-style': 'none',
+        'scrollbar-width': 'none',
+        '&::-webkit-scrollbar': {
+          display: 'none'
+        }
+      },
+    })
+  },
+]
+```
+
+## Content paths
+
+Ensure all component files are included:
+
+```ts
+content: [
+  // App files
+  "./app/**/*.{ts,tsx}",
+  "./src/**/*.{ts,tsx}",
+  
+  // Package files
+  "../../packages/ui/src/**/*.{ts,tsx}",
+  "../../packages/pro-table/src/**/*.{ts,tsx}",
+  
+  // Node modules (if needed)
+  "./node_modules/@my-org/**/*.{js,ts,jsx,tsx}",
+]
+```
+
+## CSS variables
+
+Define CSS variables in `globals.css`:
+
+```css
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    
+    /* Custom variables */
+    --header-height: 64px;
+    --sidebar-width: 256px;
+  }
+  
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+  }
+}
+```
+
+Usage:
+
+```tsx
+<div className="h-[var(--header-height)]">
+  Header
+</div>
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use design tokens" icon="palette">
+    Prefer CSS variables over hardcoded values for themeable colors
+  </Card>
+  <Card title="Extend, don't replace" icon="plus">
+    Use `theme.extend` to add to existing values
+  </Card>
+  <Card title="Document custom classes" icon="book">
+    Comment your custom utilities and plugins
+  </Card>
+  <Card title="Keep it DRY" icon="copy">
+    Share common config across apps via the base config
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Theming" icon="paintbrush" href="/concepts/theming">
+    Learn about the theming system
+  </Card>
+  <Card title="Theme customization" icon="palette" href="/advanced/theme-customization">
+    Deep dive into theme customization
+  </Card>
+</CardGroup>

@@ -1,0 +1,264 @@
+---
+title: 'Component Library'
+description: 'Comprehensive UI component library built on shadcn/ui and Radix UI primitives'
+---
+
+## Introduction
+
+Poketto Stack includes a comprehensive component library built on top of [shadcn/ui](https://ui.shadcn.com/) and [Radix UI](https://www.radix-ui.com/) primitives. The library provides over 50 accessible, customizable components that follow modern design patterns and best practices.
+
+All components are:
+- **Accessible**: Built on Radix UI primitives with ARIA compliance
+- **Customizable**: Styled with Tailwind CSS and class-variance-authority
+- **Type-safe**: Full TypeScript support with proper type definitions
+- **Framework-ready**: Works seamlessly with React and Next.js
+
+## Installation
+
+Components are exported from the `@poketto/ui` package. Install the package in your app:
+
+```bash
+pnpm add @poketto/ui
+```
+
+## Usage
+
+Import components directly from their specific paths:
+
+```tsx
+import { Button } from '@poketto/ui/button'
+import { Card, CardHeader, CardTitle, CardContent } from '@poketto/ui/card'
+import { Input } from '@poketto/ui/input'
+
+export function MyComponent() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Example</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Input placeholder="Enter text..." />
+        <Button>Submit</Button>
+      </CardContent>
+    </Card>
+  )
+}
+```
+
+## Component Categories
+
+<CardGroup cols={2}>
+  <Card title="Forms" icon="square-check" href="/components/forms">
+    Input controls, validation, and form handling components
+  </Card>
+  <Card title="Layout" icon="layout-grid" href="/components/layout">
+    Structural components for organizing content and navigation
+  </Card>
+  <Card title="Feedback" icon="bell" href="/components/feedback">
+    Alerts, toasts, progress indicators, and status displays
+  </Card>
+  <Card title="Navigation" icon="compass" href="/components/navigation">
+    Menus, breadcrumbs, tabs, and navigation patterns
+  </Card>
+  <Card title="Data Display" icon="table" href="/components/data-display">
+    Tables, charts, badges, and data presentation components
+  </Card>
+  <Card title="Overlay" icon="layers" href="/components/overlay">
+    Dialogs, popovers, tooltips, and modal interfaces
+  </Card>
+</CardGroup>
+
+## All Components
+
+### Layout
+<CardGroup cols={3}>
+  <Card title="Accordion" href="/components/accordion">
+    Collapsible content sections
+  </Card>
+  <Card title="Aspect Ratio" href="/components/aspect-ratio">
+    Maintain consistent dimensions
+  </Card>
+  <Card title="Card" href="/components/card">
+    Flexible content container
+  </Card>
+  <Card title="Carousel" href="/components/carousel">
+    Scrollable image or content slider
+  </Card>
+  <Card title="Collapsible" href="/components/collapsible">
+    Expandable content region
+  </Card>
+  <Card title="Resizable" href="/components/resizable">
+    Adjustable panel layouts
+  </Card>
+  <Card title="Scroll Area" href="/components/scroll-area">
+    Custom scrollable regions
+  </Card>
+  <Card title="Separator" href="/components/separator">
+    Visual content divider
+  </Card>
+  <Card title="Sidebar" href="/components/sidebar">
+    Application navigation sidebar
+  </Card>
+  <Card title="Tabs" href="/components/tabs">
+    Tabbed interface pattern
+  </Card>
+</CardGroup>
+
+### Forms
+<CardGroup cols={3}>
+  <Card title="Button" href="/components/button">
+    Interactive button component
+  </Card>
+  <Card title="Calendar" href="/components/calendar">
+    Date picker calendar
+  </Card>
+  <Card title="Checkbox" href="/components/checkbox">
+    Checkable input control
+  </Card>
+  <Card title="Form" href="/components/form">
+    Form validation wrapper
+  </Card>
+  <Card title="Input" href="/components/input">
+    Text input field
+  </Card>
+  <Card title="Input OTP" href="/components/input-otp">
+    One-time password input
+  </Card>
+  <Card title="Label" href="/components/label">
+    Form field label
+  </Card>
+  <Card title="Radio Group" href="/components/radio-group">
+    Mutually exclusive options
+  </Card>
+  <Card title="Select" href="/components/select">
+    Dropdown selection input
+  </Card>
+  <Card title="Slider" href="/components/slider">
+    Range selection slider
+  </Card>
+  <Card title="Switch" href="/components/switch">
+    Toggle switch control
+  </Card>
+  <Card title="Textarea" href="/components/textarea">
+    Multi-line text input
+  </Card>
+  <Card title="Toggle" href="/components/toggle">
+    Two-state button
+  </Card>
+  <Card title="Toggle Group" href="/components/toggle-group">
+    Group of toggle buttons
+  </Card>
+</CardGroup>
+
+### Feedback
+<CardGroup cols={3}>
+  <Card title="Alert" href="/components/alert">
+    Contextual feedback messages
+  </Card>
+  <Card title="Progress" href="/components/progress">
+    Progress indicator bar
+  </Card>
+  <Card title="Skeleton" href="/components/skeleton">
+    Loading placeholder
+  </Card>
+  <Card title="Sonner" href="/components/sonner">
+    Toast notification system
+  </Card>
+  <Card title="Toast" href="/components/toast">
+    Temporary notification
+  </Card>
+</CardGroup>
+
+### Navigation
+<CardGroup cols={3}>
+  <Card title="Breadcrumb" href="/components/breadcrumb">
+    Hierarchical navigation trail
+  </Card>
+  <Card title="Command" href="/components/command">
+    Command palette interface
+  </Card>
+  <Card title="Menubar" href="/components/menubar">
+    Application menu bar
+  </Card>
+  <Card title="Navigation Menu" href="/components/navigation-menu">
+    Site navigation component
+  </Card>
+  <Card title="Pagination" href="/components/pagination">
+    Page navigation controls
+  </Card>
+</CardGroup>
+
+### Data Display
+<CardGroup cols={3}>
+  <Card title="Avatar" href="/components/avatar">
+    User profile image
+  </Card>
+  <Card title="Badge" href="/components/badge">
+    Status or count indicator
+  </Card>
+  <Card title="Chart" href="/components/chart">
+    Data visualization charts
+  </Card>
+  <Card title="Table" href="/components/table">
+    Tabular data display
+  </Card>
+</CardGroup>
+
+### Overlay
+<CardGroup cols={3}>
+  <Card title="Alert Dialog" href="/components/alert-dialog">
+    Confirmation modal dialog
+  </Card>
+  <Card title="Context Menu" href="/components/context-menu">
+    Right-click context menu
+  </Card>
+  <Card title="Dialog" href="/components/dialog">
+    Modal dialog overlay
+  </Card>
+  <Card title="Drawer" href="/components/drawer">
+    Slide-in panel
+  </Card>
+  <Card title="Dropdown Menu" href="/components/dropdown-menu">
+    Dropdown action menu
+  </Card>
+  <Card title="Hover Card" href="/components/hover-card">
+    Content preview on hover
+  </Card>
+  <Card title="Popover" href="/components/popover">
+    Floating content panel
+  </Card>
+  <Card title="Sheet" href="/components/sheet">
+    Side panel overlay
+  </Card>
+  <Card title="Tooltip" href="/components/tooltip">
+    Contextual help text
+  </Card>
+</CardGroup>
+
+## Styling
+
+All components use Tailwind CSS for styling and can be customized through:
+
+1. **CSS Variables**: Theme colors and design tokens
+2. **className Props**: Override styles on individual instances
+3. **Tailwind Config**: Extend the default theme in `tailwind.config.ts`
+
+## Accessibility
+
+Components follow WAI-ARIA best practices and include:
+- Proper semantic HTML
+- Keyboard navigation support
+- Screen reader compatibility
+- Focus management
+- ARIA attributes and roles
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Browse Components" icon="grid-2x2" href="/components/forms">
+    Explore individual component documentation
+  </Card>
+  <Card title="Theming" icon="palette" href="/customization/theming">
+    Learn how to customize component styles
+  </Card>
+</CardGroup>

@@ -1,0 +1,237 @@
+---
+title: "Progress"
+description: "Display progress indicators to show completion status of tasks and operations"
+---
+
+## Introduction
+
+The Progress component visually represents the completion progress of a task or operation. It provides users with feedback about ongoing processes and helps manage expectations about wait times.
+
+**When to use:**
+- Show upload or download progress
+- Display form completion status
+- Indicate loading states with known duration
+- Visualize multi-step process completion
+
+## Installation
+
+Import the Progress component from `@poketto/ui`:
+
+```tsx
+import { Progress } from "@poketto/ui";
+```
+
+## Basic Usage
+
+A simple progress bar with a value:
+
+```tsx
+<Progress value={60} />
+```
+
+## Examples
+
+### Static Progress
+
+Show a fixed progress value:
+
+```tsx
+<Progress value={45} />
+```
+
+### Dynamic Progress
+
+Update progress over time:
+
+```tsx
+function DynamicProgress() {
+  const [progress, setProgress] = React.useState(0);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return <Progress value={progress} />;
+}
+```
+
+### Animated Progress
+
+Simulate a loading process:
+
+```tsx
+function AnimatedProgress() {
+  const [progress, setProgress] = React.useState(13);
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 500);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return <Progress value={progress} />;
+}
+```
+
+### With Label
+
+Display progress with a percentage label:
+
+```tsx
+function ProgressWithLabel() {
+  const [progress, setProgress] = React.useState(33);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>Uploading...</span>
+        <span>{progress}%</span>
+      </div>
+      <Progress value={progress} />
+    </div>
+  );
+}
+```
+
+### File Upload Progress
+
+Track file upload progress:
+
+```tsx
+function FileUploadProgress() {
+  const [progress, setProgress] = React.useState(0);
+
+  const uploadFile = async (file: File) => {
+    // Simulate upload progress
+    const totalSize = file.size;
+    let uploaded = 0;
+
+    const interval = setInterval(() => {
+      uploaded += totalSize / 10;
+      const percentage = Math.min((uploaded / totalSize) * 100, 100);
+      setProgress(percentage);
+
+      if (percentage >= 100) {
+        clearInterval(interval);
+      }
+    }, 200);
+  };
+
+  return (
+    <div className="w-full space-y-2">
+      <Progress value={progress} />
+      <p className="text-sm text-muted-foreground">
+        {progress < 100 ? `Uploading... ${Math.round(progress)}%` : "Upload complete!"}
+      </p>
+    </div>
+  );
+}
+```
+
+### Multi-Step Progress
+
+Show progress through multiple steps:
+
+```tsx
+function MultiStepProgress() {
+  const [currentStep, setCurrentStep] = React.useState(1);
+  const totalSteps = 4;
+  const progress = (currentStep / totalSteps) * 100;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span>Step {currentStep} of {totalSteps}</span>
+        <span>{Math.round(progress)}%</span>
+      </div>
+      <Progress value={progress} />
+    </div>
+  );
+}
+```
+
+### Custom Styled Progress
+
+Customize the progress bar appearance:
+
+```tsx
+<Progress value={60} className="h-4" />
+```
+
+### Indeterminate Progress
+
+While the component doesn't have a built-in indeterminate state, you can show zero progress for loading states:
+
+```tsx
+function IndeterminateProgress() {
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  return (
+    <div className="space-y-2">
+      <Progress value={isLoading ? 0 : 100} className="animate-pulse" />
+      <p className="text-sm text-muted-foreground">
+        {isLoading ? "Loading..." : "Complete!"}
+      </p>
+    </div>
+  );
+}
+```
+
+## Props
+
+<ParamField path="value" type="number" required>
+  The progress value between 0 and 100. This determines how much of the progress bar is filled.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the progress bar root element.
+</ParamField>
+
+<ParamField path="max" type="number" default="100">
+  The maximum progress value. Defaults to 100.
+</ParamField>
+
+Extends all standard HTML div element props from `@radix-ui/react-progress`.
+
+## Best Practices
+
+<Check>**Do** use progress bars for operations with known duration</Check>
+<Check>**Do** show percentage or step information alongside the bar</Check>
+<Check>**Do** ensure the progress accurately reflects the operation status</Check>
+<Check>**Do** provide feedback when progress is complete</Check>
+<Check>**Do** keep progress bars visible during the entire operation</Check>
+
+<Warning>**Don't** use progress bars for operations with unknown duration - use a spinner instead</Warning>
+<Warning>**Don't** fake progress - users notice when bars don't match actual progress</Warning>
+<Warning>**Don't** use too many progress bars on one screen</Warning>
+<Warning>**Don't** forget to handle edge cases (0% and 100%)</Warning>
+
+## Accessibility
+
+- The component uses proper ARIA attributes for progress indicators
+- Screen readers announce the current progress value
+- The progress value is exposed to assistive technologies
+
+## Styling Notes
+
+The Progress component uses CSS transforms to animate the indicator. The default height is `h-2` (8px), but you can customize it:
+
+```tsx
+// Thin progress bar
+<Progress value={60} className="h-1" />
+
+// Medium progress bar
+<Progress value={60} className="h-3" />
+
+// Thick progress bar
+<Progress value={60} className="h-4" />
+```

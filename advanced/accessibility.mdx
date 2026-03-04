@@ -1,0 +1,189 @@
+---
+title: Accessibility
+description: Build accessible applications that work for everyone
+---
+
+Poketto Stack components are built with accessibility in mind. Learn how to maintain and enhance accessibility in your application.
+
+## Semantic HTML
+
+Use appropriate HTML elements:
+
+```tsx
+// ✅ Good - semantic
+<button onClick={handleClick}>Submit</button>
+<nav><a href="/about">About</a></nav>
+
+// ❌ Bad - div soup
+<div onClick={handleClick}>Submit</div>
+<div><span onClick={navigate}>About</span></div>
+```
+
+## ARIA attributes
+
+Add ARIA attributes when semantic HTML isn't enough:
+
+```tsx
+// Labels
+<button aria-label="Close dialog">×</button>
+
+// Descriptions
+<input
+  type="email"
+  aria-describedby="email-hint"
+/>
+<p id="email-hint">We'll never share your email</p>
+
+// States
+<button aria-pressed={isActive}>
+  Toggle
+</button>
+
+// Live regions
+<div aria-live="polite" aria-atomic="true">
+  {statusMessage}
+</div>
+```
+
+## Keyboard navigation
+
+Ensure all interactive elements are keyboard accessible:
+
+```tsx
+function Dialog({ isOpen, onClose }) {
+  useEffect(() => {
+    if (!isOpen) return
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+    }
+    
+    window.addEventListener("keydown", handleEscape)
+    return () => window.removeEventListener("keydown", handleEscape)
+  }, [isOpen, onClose])
+  
+  return (
+    <div role="dialog" aria-modal="true">
+      {/* Dialog content */}
+    </div>
+  )
+}
+```
+
+## Focus management
+
+Manage focus for better UX:
+
+```tsx
+import { useRef, useEffect } from "react"
+
+function Modal({ isOpen, onClose }) {
+  const firstFocusableRef = useRef<HTMLButtonElement>(null)
+  
+  useEffect(() => {
+    if (isOpen) {
+      firstFocusableRef.current?.focus()
+    }
+  }, [isOpen])
+  
+  return (
+    <div>
+      <button ref={firstFocusableRef} onClick={onClose}>
+        Close
+      </button>
+      {/* Modal content */}
+    </div>
+  )
+}
+```
+
+## Color contrast
+
+Ensure sufficient color contrast (WCAG AA: 4.5:1 for normal text):
+
+```tsx
+// ✅ Good contrast
+<div className="bg-gray-900 text-white">
+  High contrast text
+</div>
+
+// ❌ Poor contrast
+<div className="bg-gray-300 text-gray-400">
+  Low contrast text
+</div>
+```
+
+## Screen reader support
+
+Write descriptive labels and text:
+
+```tsx
+// ✅ Descriptive
+<button aria-label="Delete invoice #12345">
+  <TrashIcon />
+</button>
+
+// ❌ Generic
+<button aria-label="Delete">
+  <TrashIcon />
+</button>
+```
+
+## Testing accessibility
+
+### Manual testing
+
+Test with keyboard only:
+- Tab through all interactive elements
+- Activate with Enter/Space
+- Close dialogs with Escape
+
+Test with screen readers:
+- VoiceOver (Mac)
+- NVDA (Windows)
+- JAWS (Windows)
+
+### Automated testing
+
+Use axe-core with Testing Library:
+
+```tsx
+import { render } from "@testing-library/react"
+import { axe, toHaveNoViolations } from "jest-axe"
+
+expect.extend(toHaveNoViolations)
+
+test("should not have accessibility violations", async () => {
+  const { container } = render(<MyComponent />)
+  const results = await axe(container)
+  expect(results).toHaveNoViolations()
+})
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use semantic HTML" icon="code">
+    Proper elements provide built-in accessibility
+  </Card>
+  <Card title="Test with keyboard" icon="keyboard">
+    Ensure full keyboard navigation
+  </Card>
+  <Card title="Add alt text" icon="image">
+    All images need descriptive alt text
+  </Card>
+  <Card title="Maintain focus order" icon="list-ordered">
+    Logical tab order matches visual order
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Components" icon="cube" href="/components/overview">
+    All components are accessibility-ready
+  </Card>
+  <Card title="Testing" icon="vial" href="/guides/testing">
+    Test accessibility in your components
+  </Card>
+</CardGroup>

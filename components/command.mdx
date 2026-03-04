@@ -1,0 +1,412 @@
+---
+title: Command
+description: Fast, composable command menu for keyboard-first navigation and search.
+---
+
+The Command component provides a command palette interface for search, navigation, and actions with keyboard-first interaction.
+
+## Installation
+
+```tsx
+import {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandShortcut,
+  CommandSeparator,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+<Command>
+  <CommandInput placeholder="Type a command or search..." />
+  <CommandList>
+    <CommandEmpty>No results found.</CommandEmpty>
+    <CommandGroup heading="Suggestions">
+      <CommandItem>Calendar</CommandItem>
+      <CommandItem>Search Emoji</CommandItem>
+      <CommandItem>Calculator</CommandItem>
+    </CommandGroup>
+  </CommandList>
+</Command>
+```
+
+## Examples
+
+### Command Dialog
+
+```tsx
+import { useState, useEffect } from "react";
+
+function CommandMenu() {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
+  return (
+    <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandInput placeholder="Type a command or search..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Suggestions">
+          <CommandItem>Calendar</CommandItem>
+          <CommandItem>Search Emoji</CommandItem>
+          <CommandItem>Calculator</CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </CommandDialog>
+  );
+}
+```
+
+### With Icons and Shortcuts
+
+```tsx
+import { Calendar, Smile, Calculator, User, Settings } from "lucide-react";
+
+<Command>
+  <CommandInput placeholder="Type a command or search..." />
+  <CommandList>
+    <CommandEmpty>No results found.</CommandEmpty>
+    <CommandGroup heading="Suggestions">
+      <CommandItem>
+        <Calendar />
+        <span>Calendar</span>
+      </CommandItem>
+      <CommandItem>
+        <Smile />
+        <span>Search Emoji</span>
+      </CommandItem>
+      <CommandItem>
+        <Calculator />
+        <span>Calculator</span>
+      </CommandItem>
+    </CommandGroup>
+    <CommandSeparator />
+    <CommandGroup heading="Settings">
+      <CommandItem>
+        <User />
+        <span>Profile</span>
+        <CommandShortcut>⌘P</CommandShortcut>
+      </CommandItem>
+      <CommandItem>
+        <Settings />
+        <span>Settings</span>
+        <CommandShortcut>⌘S</CommandShortcut>
+      </CommandItem>
+    </CommandGroup>
+  </CommandList>
+</Command>
+```
+
+### With Navigation
+
+```tsx
+import { useRouter } from "next/navigation";
+import { File, Users, Settings, HelpCircle } from "lucide-react";
+
+function NavigationCommand() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const runCommand = (command: () => void) => {
+    setOpen(false);
+    command();
+  };
+
+  return (
+    <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandInput placeholder="Type a command or search..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Navigation">
+          <CommandItem onSelect={() => runCommand(() => router.push("/dashboard"))}>
+            <File />
+            <span>Dashboard</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/team"))}>
+            <Users />
+            <span>Team</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/settings"))}>
+            <Settings />
+            <span>Settings</span>
+          </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Help">
+          <CommandItem onSelect={() => runCommand(() => router.push("/docs"))}>
+            <HelpCircle />
+            <span>Documentation</span>
+          </CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </CommandDialog>
+  );
+}
+```
+
+### Filterable List
+
+```tsx
+import { useState } from "react";
+
+function FilterableCommand() {
+  const [search, setSearch] = useState("");
+
+  return (
+    <Command>
+      <CommandInput 
+        placeholder="Search fruits..." 
+        value={search}
+        onValueChange={setSearch}
+      />
+      <CommandList>
+        <CommandEmpty>No fruits found.</CommandEmpty>
+        <CommandGroup heading="Fruits">
+          <CommandItem>Apple</CommandItem>
+          <CommandItem>Banana</CommandItem>
+          <CommandItem>Cherry</CommandItem>
+          <CommandItem>Date</CommandItem>
+          <CommandItem>Elderberry</CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  );
+}
+```
+
+### With Actions
+
+```tsx
+import { Copy, Trash, Edit, Share } from "lucide-react";
+
+function ActionsCommand({ onAction }: { onAction: (action: string) => void }) {
+  return (
+    <Command>
+      <CommandInput placeholder="Type a command..." />
+      <CommandList>
+        <CommandEmpty>No actions found.</CommandEmpty>
+        <CommandGroup heading="Actions">
+          <CommandItem onSelect={() => onAction('copy')}>
+            <Copy />
+            <span>Copy</span>
+            <CommandShortcut>⌘C</CommandShortcut>
+          </CommandItem>
+          <CommandItem onSelect={() => onAction('edit')}>
+            <Edit />
+            <span>Edit</span>
+            <CommandShortcut>⌘E</CommandShortcut>
+          </CommandItem>
+          <CommandItem onSelect={() => onAction('share')}>
+            <Share />
+            <span>Share</span>
+            <CommandShortcut>⌘S</CommandShortcut>
+          </CommandItem>
+          <CommandSeparator />
+          <CommandItem onSelect={() => onAction('delete')}>
+            <Trash />
+            <span>Delete</span>
+            <CommandShortcut>⌘⌫</CommandShortcut>
+          </CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  );
+}
+```
+
+### Multi-Section Command
+
+```tsx
+import { File, Folder, Hash, User } from "lucide-react";
+
+<Command>
+  <CommandInput placeholder="Search everything..." />
+  <CommandList>
+    <CommandEmpty>No results found.</CommandEmpty>
+    <CommandGroup heading="Files">
+      <CommandItem>
+        <File />
+        <span>README.md</span>
+      </CommandItem>
+      <CommandItem>
+        <File />
+        <span>package.json</span>
+      </CommandItem>
+    </CommandGroup>
+    <CommandGroup heading="Folders">
+      <CommandItem>
+        <Folder />
+        <span>src</span>
+      </CommandItem>
+      <CommandItem>
+        <Folder />
+        <span>public</span>
+      </CommandItem>
+    </CommandGroup>
+    <CommandGroup heading="Channels">
+      <CommandItem>
+        <Hash />
+        <span>general</span>
+      </CommandItem>
+      <CommandItem>
+        <Hash />
+        <span>random</span>
+      </CommandItem>
+    </CommandGroup>
+    <CommandGroup heading="People">
+      <CommandItem>
+        <User />
+        <span>John Doe</span>
+      </CommandItem>
+      <CommandItem>
+        <User />
+        <span>Jane Smith</span>
+      </CommandItem>
+    </CommandGroup>
+  </CommandList>
+</Command>
+```
+
+## Component API
+
+### Command
+
+Root command component.
+
+**Props:**
+- Extends `cmdk` Command props
+- `value?: string` - Controlled selected value
+- `onValueChange?: (value: string) => void` - Value change handler
+- `filter?: (value: string, search: string) => number` - Custom filter function
+- `shouldFilter?: boolean` - Enable/disable filtering (default: true)
+- `label?: string` - Accessible label
+
+### CommandDialog
+
+Command component wrapped in a dialog.
+
+**Props:**
+- Extends `@radix-ui/react-dialog` DialogProps
+- `open?: boolean` - Controlled open state
+- `onOpenChange?: (open: boolean) => void` - Open state handler
+- Renders Command inside a Dialog with pre-configured styling
+
+### CommandInput
+
+Search input field.
+
+**Props:**
+- Extends `cmdk` Input props
+- `value?: string` - Controlled input value
+- `onValueChange?: (search: string) => void` - Search change handler
+- `placeholder?: string` - Input placeholder
+- Automatically includes a Search icon from lucide-react
+
+### CommandList
+
+Scrollable container for command items.
+
+**Props:**
+- Extends `cmdk` List props
+- Default max height: 300px with vertical scroll
+
+### CommandEmpty
+
+Displays when no results are found.
+
+**Props:**
+- Extends `cmdk` Empty props
+- Renders children when filtered results are empty
+
+### CommandGroup
+
+Groups related command items.
+
+**Props:**
+- Extends `cmdk` Group props
+- `heading?: string` - Group heading text
+- `value?: string` - Group value for filtering
+
+### CommandItem
+
+Individual selectable command item.
+
+**Props:**
+- Extends `cmdk` Item props
+- `value?: string` - Search value
+- `onSelect?: (value: string) => void` - Selection handler
+- `disabled?: boolean` - Disable the item
+- `keywords?: string[]` - Additional search keywords
+
+### CommandSeparator
+
+Visual separator between groups.
+
+**Props:**
+- Extends `cmdk` Separator props
+
+### CommandShortcut
+
+Displays keyboard shortcut hint.
+
+**Props:**
+- Extends `React.HTMLAttributes<HTMLSpanElement>`
+- Automatically positioned with monospace styling
+
+## Composition Pattern
+
+The Command component follows this structure:
+
+```
+Command
+  ├─ CommandInput
+  └─ CommandList
+      ├─ CommandEmpty
+      ├─ CommandGroup
+      │   ├─ CommandItem
+      │   │   └─ CommandShortcut (optional)
+      │   └─ CommandItem
+      ├─ CommandSeparator
+      └─ CommandGroup
+          └─ CommandItem
+
+CommandDialog
+  └─ Dialog
+      └─ DialogContent
+          └─ Command
+              ├─ CommandInput
+              └─ CommandList
+                  └─ ...
+```
+
+## Accessibility
+
+- Built on top of `cmdk` (Command Menu for React) with full keyboard support
+- Arrow keys (Up/Down) to navigate items
+- Enter to select items
+- Escape to close (when used in CommandDialog)
+- Type to search/filter items
+- Tab navigation support
+- Proper ARIA attributes for screen readers
+- Focus management with automatic focus on input when opened
+- `CommandEmpty` provides feedback when no results match
+- Icons are sized consistently with `[&_svg]:size-4` utility
+- Search icon in CommandInput uses proper opacity for visual hierarchy
+- Disabled items marked with `data-disabled=true` and skip focus

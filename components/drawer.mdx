@@ -1,0 +1,306 @@
+---
+title: "Drawer"
+description: "Display content in a slide-out panel that overlays the main interface from the bottom of the screen"
+---
+
+## Introduction
+
+Drawers are slide-out panels that appear from the bottom of the screen, commonly used on mobile devices. They provide a mobile-friendly way to display additional content, forms, or navigation without leaving the current page.
+
+**When to use:**
+- Mobile-first interfaces that need contextual panels
+- Forms or filters that don't need a full page
+- Additional details or options on mobile devices
+- Bottom sheets for mobile-optimized layouts
+
+## Installation
+
+Import the Drawer components from `@poketto/ui`:
+
+```tsx
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+A basic drawer with trigger, content, and actions:
+
+```tsx
+<Drawer>
+  <DrawerTrigger asChild>
+    <button>Open Drawer</button>
+  </DrawerTrigger>
+  <DrawerContent>
+    <DrawerHeader>
+      <DrawerTitle>Edit Profile</DrawerTitle>
+      <DrawerDescription>
+        Make changes to your profile here. Click save when you're done.
+      </DrawerDescription>
+    </DrawerHeader>
+    <div className="p-4">
+      {/* Your content */}
+    </div>
+    <DrawerFooter>
+      <button>Save</button>
+      <DrawerClose asChild>
+        <button>Cancel</button>
+      </DrawerClose>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+## Examples
+
+### Simple Drawer
+
+Basic drawer with minimal content:
+
+```tsx
+<Drawer>
+  <DrawerTrigger asChild>
+    <button>View Details</button>
+  </DrawerTrigger>
+  <DrawerContent>
+    <DrawerHeader>
+      <DrawerTitle>Details</DrawerTitle>
+      <DrawerDescription>
+        Here are the details you requested.
+      </DrawerDescription>
+    </DrawerHeader>
+    <div className="p-4">
+      <p>Your content goes here</p>
+    </div>
+  </DrawerContent>
+</Drawer>
+```
+
+### Drawer with Form
+
+Drawer containing a form:
+
+```tsx
+import { Input, Label } from "@poketto/ui";
+
+<Drawer>
+  <DrawerTrigger asChild>
+    <button>Add Item</button>
+  </DrawerTrigger>
+  <DrawerContent>
+    <DrawerHeader>
+      <DrawerTitle>Add New Item</DrawerTitle>
+      <DrawerDescription>
+        Fill in the details below to add a new item.
+      </DrawerDescription>
+    </DrawerHeader>
+    <div className="p-4 space-y-4">
+      <div>
+        <Label htmlFor="name">Name</Label>
+        <Input id="name" placeholder="Item name" />
+      </div>
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Input id="description" placeholder="Item description" />
+      </div>
+    </div>
+    <DrawerFooter>
+      <button type="submit">Add Item</button>
+      <DrawerClose asChild>
+        <button variant="outline">Cancel</button>
+      </DrawerClose>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+### Controlled Drawer
+
+Control the drawer state programmatically:
+
+```tsx
+function ControlledDrawer() {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <button>Open</button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Controlled Drawer</DrawerTitle>
+        </DrawerHeader>
+        <div className="p-4">
+          <p>This drawer's state is controlled externally.</p>
+        </div>
+        <DrawerFooter>
+          <button onClick={() => setOpen(false)}>Close</button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+```
+
+### Drawer with Scroll Content
+
+Handle long content with scrolling:
+
+```tsx
+<Drawer>
+  <DrawerTrigger asChild>
+    <button>View All</button>
+  </DrawerTrigger>
+  <DrawerContent>
+    <DrawerHeader>
+      <DrawerTitle>All Items</DrawerTitle>
+      <DrawerDescription>
+        Scroll to view all items
+      </DrawerDescription>
+    </DrawerHeader>
+    <div className="p-4 overflow-y-auto max-h-[60vh]">
+      {items.map((item) => (
+        <div key={item.id} className="py-2">
+          {item.name}
+        </div>
+      ))}
+    </div>
+    <DrawerFooter>
+      <DrawerClose asChild>
+        <button>Close</button>
+      </DrawerClose>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+### Disable Background Scaling
+
+By default, the drawer scales the background. You can disable this:
+
+```tsx
+<Drawer shouldScaleBackground={false}>
+  <DrawerTrigger asChild>
+    <button>Open</button>
+  </DrawerTrigger>
+  <DrawerContent>
+    {/* Content */}
+  </DrawerContent>
+</Drawer>
+```
+
+## Components
+
+### Drawer
+
+<ParamField path="open" type="boolean">
+  Controlled open state of the drawer.
+</ParamField>
+
+<ParamField path="onOpenChange" type="(open: boolean) => void">
+  Event handler called when the open state changes.
+</ParamField>
+
+<ParamField path="shouldScaleBackground" type="boolean" default="true">
+  Whether the background should scale down when the drawer is open.
+</ParamField>
+
+### DrawerTrigger
+
+<ParamField path="asChild" type="boolean" default="false">
+  When true, the trigger will not render its own button and will pass props to its child element.
+</ParamField>
+
+### DrawerContent
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the drawer content.
+</ParamField>
+
+<ParamField path="children" type="React.ReactNode">
+  The content to display inside the drawer.
+</ParamField>
+
+### DrawerHeader, DrawerFooter
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the container.
+</ParamField>
+
+### DrawerTitle
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the title.
+</ParamField>
+
+### DrawerDescription
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the description.
+</ParamField>
+
+### DrawerClose
+
+<ParamField path="asChild" type="boolean" default="false">
+  When true, will pass props to its child element instead of rendering a button.
+</ParamField>
+
+## Best Practices
+
+<Check>**Do** use drawers for mobile-friendly interfaces</Check>
+<Check>**Do** include a clear way to close the drawer</Check>
+<Check>**Do** keep drawer content focused and concise</Check>
+<Check>**Do** use the drag handle for intuitive closing</Check>
+<Check>**Do** include a title for context</Check>
+
+<Warning>**Don't** use drawers for critical navigation on desktop</Warning>
+<Warning>**Don't** nest drawers within other drawers</Warning>
+<Warning>**Don't** put too much content in a drawer - use a full page instead</Warning>
+<Warning>**Don't** make drawers the only way to access important features</Warning>
+
+## Responsive Design
+
+Consider using a Dialog on desktop and a Drawer on mobile:
+
+```tsx
+function ResponsiveDialog({ children }) {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  if (isDesktop) {
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <button>Open</button>
+        </DialogTrigger>
+        <DialogContent>{children}</DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <button>Open</button>
+      </DrawerTrigger>
+      <DrawerContent>{children}</DrawerContent>
+    </Drawer>
+  );
+}
+```
+
+## Accessibility
+
+- Automatically traps focus within the drawer
+- Can be dismissed by swiping down or clicking outside
+- Properly associates title and description
+- Includes a visual drag handle for intuitive interaction
+- Restores focus to the trigger element when closed

@@ -1,0 +1,215 @@
+---
+title: Component patterns
+description: Learn best practices and common patterns for building components
+---
+
+Master component design patterns used throughout Poketto Stack for building maintainable, reusable components.
+
+## Composition pattern
+
+Build complex components from simple, reusable pieces:
+
+```tsx
+// Base components
+function Card({ children, className }) {
+  return <div className={cn("rounded-lg border p-6", className)}>{children}</div>
+}
+
+function CardHeader({ children }) {
+  return <div className="mb-4">{children}</div>
+}
+
+function CardTitle({ children }) {
+  return <h3 className="text-2xl font-semibold">{children}</h3>
+}
+
+// Usage
+export default function ProductCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Product Name</CardTitle>
+      </CardHeader>
+      <p>Product description</p>
+    </Card>
+  )
+}
+```
+
+## Compound components
+
+Create related components that work together:
+
+```tsx
+const TabsContext = createContext<{ activeTab: string; setActiveTab: (id: string) => void } | null>(null)
+
+function Tabs({ defaultValue, children }) {
+  const [activeTab, setActiveTab] = useState(defaultValue)
+  
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+      {children}
+    </TabsContext.Provider>
+  )
+}
+
+function TabsList({ children }) {
+  return <div className="flex gap-2">{children}</div>
+}
+
+function TabsTrigger({ value, children }) {
+  const context = useContext(TabsContext)
+  const isActive = context?.activeTab === value
+  
+  return (
+    <button
+      onClick={() => context?.setActiveTab(value)}
+      className={cn(isActive && "bg-primary text-primary-foreground")}
+    >
+      {children}
+    </button>
+  )
+}
+
+// Usage
+<Tabs defaultValue="tab1">
+  <TabsList>
+    <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+    <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+  </TabsList>
+</Tabs>
+```
+
+## Render props
+
+Share logic between components:
+
+```tsx
+function DataFetcher({ url, children }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: [url],
+    queryFn: () => fetch(url).then(res => res.json())
+  })
+  
+  return children({ data, isLoading, error })
+}
+
+// Usage
+<DataFetcher url="/api/users">
+  {({ data, isLoading, error }) => {
+    if (isLoading) return <Skeleton />
+    if (error) return <Error message={error.message} />
+    return <UserList users={data} />
+  }}
+</DataFetcher>
+```
+
+## Controlled vs uncontrolled
+
+Support both patterns for flexibility:
+
+```tsx
+function Input({ value, defaultValue, onChange, ...props }) {
+  // Uncontrolled state
+  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue ?? "")
+  
+  // Use controlled value if provided, otherwise use uncontrolled
+  const isControlled = value !== undefined
+  const inputValue = isControlled ? value : uncontrolledValue
+  
+  const handleChange = (e) => {
+    if (!isControlled) {
+      setUncontrolledValue(e.target.value)
+    }
+    onChange?.(e)
+  }
+  
+  return <input value={inputValue} onChange={handleChange} {...props} />
+}
+
+// Controlled usage
+const [value, setValue] = useState("")
+<Input value={value} onChange={(e) => setValue(e.target.value)} />
+
+// Uncontrolled usage
+<Input defaultValue="initial" />
+```
+
+## As child pattern
+
+Allow components to render as different elements:
+
+```tsx
+import { Slot } from "@radix-ui/react-slot"
+
+function Button({ asChild, children, ...props }) {
+  const Comp = asChild ? Slot : "button"
+  
+  return <Comp {...props}>{children}</Comp>
+}
+
+// Render as button
+<Button>Click me</Button>
+
+// Render as link
+<Button asChild>
+  <a href="/page">Link</a>
+</Button>
+```
+
+## Container/Presentational
+
+Separate logic from presentation:
+
+```tsx
+// Container (logic)
+function UserProfileContainer({ userId }) {
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId)
+  })
+  
+  if (isLoading) return <UserProfileSkeleton />
+  
+  return <UserProfile user={user} />
+}
+
+// Presentational (UI only)
+function UserProfile({ user }) {
+  return (
+    <div>
+      <Avatar src={user.avatar} />
+      <h2>{user.name}</h2>
+      <p>{user.bio}</p>
+    </div>
+  )
+}
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Keep it simple" icon="sparkles">
+    Start simple, add complexity only when needed
+  </Card>
+  <Card title="Single responsibility" icon="target">
+    Each component should do one thing well
+  </Card>
+  <Card title="Compose, don't inherit" icon="puzzle-piece">
+    Prefer composition over complex inheritance
+  </Card>
+  <Card title="Make it testable" icon="vial">
+    Design for easy testing and mocking
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Custom components" icon="code" href="/advanced/custom-components">
+    Build your own components
+  </Card>
+  <Card title="Testing" icon="vial" href="/guides/testing">
+    Test your components
+  </Card>
+</CardGroup>

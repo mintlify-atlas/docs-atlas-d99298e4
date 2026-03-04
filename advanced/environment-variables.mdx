@@ -1,0 +1,122 @@
+---
+title: Environment variables
+description: Configure your application with environment variables
+---
+
+Poketto Stack uses environment variables for configuration. Learn how to manage them across development and production.
+
+## Environment files
+
+The admin app uses `.env` files:
+
+```
+apps/admin/
+├── .env.example      # Template file (committed)
+├── .env             # Local development (gitignored)
+└── .env.production  # Production variables (gitignored)
+```
+
+## Available variables
+
+From `.env.example`:
+
+```bash
+VITE_APP_NAME="Vite Boilerplate"
+VITE_API_URL=http://localhost:5173/
+VITE_ENABLE_DEVTOOLS=false
+VITE_EDITOR=cursor
+```
+
+<ParamField path="VITE_APP_NAME" type="string">
+  The application name displayed in the UI
+</ParamField>
+
+<ParamField path="VITE_API_URL" type="string">
+  Base URL for API requests
+</ParamField>
+
+<ParamField path="VITE_ENABLE_DEVTOOLS" type="boolean">
+  Enable React Query and other devtools in production
+</ParamField>
+
+<ParamField path="VITE_EDITOR" type="string">
+  Default code editor for click-to-component (cursor, vscode, etc.)
+</ParamField>
+
+## Using variables
+
+Access environment variables in your code:
+
+```tsx
+const apiUrl = import.meta.env.VITE_API_URL
+const appName = import.meta.env.VITE_APP_NAME
+const isDev = import.meta.env.DEV
+const isProd = import.meta.env.PROD
+```
+
+<Note>
+  Only variables prefixed with `VITE_` are exposed to your application code.
+</Note>
+
+## Type safety
+
+Add types for environment variables:
+
+```ts env.d.ts
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_APP_NAME: string
+  readonly VITE_API_URL: string
+  readonly VITE_ENABLE_DEVTOOLS: string
+  readonly VITE_EDITOR: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
+```
+
+## Validation
+
+Validate environment variables at runtime:
+
+```ts
+import { z } from "zod"
+
+const envSchema = z.object({
+  VITE_APP_NAME: z.string().min(1),
+  VITE_API_URL: z.string().url(),
+  VITE_ENABLE_DEVTOOLS: z.string().transform(val => val === "true"),
+})
+
+export const env = envSchema.parse(import.meta.env)
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Never commit secrets" icon="lock">
+    Keep .env files in .gitignore
+  </Card>
+  <Card title="Provide examples" icon="file-code">
+    Maintain .env.example with all required variables
+  </Card>
+  <Card title="Validate early" icon="check">
+    Validate env vars at startup
+  </Card>
+  <Card title="Use VITE_ prefix" icon="tag">
+    Only VITE_-prefixed vars are exposed to client
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Building" icon="hammer" href="/advanced/building">
+    Build with environment variables
+  </Card>
+  <Card title="Docker" icon="docker" href="/advanced/docker">
+    Pass env vars to Docker containers
+  </Card>
+</CardGroup>

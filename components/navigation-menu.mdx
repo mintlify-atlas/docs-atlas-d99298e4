@@ -1,0 +1,358 @@
+---
+title: Navigation Menu
+description: A horizontal navigation component with dropdown content panels for complex site navigation.
+---
+
+Navigation Menu provides a structured way to organize primary navigation with support for dropdown content panels.
+
+## Installation
+
+```tsx
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+  NavigationMenuIndicator,
+  NavigationMenuViewport,
+  navigationMenuTriggerStyle,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Getting Started</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px]">
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/docs/installation">Installation</a>
+            </NavigationMenuLink>
+          </li>
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/docs/introduction">Introduction</a>
+            </NavigationMenuLink>
+          </li>
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+    <NavigationMenuItem>
+      <NavigationMenuLink href="/about" className={navigationMenuTriggerStyle()}>
+        About
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+## Examples
+
+### Multi-Column Layout
+
+```tsx
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Components</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/components/button" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                <div className="text-sm font-medium leading-none">Button</div>
+                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                  Displays a button or a component that looks like a button.
+                </p>
+              </a>
+            </NavigationMenuLink>
+          </li>
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/components/card" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                <div className="text-sm font-medium leading-none">Card</div>
+                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                  Displays a card with header, content, and footer.
+                </p>
+              </a>
+            </NavigationMenuLink>
+          </li>
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+### With Featured Content
+
+```tsx
+import Link from "next/link";
+
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Getting Started</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+          <li className="row-span-3">
+            <NavigationMenuLink asChild>
+              <a
+                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                href="/"
+              >
+                <div className="mb-2 mt-4 text-lg font-medium">
+                  Poketto Stack
+                </div>
+                <p className="text-sm leading-tight text-muted-foreground">
+                  Build beautiful applications with our component library.
+                </p>
+              </a>
+            </NavigationMenuLink>
+          </li>
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/docs">Introduction</a>
+            </NavigationMenuLink>
+          </li>
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/docs/installation">Installation</a>
+            </NavigationMenuLink>
+          </li>
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/docs/primitives">Typography</a>
+            </NavigationMenuLink>
+          </li>
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+### Simple Link Navigation
+
+```tsx
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuLink href="/" className={navigationMenuTriggerStyle()}>
+        Home
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+    <NavigationMenuItem>
+      <NavigationMenuLink href="/docs" className={navigationMenuTriggerStyle()}>
+        Documentation
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+    <NavigationMenuItem>
+      <NavigationMenuLink href="/about" className={navigationMenuTriggerStyle()}>
+        About
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+### With Next.js Integration
+
+```tsx
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+function NavigationMenuDemo() {
+  const pathname = usePathname();
+
+  return (
+    <NavigationMenu>
+      <NavigationMenuList>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+              <li>
+                <NavigationMenuLink asChild>
+                  <Link href="/products/web" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent">
+                    <div className="text-sm font-medium">Web Apps</div>
+                    <p className="text-sm text-muted-foreground">Build modern web applications</p>
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+              <li>
+                <NavigationMenuLink asChild>
+                  <Link href="/products/mobile" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent">
+                    <div className="text-sm font-medium">Mobile Apps</div>
+                    <p className="text-sm text-muted-foreground">Native mobile experiences</p>
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuLink asChild>
+            <Link href="/pricing" className={navigationMenuTriggerStyle()}>
+              Pricing
+            </Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+```
+
+### With Indicator
+
+```tsx
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Learn</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <ul className="grid gap-3 p-6 md:w-[400px]">
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/docs">Documentation</a>
+            </NavigationMenuLink>
+          </li>
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <ul className="grid gap-3 p-6 md:w-[400px]">
+          <li>
+            <NavigationMenuLink asChild>
+              <a href="/blog">Blog</a>
+            </NavigationMenuLink>
+          </li>
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+    <NavigationMenuIndicator />
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+## Component API
+
+### NavigationMenu
+
+Root component that provides context for all menu items.
+
+**Props:**
+- Extends `@radix-ui/react-navigation-menu` Root props
+- `value?: string` - Controlled active item value
+- `onValueChange?: (value: string) => void` - Value change handler
+- `defaultValue?: string` - Default active value
+- `delayDuration?: number` - Hover delay in ms (default: 200)
+- `skipDelayDuration?: number` - Skip delay after interaction (default: 300)
+
+**Note:** The NavigationMenu component automatically includes a NavigationMenuViewport at the end.
+
+### NavigationMenuList
+
+Container for menu items.
+
+**Props:**
+- Extends `@radix-ui/react-navigation-menu` List props
+
+### NavigationMenuItem
+
+Individual menu item container.
+
+**Props:**
+- Extends `@radix-ui/react-navigation-menu` Item props
+- `value?: string` - Unique identifier for the item
+
+### NavigationMenuTrigger
+
+Button that toggles the content panel.
+
+**Props:**
+- Extends `@radix-ui/react-navigation-menu` Trigger props
+- Automatically includes a ChevronDown icon that rotates on open
+
+### NavigationMenuContent
+
+Container for dropdown content.
+
+**Props:**
+- Extends `@radix-ui/react-navigation-menu` Content props
+- Includes smooth animations for enter/exit
+
+### NavigationMenuLink
+
+Navigational link element.
+
+**Props:**
+- Extends `@radix-ui/react-navigation-menu` Link props
+- `asChild?: boolean` - Compose with child element
+- `active?: boolean` - Active state styling
+
+### NavigationMenuViewport
+
+Portal viewport for content panels.
+
+**Props:**
+- Extends `@radix-ui/react-navigation-menu` Viewport props
+- Automatically rendered by NavigationMenu root component
+
+### NavigationMenuIndicator
+
+Visual indicator showing active item.
+
+**Props:**
+- Extends `@radix-ui/react-navigation-menu` Indicator props
+- Renders a small arrow/pointer below the active trigger
+
+### navigationMenuTriggerStyle
+
+Helper function that returns trigger styling classes.
+
+**Usage:**
+```tsx
+<NavigationMenuLink className={navigationMenuTriggerStyle()}>
+  Link
+</NavigationMenuLink>
+```
+
+## Composition Pattern
+
+The NavigationMenu component follows this structure:
+
+```
+NavigationMenu
+  ├─ NavigationMenuList
+  │   ├─ NavigationMenuItem
+  │   │   ├─ NavigationMenuTrigger
+  │   │   └─ NavigationMenuContent
+  │   │       └─ NavigationMenuLink (multiple)
+  │   ├─ NavigationMenuItem
+  │   │   └─ NavigationMenuLink
+  │   └─ NavigationMenuIndicator (optional)
+  └─ NavigationMenuViewport (auto-included)
+```
+
+## Accessibility
+
+- Built on Radix UI primitives with full ARIA support
+- Keyboard navigation with arrow keys between triggers
+- Tab/Shift+Tab to navigate through content
+- Escape to close open content
+- Enter/Space to activate triggers
+- Automatic focus management when content opens
+- `aria-current` attribute on active links
+- Proper focus indicators for all interactive elements
+- ChevronDown icon has `aria-hidden="true"` to avoid screen reader confusion
+- Smooth animations respect `prefers-reduced-motion`

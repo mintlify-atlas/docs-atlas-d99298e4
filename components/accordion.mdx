@@ -1,0 +1,171 @@
+---
+title: Accordion
+description: A vertically stacked set of interactive headings that each reveal a section of content.
+---
+
+## Introduction
+
+The Accordion component is built on top of Radix UI's Accordion primitive and provides a way to organize content in a collapsible format. It's ideal for FAQs, settings panels, or any scenario where you need to conserve space while keeping content accessible.
+
+## Installation
+
+```tsx
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@poketto/ui";
+```
+
+## Usage
+
+The basic Accordion structure requires four components working together:
+
+```tsx
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Is it accessible?</AccordionTrigger>
+    <AccordionContent>
+      Yes. It adheres to the WAI-ARIA design pattern.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+## Examples
+
+### Single Item Accordion
+
+Only one item can be opened at a time:
+
+```tsx
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>What is Poketto Stack?</AccordionTrigger>
+    <AccordionContent>
+      Poketto Stack is a modern full-stack development framework.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-2">
+    <AccordionTrigger>How do I get started?</AccordionTrigger>
+    <AccordionContent>
+      Follow our quick start guide to set up your first project.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+### Multiple Items Accordion
+
+Multiple items can be opened simultaneously:
+
+```tsx
+<Accordion type="multiple">
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Features</AccordionTrigger>
+    <AccordionContent>
+      Built-in authentication, database integration, and more.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-2">
+    <AccordionTrigger>Performance</AccordionTrigger>
+    <AccordionContent>
+      Optimized for speed with server-side rendering.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-3">
+    <AccordionTrigger>Customization</AccordionTrigger>
+    <AccordionContent>
+      Fully customizable with Tailwind CSS.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+### With Default Value
+
+Set an item to be open by default:
+
+```tsx
+<Accordion type="single" defaultValue="item-2" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Question 1</AccordionTrigger>
+    <AccordionContent>Answer 1</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-2">
+    <AccordionTrigger>Question 2</AccordionTrigger>
+    <AccordionContent>Answer 2 (opened by default)</AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+## Props
+
+### Accordion
+
+The root component that wraps all accordion items.
+
+<ParamField path="type" type="'single' | 'multiple'" required>
+  Determines whether one or multiple items can be opened at the same time.
+</ParamField>
+
+<ParamField path="collapsible" type="boolean">
+  When `type="single"`, allows the open item to be collapsed. Defaults to `false`.
+</ParamField>
+
+<ParamField path="defaultValue" type="string | string[]">
+  The default active value(s). Use string for `type="single"` or string array for `type="multiple"`.
+</ParamField>
+
+<ParamField path="value" type="string | string[]">
+  Controlled value(s) of the accordion. Use with `onValueChange`.
+</ParamField>
+
+<ParamField path="onValueChange" type="(value: string | string[]) => void">
+  Callback fired when the accordion value changes.
+</ParamField>
+
+### AccordionItem
+
+Wrapper for each accordion section.
+
+<ParamField path="value" type="string" required>
+  Unique identifier for the accordion item.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default styles include a bottom border.
+</ParamField>
+
+### AccordionTrigger
+
+The clickable header that toggles the accordion item.
+
+<ParamField path="children" type="ReactNode" required>
+  The content of the trigger, typically the question or section title.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to customize the trigger appearance.
+</ParamField>
+
+### AccordionContent
+
+The collapsible content area.
+
+<ParamField path="children" type="ReactNode" required>
+  The content to display when the accordion item is expanded.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to customize the content wrapper.
+</ParamField>
+
+## Accessibility
+
+- Built with Radix UI Accordion primitive following WAI-ARIA design patterns
+- Keyboard navigation: `Tab` to focus triggers, `Space` or `Enter` to toggle
+- Screen reader support with proper ARIA attributes
+- Animated chevron icon indicates expanded/collapsed state
+- Focus management handles keyboard and screen reader interactions

@@ -1,0 +1,171 @@
+---
+title: Building for production
+description: Optimize and build your application for production deployment
+---
+
+Learn how to build, optimize, and prepare your Poketto Stack application for production deployment.
+
+## Build commands
+
+Build the entire monorepo or specific apps:
+
+```bash
+# Build all apps and packages
+pnpm run build
+
+# Build specific app
+pnpm admin:build
+
+# Build with Turbo for caching
+turbo build
+```
+
+## Build configuration
+
+The build is configured in `package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "build": "turbo build",
+    "admin:build": "turbo --filter admin build"
+  }
+}
+```
+
+Each app has its own build script:
+
+```json apps/admin/package.json
+{
+  "scripts": {
+    "build": "react-router typegen && tsc && react-router build"
+  }
+}
+```
+
+## Production optimizations
+
+### Code splitting
+
+React Router automatically code-splits by route. For manual splits:
+
+```tsx
+import { lazy, Suspense } from "react"
+
+const HeavyComponent = lazy(() => import("./heavy-component"))
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HeavyComponent />
+    </Suspense>
+  )
+}
+```
+
+### Tree shaking
+
+Ensure proper tree shaking with ES modules:
+
+```tsx
+// ✅ Good - tree-shakeable
+import { Button } from "@poketto/ui/button"
+
+// ❌ Bad - imports entire package
+import { Button } from "@poketto/ui"
+```
+
+### Bundle analysis
+
+Analyze bundle size:
+
+```bash
+# Add to package.json
+{
+  "scripts": {
+    "analyze": "vite build --mode analyze"
+  }
+}
+```
+
+## Environment variables
+
+### Build-time variables
+
+Set environment variables for builds:
+
+```bash .env.production
+VITE_APP_NAME="My App"
+VITE_API_URL=https://api.example.com
+VITE_ENABLE_DEVTOOLS=false
+```
+
+Access in code:
+
+```tsx
+const apiUrl = import.meta.env.VITE_API_URL
+const appName = import.meta.env.VITE_APP_NAME
+```
+
+### Runtime variables
+
+For runtime configuration, use a config endpoint:
+
+```tsx
+async function loadConfig() {
+  const response = await fetch("/api/config")
+  return response.json()
+}
+```
+
+## Build output
+
+The build outputs to `dist/`:
+
+```
+dist/
+├── client/
+│   ├── assets/
+│   │   ├── index-[hash].js
+│   │   └── index-[hash].css
+│   └── index.html
+└── server/
+    └── index.js
+```
+
+## Previewing builds
+
+Test the production build locally:
+
+```bash
+pnpm build
+pnpm preview
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Minimize dependencies" icon="weight">
+    Only include necessary dependencies in production
+  </Card>
+  <Card title="Enable compression" icon="file-zipper">
+    Use gzip or brotli compression on server
+  </Card>
+  <Card title="Cache assets" icon="clock">
+    Set appropriate cache headers for static assets
+  </Card>
+  <Card title="Monitor bundle size" icon="chart-line">
+    Regularly check and optimize bundle size
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Docker" icon="docker" href="/advanced/docker">
+    Deploy with Docker
+  </Card>
+  <Card title="Performance" icon="gauge" href="/advanced/performance">
+    Optimize application performance
+  </Card>
+</CardGroup>

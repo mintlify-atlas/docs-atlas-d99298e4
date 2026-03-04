@@ -1,0 +1,376 @@
+---
+title: '@poketto/cli'
+description: 'Command-line tool to rename organization names across monorepo projects with support for pnpm, Yarn, npm, Lerna, and Nx'
+---
+
+## Overview
+
+`@poketto/cli` is a powerful command-line tool designed to simplify the process of renaming organization names across monorepo projects. When you need to rename packages from `@old-org/package` to `@new-org/package`, manually updating all references can be time-consuming and error-prone. This tool automates the process while maintaining consistency across package dependencies and code references.
+
+## Features
+
+- ✨ Automatic workspace structure detection
+- 📦 Batch update package.json files
+- 🔄 Smart code reference updates
+- 👀 Dry-run mode to preview changes
+- 🎯 Precise file filtering with glob patterns
+- 🚀 Support for multiple monorepo tools
+- ⚡ Fast and reliable renaming
+- 🛡️ Safe with confirmation prompts
+
+## Supported Monorepo Tools
+
+- **pnpm Workspaces**
+- **Yarn Workspaces**
+- **npm Workspaces**
+- **Lerna**
+- **Nx**
+
+## Installation
+
+### Global Installation
+
+```bash
+# npm
+npm install -g @poketto/cli
+
+# yarn
+yarn global add @poketto/cli
+
+# pnpm
+pnpm add -g @poketto/cli
+```
+
+### Local Installation
+
+```bash
+pnpm add -D @poketto/cli
+```
+
+## Usage
+
+### Basic Usage
+
+Run the command in your monorepo root directory:
+
+```bash
+poketto-cli <old-org> <new-org>
+```
+
+### Examples
+
+```bash
+# Rename from @company to @newcompany
+poketto-cli @company @newcompany
+
+# Works with or without @ prefix
+poketto-cli company newcompany
+
+# Preview changes without modifying files
+poketto-cli @company @newcompany --dry-run
+
+# Skip confirmation prompts (useful for CI/CD)
+poketto-cli @company @newcompany --yes
+```
+
+## Command Options
+
+<ResponseField name="old-org" type="string" required>
+  Current organization name (with or without @ prefix)
+</ResponseField>
+
+<ResponseField name="new-org" type="string" required>
+  New organization name (with or without @ prefix)
+</ResponseField>
+
+<ResponseField name="-d, --dry-run" type="boolean" default="false">
+  Preview changes without modifying files
+</ResponseField>
+
+<ResponseField name="-y, --yes" type="boolean" default="false">
+  Skip confirmation prompts (auto-confirm)
+</ResponseField>
+
+<ResponseField name="--include" type="string">
+  Comma-separated glob patterns for files to include
+  
+  Example: `--include "**/*.{ts,tsx,json}"`
+</ResponseField>
+
+<ResponseField name="--exclude" type="string">
+  Comma-separated glob patterns for files to exclude
+  
+  Example: `--exclude "**/node_modules/**,**/dist/**"`
+</ResponseField>
+
+<ResponseField name="--verbose" type="boolean" default="false">
+  Enable verbose logging to see detailed operation logs
+</ResponseField>
+
+<ResponseField name="--silent" type="boolean" default="false">
+  Suppress all non-error output
+</ResponseField>
+
+<ResponseField name="-h, --help" type="boolean">
+  Display help information
+</ResponseField>
+
+<ResponseField name="-V, --version" type="boolean">
+  Display version number
+</ResponseField>
+
+## Common Scenarios
+
+### Preview Changes
+
+Use `--dry-run` to see what would be changed without modifying any files:
+
+```bash
+poketto-cli @old-org @new-org --dry-run
+```
+
+Output:
+```
+✔ Detected pnpm Workspaces monorepo
+✔ Found 12 packages
+ℹ Dry run completed. Would modify 48 files in 12 packages
+
+Files that would be modified:
+- packages/ui/package.json
+- packages/ui/src/index.ts
+- packages/api/package.json
+- ...
+```
+
+### CI/CD Automation
+
+Skip interactive prompts for automated workflows:
+
+```bash
+poketto-cli @old-org @new-org --yes
+```
+
+### Update Only Package Files
+
+Rename only in package.json files:
+
+```bash
+poketto-cli @old-org @new-org --include "**/package.json"
+```
+
+### Update Source Code Only
+
+Rename only in TypeScript source files:
+
+```bash
+poketto-cli @old-org @new-org --include "src/**/*.{ts,tsx}"
+```
+
+### Exclude Test Files
+
+Exclude test files from renaming:
+
+```bash
+poketto-cli @old-org @new-org --exclude "**/*.test.ts,**/*.spec.ts"
+```
+
+### Multi-Step Approach
+
+Perform the rename in steps for better control:
+
+```bash
+# Step 1: Update package.json files only
+poketto-cli @old-org @new-org --include "**/package.json"
+
+# Step 2: Update source code
+poketto-cli @old-org @new-org --include "src/**/*.{ts,tsx}"
+
+# Step 3: Update configuration files
+poketto-cli @old-org @new-org --include "**/*.{json,yml,yaml}"
+```
+
+## How It Works
+
+1. **Detection**: Automatically detects your monorepo structure
+2. **Scanning**: Scans all packages in the workspace
+3. **Preview**: Shows what will be changed (with confirmation)
+4. **Renaming**: Updates all occurrences of the old organization name
+5. **Verification**: Reports modified files and packages
+
+### What Gets Updated
+
+The CLI updates organization names in:
+
+- ✅ `package.json` - `name`, `dependencies`, `devDependencies`, `peerDependencies`
+- ✅ Import statements - `import { x } from '@old-org/package'`
+- ✅ TypeScript/JavaScript files
+- ✅ Configuration files (if included)
+- ✅ Documentation (if included)
+
+## Best Practices
+
+### 1. Create a Backup
+
+Always commit your changes or create a branch before running the tool:
+
+```bash
+git checkout -b rename/org
+git add -A
+git commit -m "chore: backup before organization rename"
+```
+
+### 2. Preview First
+
+Always run with `--dry-run` first to review changes:
+
+```bash
+poketto-cli @old-org @new-org --dry-run --verbose
+```
+
+### 3. Test After Renaming
+
+After renaming, verify everything works:
+
+```bash
+# Reinstall dependencies
+pnpm install
+
+# Run tests
+pnpm test
+
+# Build the project
+pnpm build
+```
+
+### 4. Use Version Control
+
+Review the changes before committing:
+
+```bash
+git diff
+git add -A
+git commit -m "chore: rename organization from @old-org to @new-org"
+```
+
+## Troubleshooting
+
+### "No monorepo structure detected"
+
+**Solution**: Ensure you're running the command from the monorepo root directory and that you have a workspace configuration file:
+
+- pnpm: `pnpm-workspace.yaml`
+- Yarn: `package.json` with `workspaces` field
+- npm: `package.json` with `workspaces` field
+- Lerna: `lerna.json`
+- Nx: `nx.json`
+
+### "Organization name must contain only letters, numbers, hyphens, underscores, and dots"
+
+**Solution**: Ensure your organization name follows npm package naming conventions:
+
+```bash
+# ✅ Valid
+poketto-cli @my-org @new-org
+poketto-cli @my.org @new.org
+poketto-cli @my_org @new_org
+
+# ❌ Invalid
+poketto-cli @my org @new org  # No spaces
+poketto-cli @my@org @new@org  # No special chars
+```
+
+### Some References Not Updated
+
+**Solution**: Use `--verbose` to see which files are being processed:
+
+```bash
+poketto-cli @old-org @new-org --verbose
+```
+
+If certain files aren't being updated, check your include/exclude patterns:
+
+```bash
+# Include additional file types
+poketto-cli @old-org @new-org --include "**/*.{ts,tsx,js,jsx,json,md}"
+```
+
+### Performance Issues
+
+**Solution**: Narrow down the scope with `--include` to exclude large directories:
+
+```bash
+poketto-cli @old-org @new-org \
+  --include "src/**/*" \
+  --exclude "**/node_modules/**,**/dist/**,.next/**"
+```
+
+## Examples
+
+### Complete Workflow
+
+```bash
+# 1. Create a backup branch
+git checkout -b rename/organization
+
+# 2. Preview the changes
+poketto-cli @acme @poketto --dry-run --verbose
+
+# 3. Execute the rename
+poketto-cli @acme @poketto
+
+# 4. Verify the changes
+git diff
+
+# 5. Reinstall dependencies
+pnpm install
+
+# 6. Test everything
+pnpm test && pnpm build
+
+# 7. Commit the changes
+git add -A
+git commit -m "chore: rename organization from @acme to @poketto"
+```
+
+### Selective Renaming
+
+```bash
+# Only update TypeScript files
+poketto-cli @old-org @new-org --include "**/*.{ts,tsx}"
+
+# Update everything except tests
+poketto-cli @old-org @new-org --exclude "**/*.{test,spec}.{ts,tsx}"
+
+# Update specific packages
+poketto-cli @old-org @new-org --include "packages/{ui,api}/**/*"
+```
+
+## Programmatic Usage
+
+You can also use the CLI as a library:
+
+```typescript
+import { renameOrganization, scanPackages, detectMonorepo } from '@poketto/cli'
+
+const repoType = await detectMonorepo()
+const packages = await scanPackages(repoType)
+
+const result = await renameOrganization({
+  oldOrg: '@old-org',
+  newOrg: '@new-org',
+  packages,
+  dryRun: false,
+})
+
+console.log(`Modified ${result.modifiedFiles} files`)
+```
+
+## Configuration
+
+The CLI automatically detects your monorepo configuration. No additional setup is required.
+
+## Related Packages
+
+- [@poketto/ui](/packages/ui) - UI component library
+- [@poketto/pro-table](/packages/pro-table) - Data table components
+- [@poketto/tiptap](/packages/tiptap) - Rich text editor

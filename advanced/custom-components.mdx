@@ -1,0 +1,362 @@
+---
+title: Custom components
+description: Create custom components that integrate seamlessly with the design system
+---
+
+Learn how to build custom components that follow Poketto Stack's design patterns and integrate with the shadcn/ui design system.
+
+## Component structure
+
+Custom components should follow this structure:
+
+```tsx
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@poketto/ui/utils"
+
+// 1. Define variants with CVA
+const componentVariants = cva(
+  "base-classes-here",
+  {
+    variants: {
+      variant: {
+        default: "default-classes",
+        custom: "custom-classes",
+      },
+      size: {
+        sm: "small-classes",
+        md: "medium-classes",
+        lg: "large-classes",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+    },
+  }
+)
+
+// 2. Define props interface
+export interface ComponentProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof componentVariants> {
+  // Custom props here
+}
+
+// 3. Export component with forwardRef
+const Component = React.forwardRef<HTMLDivElement, ComponentProps>(
+  ({ className, variant, size, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn(componentVariants({ variant, size, className }))}
+        {...props}
+      />
+    )
+  }
+)
+Component.displayName = "Component"
+
+export { Component, componentVariants }
+```
+
+## Status indicator example
+
+Here's a complete example of a custom status indicator component:
+
+```tsx status-indicator.tsx
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@poketto/ui/utils"
+import { CheckCircle2, AlertCircle, Clock, XCircle } from "lucide-react"
+
+const statusIndicatorVariants = cva(
+  "inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium transition-colors",
+  {
+    variants: {
+      status: {
+        success: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+        warning: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+        error: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+        info: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+        pending: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
+      },
+      size: {
+        sm: "text-xs px-2 py-0.5",
+        md: "text-sm px-3 py-1",
+        lg: "text-base px-4 py-1.5",
+      },
+    },
+    defaultVariants: {
+      status: "info",
+      size: "md",
+    },
+  }
+)
+
+const statusIcons = {
+  success: CheckCircle2,
+  warning: AlertCircle,
+  error: XCircle,
+  info: AlertCircle,
+  pending: Clock,
+}
+
+export interface StatusIndicatorProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof statusIndicatorVariants> {
+  showIcon?: boolean
+}
+
+const StatusIndicator = React.forwardRef<HTMLDivElement, StatusIndicatorProps>(
+  ({ className, status = "info", size, showIcon = true, children, ...props }, ref) => {
+    const Icon = statusIcons[status]
+
+    return (
+      <div
+        ref={ref}
+        className={cn(statusIndicatorVariants({ status, size, className }))}
+        {...props}
+      >
+        {showIcon && Icon && <Icon className="h-4 w-4" />}
+        {children}
+      </div>
+    )
+  }
+)
+StatusIndicator.displayName = "StatusIndicator"
+
+export { StatusIndicator, statusIndicatorVariants }
+```
+
+Usage:
+
+```tsx
+import { StatusIndicator } from "@/components/status-indicator"
+
+export default function OrderStatus() {
+  return (
+    <div className="space-y-2">
+      <StatusIndicator status="success">Completed</StatusIndicator>
+      <StatusIndicator status="pending">Processing</StatusIndicator>
+      <StatusIndicator status="error">Failed</StatusIndicator>
+      <StatusIndicator status="warning" size="lg" showIcon={false}>
+        Review required
+      </StatusIndicator>
+    </div>
+  )
+}
+```
+
+## Compound components
+
+Create compound components for complex UI patterns:
+
+```tsx stat-card.tsx
+import * as React from "react"
+import { Card } from "@poketto/ui/card"
+import { cn } from "@poketto/ui/utils"
+
+const StatCard = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <Card
+    ref={ref}
+    className={cn("p-6", className)}
+    {...props}
+  />
+))
+StatCard.displayName = "StatCard"
+
+const StatCardTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn("text-sm font-medium text-muted-foreground", className)}
+    {...props}
+  />
+))
+StatCardTitle.displayName = "StatCardTitle"
+
+const StatCardValue = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-3xl font-bold mt-2", className)}
+    {...props}
+  />
+))
+StatCardValue.displayName = "StatCardValue"
+
+const StatCardDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-xs text-muted-foreground mt-1", className)}
+    {...props}
+  />
+))
+StatCardDescription.displayName = "StatCardDescription"
+
+export { StatCard, StatCardTitle, StatCardValue, StatCardDescription }
+```
+
+Usage:
+
+```tsx
+import {
+  StatCard,
+  StatCardTitle,
+  StatCardValue,
+  StatCardDescription,
+} from "@/components/stat-card"
+import { TrendingUp } from "lucide-react"
+
+export default function Dashboard() {
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      <StatCard>
+        <StatCardTitle>Total Revenue</StatCardTitle>
+        <StatCardValue>$45,231.89</StatCardValue>
+        <StatCardDescription>
+          <TrendingUp className="inline h-3 w-3 mr-1" />
+          +20.1% from last month
+        </StatCardDescription>
+      </StatCard>
+      
+      <StatCard>
+        <StatCardTitle>Active Users</StatCardTitle>
+        <StatCardValue>2,350</StatCardValue>
+        <StatCardDescription>+180 new this week</StatCardDescription>
+      </StatCard>
+      
+      <StatCard>
+        <StatCardTitle>Conversion Rate</StatCardTitle>
+        <StatCardValue>3.2%</StatCardValue>
+        <StatCardDescription>+0.3% from last month</StatCardDescription>
+      </StatCard>
+    </div>
+  )
+}
+```
+
+## Polymorphic components
+
+Create components that can render as different elements:
+
+```tsx
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cn } from "@poketto/ui/utils"
+
+interface TextProps extends React.HTMLAttributes<HTMLElement> {
+  asChild?: boolean
+  as?: "p" | "span" | "div" | "label"
+  size?: "sm" | "md" | "lg"
+}
+
+const Text = React.forwardRef<HTMLElement, TextProps>(
+  ({ className, asChild = false, as: Tag = "p", size = "md", ...props }, ref) => {
+    const Comp = asChild ? Slot : Tag
+
+    return (
+      <Comp
+        ref={ref as any}
+        className={cn(
+          "text-foreground",
+          size === "sm" && "text-sm",
+          size === "md" && "text-base",
+          size === "lg" && "text-lg",
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+Text.displayName = "Text"
+
+export { Text }
+```
+
+Usage:
+
+```tsx
+import { Text } from "@/components/text"
+import { Link } from "react-router"
+
+<Text>Default paragraph</Text>
+<Text as="span" size="sm">Small span</Text>
+<Text asChild>
+  <Link to="/about">Link with Text styling</Link>
+</Text>
+```
+
+## Adding to UI package
+
+To make your component available across the monorepo:
+
+<Steps>
+  <Step title="Create the component file">
+    Add your component to `packages/ui/src/components/ui/`:
+    
+    ```bash
+    packages/ui/src/components/ui/status-indicator.tsx
+    ```
+  </Step>
+  
+  <Step title="Export from package.json">
+    Add an export entry in `packages/ui/package.json`:
+    
+    ```json
+    {
+      "exports": {
+        "./status-indicator": "./src/components/ui/status-indicator.tsx"
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Use in your apps">
+    Import the component:
+    
+    ```tsx
+    import { StatusIndicator } from "@poketto/ui/status-indicator"
+    ```
+  </Step>
+</Steps>
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Use forwardRef" icon="arrow-right">
+    Always use `forwardRef` for better ref handling and composability
+  </Card>
+  <Card title="Type everything" icon="code">
+    Export proper TypeScript interfaces for all props
+  </Card>
+  <Card title="Follow conventions" icon="book">
+    Match the patterns used by existing shadcn/ui components
+  </Card>
+  <Card title="Document variants" icon="list">
+    Clearly document all variants and their use cases
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Component patterns" icon="puzzle-piece" href="/advanced/component-patterns">
+    Learn advanced component patterns
+  </Card>
+  <Card title="Testing" icon="vial" href="/guides/testing">
+    Write tests for your components
+  </Card>
+</CardGroup>

@@ -1,0 +1,435 @@
+---
+title: State Management
+description: How Poketto Stack handles client state with Jotai and server state with TanStack Query for a simple, scalable state architecture
+---
+
+## State Management Philosophy
+
+Poketto Stack embraces **state colocation** and separates concerns between client and server state:
+
+- **Client state (UI state)**: Managed with Jotai atoms
+- **Server state (data fetching)**: Managed with TanStack Query
+- **Form state**: Managed with React Hook Form
+- **URL state**: Managed with React Router's loaders and actions
+
+This separation keeps code simple and prevents the pitfalls of global state management.
+
+## Client State with Jotai
+
+[Jotai](https://jotai.org/) is a primitive and flexible state management library for React. It uses **atoms** as units of state.
+
+### Why Jotai?
+
+- **Minimal boilerplate**: Define state in one line
+- **Atomic updates**: Only components that use an atom re-render
+- **TypeScript-first**: Full type inference
+- **No Provider hell**: Works without context providers (though you can use them)
+- **Easy persistence**: Built-in local storage sync
+
+### Basic Atom Example
+
+Here's how the admin app manages navigation state:
+
+```ts title="apps/admin/app/atoms/nav.ts"
+import { atomWithStorage } from "jotai/utils";
+
+export const navOpenItemsAtom = atomWithStorage<Record<string, boolean>>(
+  "nav-open-items",
+  {}
+);
+```
+
+This creates an atom that:
+1. Stores which navigation items are expanded
+2. Persists to `localStorage` under the key `"nav-open-items"`
+3. Hydrates from localStorage on page load
+
+### Using Atoms in Components
+
+```tsx title="apps/admin/app/components/nav-sidebar/nav-main.tsx"
+import { useAtom } from "jotai";
+import { navOpenItemsAtom } from "@/atoms/nav";
+
+export function NavMain() {
+  const [openItems, setOpenItems] = useAtom(navOpenItemsAtom);
+
+  const toggleItem = (id: string) => {
+    setOpenItems((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  return (
+    <nav>
+      {/* Render navigation items */}
+    </nav>
+  );
+}
+```
+
+The `useAtom` hook works like `useState`, but the state is shared across all components that use the same atom.
+
+### Theme Configuration Atom
+
+The admin app stores theme customization settings in an atom:
+
+```ts title="apps/admin/app/hooks/use-config.ts"
+import { useAtom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
+
+type Config = {
+  style: "new-york" | "default";
+  theme: "zinc" | "slate" | "stone" | "gray" | "neutral";
+  radius: number;
+};
+
+const configAtom = atomWithStorage<Config>("config", {
+  style: "new-york",
+  theme: "zinc",
+  radius: 0.5,
+});
+
+export function useConfig() {
+  return useAtom(configAtom);
+}
+```
+
+<Note>
+  The `atomWithStorage` utility automatically syncs state with `localStorage`. When users refresh the page, their theme preferences persist.
+</Note>
+
+### Usage in Components
+
+```tsx
+import { useConfig } from "@/hooks/use-config";
+
+export function ThemeCustomizer() {
+  const [config, setConfig] = useConfig();
+
+  return (
+    <div>
+      <label>
+        Border Radius: {config.radius}rem
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.1"
+          value={config.radius}
+          onChange={(e) =>
+            setConfig({ ...config, radius: parseFloat(e.target.value) })
+          }
+        />
+      </label>
+    </div>
+  );
+}
+```
+
+## Server State with TanStack Query
+
+[TanStack Query](https://tanstack.com/query) (formerly React Query) manages server state—data that lives on a backend and needs to be fetched, cached, and synchronized.
+
+### Why TanStack Query?
+
+- **Automatic caching**: Fetched data is cached and reused
+- **Background refetching**: Keeps data fresh without manual intervention
+- **Optimistic updates**: Update UI before server confirms
+- **Request deduplication**: Multiple components requesting the same data trigger only one network request
+- **Error and loading states**: Built-in state management for async operations
+
+### Query Client Setup
+
+The admin app configures a global `QueryClient`:
+
+```ts title="apps/admin/app/lib/query-client.ts"
+import { QueryClient } from "@tanstack/react-query";
+import { FetchError } from "ofetch";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 10, // Data is fresh for 10 seconds
+      refetchOnWindowFocus: false, // Don't refetch when window regains focus
+      retryDelay: 1000, // Wait 1 second between retries
+      retry(failureCount, error) {
+        console.error(error);
+        
+        // Don't retry network errors
+        if (error instanceof FetchError && error.statusCode === undefined) {
+          return false;
+        }
+
+        // Retry up to 3 times for other errors
+        return !!(3 - failureCount);
+      },
+    },
+  },
+});
+
+export { queryClient };
+```
+
+### Provider Setup
+
+The `QueryClient` is provided at the root:
+
+```tsx title="apps/admin/app/providers/root-providers.tsx"
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/query-client";
+
+export const RootProviders = ({ children }) => (
+  <QueryClientProvider client={queryClient}>
+    {/* Other providers */}
+    {children}
+  </QueryClientProvider>
+);
+```
+
+### Using Queries
+
+While the admin app currently uses static data for demos, here's how you'd fetch real data:
+
+```tsx
+import { useQuery } from "@tanstack/react-query";
+import { $fetch } from "ofetch";
+
+function Dashboard() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["dashboard", "overview"],
+    queryFn: () => $fetch("/api/dashboard/overview"),
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <div>
+      <h1>Total Revenue: ${data.revenue}</h1>
+      {/* Render dashboard data */}
+    </div>
+  );
+}
+```
+
+### Query Keys
+
+Query keys uniquely identify queries for caching:
+
+```tsx
+// Simple key
+queryKey: ["users"]
+
+// Key with parameters
+queryKey: ["user", userId]
+
+// Nested key for filtering
+queryKey: ["posts", { status: "published", authorId }]
+```
+
+Queries with the same key share cached data. When you invalidate a query key, all related queries refetch.
+
+### Mutations
+
+For POST/PUT/DELETE operations, use mutations:
+
+```tsx
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { $fetch } from "ofetch";
+
+function CreateUserForm() {
+  const queryClient = useQueryClient();
+  
+  const mutation = useMutation({
+    mutationFn: (newUser) => $fetch("/api/users", {
+      method: "POST",
+      body: newUser,
+    }),
+    onSuccess: () => {
+      // Invalidate and refetch users list
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+
+  const handleSubmit = (formData) => {
+    mutation.mutate(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Form fields */}
+      <button disabled={mutation.isPending}>
+        {mutation.isPending ? "Creating..." : "Create User"}
+      </button>
+    </form>
+  );
+}
+```
+
+## State Colocation Pattern
+
+Instead of creating global stores, colocate state with the components that use it:
+
+<CodeGroup>
+```tsx Global Store (Not Recommended)
+// store.ts - Far from usage
+const userModalOpenAtom = atom(false);
+
+// SomeComponent.tsx
+import { userModalOpenAtom } from "@/store";
+```
+
+```tsx Colocated (Recommended)
+// UserModal.tsx - Right next to usage
+import { atom, useAtom } from "jotai";
+
+const userModalOpenAtom = atom(false);
+
+export function UserModal() {
+  const [isOpen, setIsOpen] = useAtom(userModalOpenAtom);
+  // ...
+}
+```
+</CodeGroup>
+
+<Tip>
+  Only create shared atoms when state truly needs to be accessed by multiple, distant components. Otherwise, keep it local.
+</Tip>
+
+## Form State with React Hook Form
+
+For complex forms, React Hook Form provides validation and state management:
+
+```tsx title="apps/admin/app/routes/(external)/login/index.tsx"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { loginFormSchema } from "@/schema/user";
+
+export default function LoginPage() {
+  const form = useForm({
+    resolver: zodResolver(loginFormSchema),
+    defaultValues: {
+      email: "admin@shadcn.com",
+      password: "admin@shadcn.com",
+    },
+  });
+
+  async function onSubmit(values) {
+    await signIn.email(values);
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Login</Button>
+      </form>
+    </Form>
+  );
+}
+```
+
+This pattern:
+- Validates with Zod schemas
+- Manages field state and errors
+- Integrates with UI components
+- Handles submission logic
+
+## URL State with React Router
+
+For state that should be shareable via URL (filters, pagination, search terms), use React Router:
+
+```tsx
+import { useSearchParams } from "react-router";
+
+function UserList() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filter = searchParams.get("status") || "all";
+
+  const updateFilter = (status: string) => {
+    setSearchParams({ status });
+  };
+
+  return (
+    <div>
+      <button onClick={() => updateFilter("active")}>Active</button>
+      <button onClick={() => updateFilter("inactive")}>Inactive</button>
+    </div>
+  );
+}
+```
+
+## When to Use Each Tool
+
+<CardGroup cols={2}>
+  <Card title="Jotai Atoms" icon="atom">
+    - UI state (modals, toggles, selections)
+    - Theme preferences
+    - User settings
+    - Local drafts
+  </Card>
+  
+  <Card title="TanStack Query" icon="database">
+    - API data fetching
+    - Server-side pagination
+    - Real-time data sync
+    - Caching remote data
+  </Card>
+  
+  <Card title="React Hook Form" icon="file-lines">
+    - Form validation
+    - Complex forms with many fields
+    - Multi-step forms
+    - Schema-based validation
+  </Card>
+  
+  <Card title="URL Search Params" icon="link">
+    - Filters and sorting
+    - Pagination state
+    - Search queries
+    - Shareable app state
+  </Card>
+</CardGroup>
+
+## Best Practices
+
+<Steps>
+  <Step title="Start with local state">
+    Use `useState` for state that only one component needs. Only lift state when multiple components need access.
+  </Step>
+  
+  <Step title="Keep server state separate">
+    Don't store API responses in Jotai atoms. Let TanStack Query handle caching and synchronization.
+  </Step>
+  
+  <Step title="Use atoms for persistence">
+    If UI state should survive page refreshes (theme, sidebar collapsed state), use `atomWithStorage`.
+  </Step>
+  
+  <Step title="Derive state when possible">
+    Instead of duplicating state, derive computed values:
+    
+    ```tsx
+    // ❌ Duplicate state
+    const [users, setUsers] = useState([]);
+    const [activeUsers, setActiveUsers] = useState([]);
+    
+    // ✅ Derived state
+    const [users, setUsers] = useState([]);
+    const activeUsers = users.filter(u => u.status === "active");
+    ```
+  </Step>
+</Steps>

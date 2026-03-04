@@ -1,0 +1,218 @@
+---
+title: "Toast"
+description: "Display temporary notification messages that appear and disappear automatically"
+---
+
+## Introduction
+
+Toasts are temporary, unobtrusive notifications that appear on screen to provide feedback about an operation. They automatically disappear after a short duration and don't require user interaction.
+
+**When to use:**
+- Confirm successful actions ("Settings saved")
+- Provide brief status updates
+- Show non-critical errors
+- Acknowledge user actions without interrupting workflow
+
+## Installation
+
+Toasts require both the component imports and the `useToast` hook:
+
+```tsx
+import { useToast } from "@poketto/ui/hooks/use-toast";
+import { Toaster } from "@poketto/ui";
+```
+
+## Setup
+
+First, add the `Toaster` component to your app's root layout:
+
+```tsx
+import { Toaster } from "@poketto/ui";
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Toaster />
+      </body>
+    </html>
+  );
+}
+```
+
+## Basic Usage
+
+Use the `useToast` hook to trigger toasts:
+
+```tsx
+import { useToast } from "@poketto/ui/hooks/use-toast";
+
+function MyComponent() {
+  const { toast } = useToast();
+
+  return (
+    <button
+      onClick={() => {
+        toast({
+          title: "Scheduled: Catch up",
+          description: "Friday, February 10, 2023 at 5:57 PM",
+        });
+      }}
+    >
+      Show Toast
+    </button>
+  );
+}
+```
+
+## Examples
+
+### Simple Toast
+
+Basic toast with just a title:
+
+```tsx
+toast({
+  title: "Message sent!",
+});
+```
+
+### Toast with Description
+
+Provide additional context with a description:
+
+```tsx
+toast({
+  title: "Uh oh! Something went wrong.",
+  description: "There was a problem with your request.",
+});
+```
+
+### Destructive Toast
+
+Use the destructive variant for errors:
+
+```tsx
+toast({
+  variant: "destructive",
+  title: "Error",
+  description: "Your session has expired. Please log in again.",
+});
+```
+
+### Toast with Action
+
+Add an action button for users to respond:
+
+```tsx
+import { ToastAction } from "@poketto/ui";
+
+toast({
+  title: "Update available",
+  description: "A new version is ready to install.",
+  action: (
+    <ToastAction altText="Install update" onClick={() => console.log("Installing...")}>
+      Install
+    </ToastAction>
+  ),
+});
+```
+
+### Programmatic Dismiss
+
+Control toast dismissal programmatically:
+
+```tsx
+const { toast, dismiss } = useToast();
+
+const { id } = toast({
+  title: "Processing...",
+  description: "This may take a few moments.",
+});
+
+// Later, dismiss the specific toast
+dismiss(id);
+```
+
+### Updating a Toast
+
+Update an existing toast:
+
+```tsx
+const { toast } = useToast();
+
+const { id, update } = toast({
+  title: "Uploading...",
+});
+
+// Later, update the toast
+update({
+  id,
+  title: "Upload complete!",
+  description: "Your file has been uploaded successfully.",
+});
+```
+
+## useToast Hook
+
+The `useToast` hook provides access to the toast system:
+
+```tsx
+const { toast, dismiss, toasts } = useToast();
+```
+
+### Hook Return Values
+
+<ParamField path="toast" type="function">
+  Function to create a new toast notification. Returns an object with `id`, `dismiss`, and `update` methods.
+</ParamField>
+
+<ParamField path="dismiss" type="function">
+  Function to dismiss a specific toast by ID, or all toasts if no ID is provided.
+</ParamField>
+
+<ParamField path="toasts" type="array">
+  Array of currently visible toast objects.
+</ParamField>
+
+## Toast Options
+
+<ParamField path="title" type="React.ReactNode">
+  The main heading of the toast.
+</ParamField>
+
+<ParamField path="description" type="React.ReactNode">
+  Additional descriptive text shown below the title.
+</ParamField>
+
+<ParamField path="variant" type="'default' | 'destructive'" default="'default'">
+  The visual style of the toast. Use `destructive` for errors.
+</ParamField>
+
+<ParamField path="action" type="ToastActionElement">
+  An optional action button component.
+</ParamField>
+
+<ParamField path="duration" type="number" default="5000">
+  How long the toast should remain visible in milliseconds.
+</ParamField>
+
+## Best Practices
+
+<Check>**Do** use toasts for confirmations and brief updates</Check>
+<Check>**Do** keep toast messages short and scannable</Check>
+<Check>**Do** use destructive variant for errors</Check>
+<Check>**Do** allow users to dismiss toasts manually</Check>
+<Check>**Do** limit the number of simultaneous toasts</Check>
+
+<Warning>**Don't** use toasts for critical information users might need to reference</Warning>
+<Warning>**Don't** require user action to dismiss important error toasts</Warning>
+<Warning>**Don't** show too many toasts at once - they stack and become overwhelming</Warning>
+<Warning>**Don't** use toasts for lengthy messages</Warning>
+
+## Accessibility
+
+- Toasts are announced to screen readers when they appear
+- Users can dismiss toasts with keyboard navigation
+- The component respects user preferences for reduced motion

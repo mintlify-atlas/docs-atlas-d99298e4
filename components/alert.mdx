@@ -1,0 +1,134 @@
+---
+title: "Alert"
+description: "Display important messages and notifications to users with customizable styling"
+---
+
+## Introduction
+
+The Alert component is used to display important information to users in a prominent way. Use alerts to communicate critical information, warnings, or general notifications that require user attention.
+
+**When to use:**
+- Display system status messages
+- Show validation errors or warnings
+- Communicate important updates
+- Provide contextual information
+
+## Installation
+
+Import the Alert components from `@poketto/ui`:
+
+```tsx
+import { Alert, AlertTitle, AlertDescription } from "@poketto/ui";
+```
+
+## Basic Usage
+
+Here's a simple alert with a title and description:
+
+```tsx
+<Alert>
+  <AlertTitle>Heads up!</AlertTitle>
+  <AlertDescription>
+    You can add components to your app using the CLI.
+  </AlertDescription>
+</Alert>
+```
+
+## Examples
+
+### Default Alert
+
+The default variant provides a neutral background for general information:
+
+```tsx
+<Alert variant="default">
+  <AlertTitle>Information</AlertTitle>
+  <AlertDescription>
+    This is a default alert for general information.
+  </AlertDescription>
+</Alert>
+```
+
+### Destructive Alert
+
+Use the destructive variant for errors and critical warnings:
+
+```tsx
+<Alert variant="destructive">
+  <AlertTitle>Error</AlertTitle>
+  <AlertDescription>
+    Your session has expired. Please log in again.
+  </AlertDescription>
+</Alert>
+```
+
+### With Icon
+
+Add icons to make alerts more visually distinctive:
+
+```tsx
+import { AlertCircle } from "lucide-react";
+
+<Alert>
+  <AlertCircle className="h-4 w-4" />
+  <AlertTitle>Heads up!</AlertTitle>
+  <AlertDescription>
+    You can add components and dependencies to your app using the CLI.
+  </AlertDescription>
+</Alert>
+```
+
+### Description Only
+
+You can use just the description without a title:
+
+```tsx
+<Alert>
+  <AlertDescription>
+    Your payment has been processed successfully.
+  </AlertDescription>
+</Alert>
+```
+
+## Props
+
+### Alert
+
+<ParamField path="variant" type="'default' | 'destructive'" default="'default'">
+  The visual style of the alert. Use `destructive` for errors and warnings.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the alert.
+</ParamField>
+
+### AlertTitle
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the title.
+</ParamField>
+
+Extends standard HTML heading element props.
+
+### AlertDescription
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the description.
+</ParamField>
+
+Extends standard HTML div element props.
+
+## Best Practices
+
+<Check>**Do** use alerts for important, actionable information</Check>
+<Check>**Do** keep alert messages concise and clear</Check>
+<Check>**Do** use the destructive variant for errors and critical warnings</Check>
+<Check>**Do** include an icon to improve scannability</Check>
+
+<Warning>**Don't** overuse alerts - they lose impact when used too frequently</Warning>
+<Warning>**Don't** use alerts for promotional content</Warning>
+<Warning>**Don't** include multiple calls to action in a single alert</Warning>
+
+## Accessibility
+
+The Alert component automatically includes `role="alert"` to announce important messages to screen readers.

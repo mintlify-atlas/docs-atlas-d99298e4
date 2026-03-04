@@ -1,0 +1,189 @@
+---
+title: Welcome to Poketto Stack
+description: A modern boilerplate built with shadcn/ui for rapid development of web applications
+---
+
+<div className="relative overflow-hidden bg-gradient-to-br from-[#050d15] via-[#0a1420] to-[#050d15] dark:from-[#050d15] dark:via-[#0a1420] dark:to-[#050d15] py-20">
+  <div className="max-w-6xl mx-auto px-6">
+    <div className="grid lg:grid-cols-12 gap-8 items-center">
+      <div className="lg:col-span-7 space-y-6">
+        <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight">
+          Build modern web apps faster with Poketto Stack
+        </h1>
+        <p className="text-xl text-gray-300 max-w-2xl">
+          A production-ready boilerplate featuring 40+ shadcn/ui components, TypeScript, React Router 7, and a complete development toolkit for building beautiful applications.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <a 
+            href="/quickstart" 
+            className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#050d15] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            Get started
+          </a>
+          <a 
+            href="/components/overview" 
+            className="inline-flex items-center justify-center px-6 py-3 border border-white/30 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-colors"
+          >
+            Explore components
+          </a>
+        </div>
+      </div>
+      <div className="lg:col-span-5 hidden lg:block">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#7c848c]/20 to-transparent rounded-2xl blur-3xl"></div>
+          <div className="relative bg-[#1a1d27] dark:bg-[#1a1d27] rounded-2xl p-6 border border-white/10">
+            <div className="space-y-3">
+              <div className="h-3 bg-gradient-to-r from-[#7c848c] to-[#7c848c]/50 rounded w-3/4"></div>
+              <div className="h-3 bg-gradient-to-r from-[#7c848c]/70 to-[#7c848c]/30 rounded w-1/2"></div>
+              <div className="h-3 bg-gradient-to-r from-[#7c848c]/50 to-[#7c848c]/20 rounded w-5/6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-semibold text-gray-900 dark:text-white mb-3">
+    Quick start
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Get your development environment set up in minutes
+  </p>
+
+  <Steps>
+    <Step title="Clone the repository">
+      Clone the Poketto Stack repository to your local machine.
+      
+      ```bash
+      git clone https://github.com/TinsFox/poketto-stack.git
+      cd poketto-stack
+      ```
+    </Step>
+    
+    <Step title="Install dependencies">
+      This project uses pnpm for package management. Install dependencies for all packages in the monorepo.
+      
+      ```bash
+      pnpm install
+      ```
+    </Step>
+    
+    <Step title="Start the development server">
+      Launch the admin application in development mode.
+      
+      ```bash
+      pnpm admin:dev
+      ```
+      
+      <Note>
+        The development server will start at `http://localhost:5173` with hot module replacement enabled.
+      </Note>
+    </Step>
+    
+    <Step title="Explore the components">
+      Launch Storybook to browse and interact with all available components.
+      
+      ```bash
+      cd apps/admin
+      pnpm storybook
+      ```
+      
+      Storybook will open at `http://localhost:6006` where you can explore all UI components in isolation.
+    </Step>
+  </Steps>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-semibold text-gray-900 dark:text-white mb-3">
+    Key features
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Everything you need to build production-ready applications
+  </p>
+
+  <CardGroup cols={2}>
+    <Card title="40+ UI components" icon="puzzle-piece" href="/components/overview">
+      Comprehensive collection of accessible, customizable components built with Radix UI and styled with Tailwind CSS.
+    </Card>
+    <Card title="Monorepo architecture" icon="layer-group" href="/concepts/monorepo-structure">
+      Organized with Turborepo for efficient builds and optimal code sharing across apps and packages.
+    </Card>
+    <Card title="Type-safe routing" icon="route" href="/concepts/routing">
+      React Router 7 with automatic type generation for routes, loaders, and actions.
+    </Card>
+    <Card title="Form handling" icon="square-check" href="/guides/forms">
+      React Hook Form integration with Zod schema validation for type-safe forms with minimal boilerplate.
+    </Card>
+    <Card title="State management" icon="database" href="/concepts/state-management">
+      Atomic state with Jotai and server state with TanStack Query for efficient data fetching and caching.
+    </Card>
+    <Card title="Internationalization" icon="language" href="/guides/internationalization">
+      Built-in i18next support with type-safe translations and automatic language detection.
+    </Card>
+    <Card title="Component development" icon="flask" href="/components/overview">
+      Storybook integration for building and testing components in isolation with dark mode support.
+    </Card>
+    <Card title="Testing ready" icon="vial" href="/guides/testing">
+      Vitest and Testing Library configured for unit and integration tests with coverage reporting.
+    </Card>
+  </CardGroup>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <h2 className="text-3xl font-semibold text-gray-900 dark:text-white mb-3">
+    Explore by topic
+  </h2>
+  <p className="text-base text-gray-600 dark:text-gray-400 mb-8">
+    Learn about the core concepts and start building
+  </p>
+
+  <CardGroup cols={3}>
+    <Card title="Components" icon="cube" href="/concepts/components">
+      Learn how components are structured and how to use them effectively in your application.
+    </Card>
+    <Card title="Theming" icon="palette" href="/concepts/theming">
+      Customize colors, typography, and design tokens to match your brand.
+    </Card>
+    <Card title="Authentication" icon="lock" href="/guides/authentication">
+      Implement secure authentication flows with Better Auth integration.
+    </Card>
+    <Card title="Data fetching" icon="cloud-arrow-down" href="/guides/data-fetching">
+      Fetch and cache server data efficiently with TanStack Query patterns.
+    </Card>
+    <Card title="Styling guide" icon="paintbrush" href="/guides/styling">
+      Master Tailwind CSS utilities and component styling conventions.
+    </Card>
+    <Card title="Building for production" icon="box-archive" href="/advanced/building">
+      Optimize and deploy your application with confidence.
+    </Card>
+  </CardGroup>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="bg-gradient-to-br from-[#050d15] to-[#0a1420] dark:from-[#050d15] dark:to-[#0a1420] rounded-2xl p-8 lg:p-12 border border-[#27272a] dark:border-[#27272a]">
+    <div className="max-w-3xl">
+      <h2 className="text-3xl font-bold text-white mb-4">
+        Ready to start building?
+      </h2>
+      <p className="text-lg text-gray-300 mb-6">
+        Follow our quickstart guide to create your first application with Poketto Stack, or dive into the component library to explore what's available.
+      </p>
+      <div className="flex flex-wrap gap-3">
+        <a 
+          href="/quickstart" 
+          className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#050d15] font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          View quickstart
+        </a>
+        <a 
+          href="https://github.com/TinsFox/poketto-stack" 
+          className="inline-flex items-center justify-center px-6 py-3 border border-white/30 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-colors"
+        >
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

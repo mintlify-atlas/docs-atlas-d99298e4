@@ -1,0 +1,262 @@
+---
+title: "Dialog"
+description: "Display modal dialogs that overlay the main content and require user interaction"
+---
+
+## Introduction
+
+Dialogs are modal windows that appear on top of the main content. They temporarily interrupt the user's workflow to display important information or request input. Dialogs block interaction with the underlying page until dismissed.
+
+**When to use:**
+- Capture user input in a focused context
+- Display additional details without leaving the page
+- Confirm user decisions
+- Show forms or multi-step processes
+
+## Installation
+
+Import the Dialog components from `@poketto/ui`:
+
+```tsx
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+A basic dialog with trigger, content, and actions:
+
+```tsx
+<Dialog>
+  <DialogTrigger asChild>
+    <button>Open Dialog</button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Edit profile</DialogTitle>
+      <DialogDescription>
+        Make changes to your profile here. Click save when you're done.
+      </DialogDescription>
+    </DialogHeader>
+    <div className="grid gap-4 py-4">
+      {/* Your form content */}
+    </div>
+    <DialogFooter>
+      <button type="submit">Save changes</button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+## Examples
+
+### Simple Confirmation Dialog
+
+Basic dialog for confirmations:
+
+```tsx
+<Dialog>
+  <DialogTrigger asChild>
+    <button>Delete account</button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Are you sure?</DialogTitle>
+      <DialogDescription>
+        This action cannot be undone. This will permanently delete your account.
+      </DialogDescription>
+    </DialogHeader>
+    <DialogFooter>
+      <DialogClose asChild>
+        <button>Cancel</button>
+      </DialogClose>
+      <button>Continue</button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+### Dialog with Form
+
+Dialog containing a form:
+
+```tsx
+import { Input } from "@poketto/ui";
+import { Label } from "@poketto/ui";
+
+<Dialog>
+  <DialogTrigger asChild>
+    <button>Edit Profile</button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Edit profile</DialogTitle>
+      <DialogDescription>
+        Make changes to your profile here. Click save when you're done.
+      </DialogDescription>
+    </DialogHeader>
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="name" className="text-right">
+          Name
+        </Label>
+        <Input id="name" defaultValue="Pedro Duarte" className="col-span-3" />
+      </div>
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="username" className="text-right">
+          Username
+        </Label>
+        <Input id="username" defaultValue="@peduarte" className="col-span-3" />
+      </div>
+    </div>
+    <DialogFooter>
+      <button type="submit">Save changes</button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+### Controlled Dialog
+
+Control the dialog state programmatically:
+
+```tsx
+function ControlledDialog() {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button>Open</button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Controlled Dialog</DialogTitle>
+          <DialogDescription>
+            This dialog's open state is controlled externally.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <button onClick={() => setOpen(false)}>Close</button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+### Dialog without Trigger
+
+Open a dialog programmatically without using DialogTrigger:
+
+```tsx
+function ProgrammaticDialog() {
+  const [open, setOpen] = React.useState(false);
+
+  const handleAction = () => {
+    // Perform some action
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <button onClick={handleAction}>Perform Action</button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Action Complete</DialogTitle>
+            <DialogDescription>
+              Your action has been completed successfully.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+```
+
+## Components
+
+### Dialog
+
+<ParamField path="open" type="boolean">
+  Controlled open state of the dialog.
+</ParamField>
+
+<ParamField path="onOpenChange" type="(open: boolean) => void">
+  Event handler called when the open state changes.
+</ParamField>
+
+<ParamField path="defaultOpen" type="boolean">
+  The initial open state for uncontrolled usage.
+</ParamField>
+
+### DialogTrigger
+
+<ParamField path="asChild" type="boolean" default="false">
+  When true, the trigger will not render its own button and will pass props to its child element.
+</ParamField>
+
+### DialogContent
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the dialog content.
+</ParamField>
+
+<ParamField path="children" type="React.ReactNode">
+  The content to display inside the dialog.
+</ParamField>
+
+### DialogHeader, DialogFooter
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the container.
+</ParamField>
+
+### DialogTitle
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the title.
+</ParamField>
+
+### DialogDescription
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the description.
+</ParamField>
+
+### DialogClose
+
+<ParamField path="asChild" type="boolean" default="false">
+  When true, will pass props to its child element instead of rendering a button.
+</ParamField>
+
+## Best Practices
+
+<Check>**Do** use dialogs for focused tasks that require user attention</Check>
+<Check>**Do** always include a DialogTitle for accessibility</Check>
+<Check>**Do** provide a clear way to close the dialog</Check>
+<Check>**Do** keep dialog content focused and concise</Check>
+<Check>**Do** use DialogDescription to provide context</Check>
+
+<Warning>**Don't** nest dialogs within other dialogs</Warning>
+<Warning>**Don't** put critical navigation in dialogs</Warning>
+<Warning>**Don't** use dialogs for simple confirmations - consider AlertDialog instead</Warning>
+<Warning>**Don't** make dialogs too large - consider a dedicated page instead</Warning>
+
+## Accessibility
+
+- Automatically traps focus within the dialog
+- Pressing `Esc` closes the dialog
+- Clicking outside the dialog closes it
+- Properly associates title and description with the dialog content
+- Restores focus to the trigger element when closed

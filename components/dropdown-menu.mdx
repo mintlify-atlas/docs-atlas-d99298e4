@@ -1,0 +1,414 @@
+---
+title: Dropdown Menu
+description: A menu component that displays a list of actions or options when triggered.
+---
+
+Dropdown menus provide a way to display contextual actions, settings, or navigation options in a compact overlay.
+
+## Installation
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+import { Button } from "@poketto/ui";
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline">Open Menu</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem>Profile</DropdownMenuItem>
+    <DropdownMenuItem>Settings</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Logout</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+## Examples
+
+### With Icons and Shortcuts
+
+```tsx
+import { User, Settings, LogOut, Mail } from "lucide-react";
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline">Account</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent className="w-56">
+    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>
+      <User />
+      Profile
+      <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+    </DropdownMenuItem>
+    <DropdownMenuItem>
+      <Mail />
+      Messages
+      <DropdownMenuShortcut>⌘M</DropdownMenuShortcut>
+    </DropdownMenuItem>
+    <DropdownMenuItem>
+      <Settings />
+      Settings
+      <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+    </DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>
+      <LogOut />
+      Log out
+      <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+    </DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### With Checkboxes
+
+```tsx
+import { useState } from "react";
+
+function DropdownMenuCheckboxes() {
+  const [showStatusBar, setShowStatusBar] = useState(true);
+  const [showActivityBar, setShowActivityBar] = useState(false);
+  const [showPanel, setShowPanel] = useState(false);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">View Options</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuCheckboxItem
+          checked={showStatusBar}
+          onCheckedChange={setShowStatusBar}
+        >
+          Status Bar
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={showActivityBar}
+          onCheckedChange={setShowActivityBar}
+        >
+          Activity Bar
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={showPanel}
+          onCheckedChange={setShowPanel}
+        >
+          Panel
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+```
+
+### With Radio Group
+
+```tsx
+import { useState } from "react";
+
+function DropdownMenuRadioGroupDemo() {
+  const [position, setPosition] = useState("bottom");
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">Panel Position</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+          <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="right">Right</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+```
+
+### With Submenu
+
+```tsx
+import { Mail, MessageSquare, UserPlus } from "lucide-react";
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline">Share</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent className="w-56">
+    <DropdownMenuLabel>Share</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>
+      <Mail />
+      Email
+    </DropdownMenuItem>
+    <DropdownMenuItem>
+      <MessageSquare />
+      Message
+    </DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger>
+        <UserPlus />
+        Invite users
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent>
+        <DropdownMenuItem>Invite by email</DropdownMenuItem>
+        <DropdownMenuItem>Invite by link</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>More options</DropdownMenuItem>
+      </DropdownMenuSubContent>
+    </DropdownMenuSub>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### With Groups
+
+```tsx
+import { User, CreditCard, Settings, Keyboard, Users } from "lucide-react";
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline">Menu</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent className="w-56">
+    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuGroup>
+      <DropdownMenuItem>
+        <User />
+        Profile
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <CreditCard />
+        Billing
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <Settings />
+        Settings
+      </DropdownMenuItem>
+      <DropdownMenuItem>
+        <Keyboard />
+        Keyboard shortcuts
+      </DropdownMenuItem>
+    </DropdownMenuGroup>
+    <DropdownMenuSeparator />
+    <DropdownMenuGroup>
+      <DropdownMenuItem>
+        <Users />
+        Team
+      </DropdownMenuItem>
+    </DropdownMenuGroup>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+### With Inset Items
+
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline">Options</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent className="w-56">
+    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem inset>Edit</DropdownMenuItem>
+    <DropdownMenuItem inset>Duplicate</DropdownMenuItem>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem inset>Archive</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+## Component API
+
+### DropdownMenu
+
+Root component that manages the dropdown state.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Root props
+- `open?: boolean` - Controlled open state
+- `onOpenChange?: (open: boolean) => void` - Open state change handler
+- `defaultOpen?: boolean` - Default open state
+- `modal?: boolean` - Whether the dropdown is modal (default: true)
+
+### DropdownMenuTrigger
+
+Button that toggles the dropdown menu.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Trigger props
+- `asChild?: boolean` - Compose with child element
+
+### DropdownMenuContent
+
+Container for menu items.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Content props
+- `sideOffset?: number` - Distance from trigger (default: 4)
+- `align?: "start" | "center" | "end"` - Alignment relative to trigger
+- `side?: "top" | "right" | "bottom" | "left"` - Preferred side
+
+### DropdownMenuItem
+
+Individual menu item.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Item props
+- `inset?: boolean` - Add left padding for alignment
+- `disabled?: boolean` - Disable the item
+- `onSelect?: (event: Event) => void` - Selection handler
+
+### DropdownMenuCheckboxItem
+
+Menu item with checkbox state.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` CheckboxItem props
+- `checked?: boolean | "indeterminate"` - Checked state
+- `onCheckedChange?: (checked: boolean) => void` - State change handler
+
+### DropdownMenuRadioGroup
+
+Container for radio items.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` RadioGroup props
+- `value?: string` - Selected value
+- `onValueChange?: (value: string) => void` - Value change handler
+
+### DropdownMenuRadioItem
+
+Radio button menu item.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` RadioItem props
+- `value: string` - Radio value (required)
+
+### DropdownMenuLabel
+
+Non-interactive label for menu sections.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Label props
+- `inset?: boolean` - Add left padding for alignment
+
+### DropdownMenuSeparator
+
+Visual separator between menu items.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Separator props
+
+### DropdownMenuShortcut
+
+Displays keyboard shortcut hint.
+
+**Props:**
+- Extends `React.HTMLAttributes<HTMLSpanElement>`
+
+### DropdownMenuSub
+
+Container for submenu.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Sub props
+- `open?: boolean` - Controlled open state
+- `onOpenChange?: (open: boolean) => void` - Open state handler
+
+### DropdownMenuSubTrigger
+
+Trigger for opening a submenu.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` SubTrigger props
+- `inset?: boolean` - Add left padding
+
+### DropdownMenuSubContent
+
+Container for submenu items.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` SubContent props
+
+### DropdownMenuGroup
+
+Groups related menu items (no visual change).
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Group props
+
+### DropdownMenuPortal
+
+Portals the content to a different DOM location.
+
+**Props:**
+- Extends `@radix-ui/react-dropdown-menu` Portal props
+
+## Composition Pattern
+
+The DropdownMenu component follows this structure:
+
+```
+DropdownMenu
+  ├─ DropdownMenuTrigger
+  └─ DropdownMenuContent (portaled)
+      ├─ DropdownMenuLabel
+      ├─ DropdownMenuSeparator
+      ├─ DropdownMenuGroup
+      │   ├─ DropdownMenuItem
+      │   └─ DropdownMenuItem
+      ├─ DropdownMenuSeparator
+      ├─ DropdownMenuCheckboxItem
+      ├─ DropdownMenuRadioGroup
+      │   ├─ DropdownMenuRadioItem
+      │   └─ DropdownMenuRadioItem
+      └─ DropdownMenuSub
+          ├─ DropdownMenuSubTrigger
+          └─ DropdownMenuSubContent
+              └─ DropdownMenuItem
+```
+
+## Accessibility
+
+- Built on top of Radix UI primitives with full keyboard navigation
+- Supports arrow key navigation between items
+- Space/Enter to select items
+- Escape to close the menu
+- Type-ahead search functionality
+- Proper ARIA attributes for screen readers
+- Focus management with focus trap when open
+- Disabled items are properly marked with `data-disabled` and skip focus
+- CheckboxItem shows visual checked indicator for screen readers
+- RadioItem uses proper radio semantics with ItemIndicator

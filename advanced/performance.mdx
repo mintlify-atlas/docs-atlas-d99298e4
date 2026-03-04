@@ -1,0 +1,189 @@
+---
+title: Performance optimization
+description: Optimize your application for maximum performance
+---
+
+Learn techniques to optimize the performance of your Poketto Stack application.
+
+## Code splitting
+
+### Route-based splitting
+
+React Router automatically code-splits by route. No configuration needed.
+
+### Component-based splitting
+
+Split heavy components:
+
+```tsx
+import { lazy, Suspense } from "react"
+import { Skeleton } from "@poketto/ui/skeleton"
+
+const Chart = lazy(() => import("./chart"))
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<Skeleton className="h-[400px]" />}>
+      <Chart data={data} />
+    </Suspense>
+  )
+}
+```
+
+## React optimization
+
+### Memoization
+
+Use `useMemo` and `useCallback`:
+
+```tsx
+import { useMemo, useCallback } from "react"
+
+function ExpensiveList({ items, onItemClick }) {
+  // Memoize expensive computation
+  const sortedItems = useMemo(() => {
+    return items.sort((a, b) => b.score - a.score)
+  }, [items])
+  
+  // Memoize callback
+  const handleClick = useCallback((id) => {
+    onItemClick(id)
+  }, [onItemClick])
+  
+  return (
+    <div>
+      {sortedItems.map(item => (
+        <Item key={item.id} item={item} onClick={handleClick} />
+      ))}
+    </div>
+  )
+}
+```
+
+### React.memo
+
+Prevent unnecessary re-renders:
+
+```tsx
+import { memo } from "react"
+
+const ExpensiveComponent = memo(function ExpensiveComponent({ data }) {
+  // Complex rendering logic
+  return <div>{/* ... */}</div>
+})
+```
+
+## Data fetching
+
+### Prefetching
+
+Prefetch data on hover:
+
+```tsx
+function UserCard({ userId }) {
+  const queryClient = useQueryClient()
+  
+  const prefetch = () => {
+    queryClient.prefetchQuery({
+      queryKey: ["user", userId],
+      queryFn: () => fetchUser(userId)
+    })
+  }
+  
+  return (
+    <div onMouseEnter={prefetch}>
+      <Link to={`/users/${userId}`}>View Profile</Link>
+    </div>
+  )
+}
+```
+
+### Optimistic updates
+
+Update UI immediately:
+
+```tsx
+const mutation = useMutation({
+  mutationFn: updateUser,
+  onMutate: async (newUser) => {
+    await queryClient.cancelQueries({ queryKey: ["users"] })
+    const previousUsers = queryClient.getQueryData(["users"])
+    queryClient.setQueryData(["users"], old => [...old, newUser])
+    return { previousUsers }
+  },
+  onError: (err, newUser, context) => {
+    queryClient.setQueryData(["users"], context.previousUsers)
+  }
+})
+```
+
+## Bundle optimization
+
+### Tree shaking
+
+Import only what you need:
+
+```tsx
+// ✅ Good - tree-shakeable
+import { Button } from "@poketto/ui/button"
+import { formatDate } from "date-fns/formatDate"
+
+// ❌ Bad - imports everything
+import * as UI from "@poketto/ui"
+import * as dateFns from "date-fns"
+```
+
+### Dynamic imports
+
+Load code on demand:
+
+```tsx
+// Import on interaction
+const handleExport = async () => {
+  const { exportToPDF } = await import("./export-utils")
+  exportToPDF(data)
+}
+```
+
+## Image optimization
+
+Use modern formats and lazy loading:
+
+```tsx
+<img
+  src="/images/hero.webp"
+  alt="Hero"
+  loading="lazy"
+  decoding="async"
+  width={1200}
+  height={600}
+/>
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Measure first" icon="gauge">
+    Use React DevTools Profiler to identify bottlenecks
+  </Card>
+  <Card title="Lazy load heavy code" icon="clock">
+    Split and lazy load charts, editors, and large dependencies
+  </Card>
+  <Card title="Optimize images" icon="image">
+    Use WebP, lazy loading, and appropriate sizes
+  </Card>
+  <Card title="Cache effectively" icon="database">
+    Use TanStack Query cache and CDN caching
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Building" icon="hammer" href="/advanced/building">
+    Build optimized production bundles
+  </Card>
+  <Card title="Data fetching" icon="cloud-arrow-down" href="/guides/data-fetching">
+    Optimize data fetching
+  </Card>
+</CardGroup>

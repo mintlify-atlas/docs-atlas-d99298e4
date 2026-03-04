@@ -1,0 +1,233 @@
+---
+title: Input
+description: A text input component for capturing user input with support for various types and states.
+---
+
+## Introduction
+
+The Input component is a styled text input field that extends the native HTML input element with consistent styling and accessibility features.
+
+## Installation
+
+The Input component is available as part of the `@poketto/ui` package:
+
+```tsx
+import { Input } from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+import { Input } from "@poketto/ui";
+
+export default function Example() {
+  return <Input placeholder="Enter your email" />;
+}
+```
+
+## Examples
+
+### With Label
+
+```tsx
+import { Input } from "@poketto/ui";
+import { Label } from "@poketto/ui";
+
+export default function InputWithLabel() {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="email">Email</Label>
+      <Input id="email" type="email" placeholder="you@example.com" />
+    </div>
+  );
+}
+```
+
+### Input Types
+
+The Input component supports all standard HTML input types:
+
+```tsx
+import { Input } from "@poketto/ui";
+
+export default function InputTypes() {
+  return (
+    <div className="space-y-4">
+      <Input type="text" placeholder="Text input" />
+      <Input type="email" placeholder="Email input" />
+      <Input type="password" placeholder="Password input" />
+      <Input type="number" placeholder="Number input" />
+      <Input type="tel" placeholder="Phone input" />
+      <Input type="url" placeholder="URL input" />
+      <Input type="search" placeholder="Search input" />
+    </div>
+  );
+}
+```
+
+### Disabled State
+
+```tsx
+import { Input } from "@poketto/ui";
+
+export default function DisabledInput() {
+  return <Input disabled placeholder="Disabled input" />;
+}
+```
+
+### With Default Value
+
+```tsx
+import { Input } from "@poketto/ui";
+
+export default function InputWithValue() {
+  return <Input defaultValue="John Doe" />;
+}
+```
+
+### File Input
+
+```tsx
+import { Input } from "@poketto/ui";
+
+export default function FileInput() {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor="file">Upload file</Label>
+      <Input id="file" type="file" />
+    </div>
+  );
+}
+```
+
+### Controlled Input
+
+```tsx
+import { Input } from "@poketto/ui";
+import { useState } from "react";
+
+export default function ControlledInput() {
+  const [value, setValue] = useState("");
+
+  return (
+    <div className="space-y-2">
+      <Input 
+        value={value} 
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Type something..."
+      />
+      <p className="text-sm text-muted-foreground">
+        You typed: {value}
+      </p>
+    </div>
+  );
+}
+```
+
+## Props
+
+<ParamField path="type" type="string" default="text">
+  The type of input field.
+  
+  Options: `"text"` | `"email"` | `"password"` | `"number"` | `"tel"` | `"url"` | `"search"` | `"date"` | `"file"` and all other HTML input types
+</ParamField>
+
+<ParamField path="placeholder" type="string">
+  Placeholder text displayed when the input is empty.
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  When `true`, disables the input and reduces opacity.
+</ParamField>
+
+<ParamField path="value" type="string">
+  The controlled value of the input.
+</ParamField>
+
+<ParamField path="defaultValue" type="string">
+  The default value for uncontrolled inputs.
+</ParamField>
+
+<ParamField path="onChange" type="(event: React.ChangeEvent<HTMLInputElement>) => void">
+  Change event handler called when the input value changes.
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes to apply to the input.
+</ParamField>
+
+The Input component accepts all standard HTML input attributes (`name`, `id`, `required`, `pattern`, `min`, `max`, etc.).
+
+## Form Integration
+
+The Input component integrates seamlessly with React Hook Form:
+
+```tsx
+import { Input } from "@poketto/ui";
+import { Button } from "@poketto/ui";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@poketto/ui";
+
+interface FormData {
+  username: string;
+  email: string;
+}
+
+export default function InputForm() {
+  const form = useForm<FormData>({
+    defaultValues: {
+      username: "",
+      email: "",
+    },
+  });
+
+  const onSubmit = (data: FormData) => {
+    console.log(data);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="johndoe" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is your public display name.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="you@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+  );
+}
+```

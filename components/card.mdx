@@ -1,0 +1,224 @@
+---
+title: Card
+description: A flexible container component for grouping related content with consistent styling.
+---
+
+## Introduction
+
+The Card component provides a structured way to display content in a contained, elevated box. It's perfect for product listings, user profiles, content previews, dashboards, and any UI pattern that benefits from visual grouping.
+
+Cards are composed of multiple sub-components that work together to create a consistent layout structure.
+
+## Installation
+
+```tsx
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@poketto/ui";
+```
+
+## Usage
+
+A basic card with all sections:
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>Card Title</CardTitle>
+    <CardDescription>Card description goes here</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p>Main content of the card.</p>
+  </CardContent>
+  <CardFooter>
+    <Button>Action</Button>
+  </CardFooter>
+</Card>
+```
+
+## Examples
+
+### Simple Card
+
+Minimal card with just content:
+
+```tsx
+<Card>
+  <CardContent className="pt-6">
+    <p>This is a simple card with only content.</p>
+  </CardContent>
+</Card>
+```
+
+### Product Card
+
+Card showcasing a product:
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>Premium Plan</CardTitle>
+    <CardDescription>Everything you need to grow</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <div className="text-3xl font-bold">$29/mo</div>
+    <ul className="mt-4 space-y-2">
+      <li>✓ Unlimited projects</li>
+      <li>✓ Advanced analytics</li>
+      <li>✓ Priority support</li>
+    </ul>
+  </CardContent>
+  <CardFooter>
+    <Button className="w-full">Get Started</Button>
+  </CardFooter>
+</Card>
+```
+
+### User Profile Card
+
+Card displaying user information:
+
+```tsx
+<Card>
+  <CardHeader>
+    <div className="flex items-center gap-4">
+      <Avatar>
+        <AvatarImage src="/avatar.jpg" />
+        <AvatarFallback>JD</AvatarFallback>
+      </Avatar>
+      <div>
+        <CardTitle>John Doe</CardTitle>
+        <CardDescription>@johndoe</CardDescription>
+      </div>
+    </div>
+  </CardHeader>
+  <CardContent>
+    <p>Full-stack developer building amazing web experiences.</p>
+  </CardContent>
+  <CardFooter className="gap-2">
+    <Button variant="outline">Follow</Button>
+    <Button>Message</Button>
+  </CardFooter>
+</Card>
+```
+
+### Notification Card
+
+Card with header and content only:
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>New Update Available</CardTitle>
+    <CardDescription>2 hours ago</CardDescription>
+  </CardHeader>
+  <CardContent>
+    Version 2.0 is now available with improved performance and new features.
+  </CardContent>
+</Card>
+```
+
+### Interactive Card
+
+Card that can be clicked:
+
+```tsx
+<Card className="cursor-pointer hover:bg-accent transition-colors">
+  <CardHeader>
+    <CardTitle>Project Alpha</CardTitle>
+    <CardDescription>Last updated 3 days ago</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p>A revolutionary approach to modern web development.</p>
+  </CardContent>
+</Card>
+```
+
+## Props
+
+### Card
+
+The root container component.
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default styles include rounded corners, border, background, and shadow.
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  Card sub-components or any valid React content.
+</ParamField>
+
+Inherits all standard HTML div attributes.
+
+### CardHeader
+
+Container for the card's header section.
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default includes flex column layout with spacing and padding.
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  Typically contains CardTitle and CardDescription.
+</ParamField>
+
+### CardTitle
+
+Displays the main heading of the card.
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default includes semibold font, tight leading, and tracking.
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  The title content.
+</ParamField>
+
+### CardDescription
+
+Displays supporting text below the title.
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default includes smaller text size and muted foreground color.
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  The description content.
+</ParamField>
+
+### CardContent
+
+Main content area of the card.
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default includes padding (with top padding removed if header is present).
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  The main content of the card.
+</ParamField>
+
+### CardFooter
+
+Footer section for actions or additional information.
+
+<ParamField path="className" type="string">
+  Additional CSS classes. Default includes flex layout, centered items, and padding.
+</ParamField>
+
+<ParamField path="children" type="ReactNode">
+  Typically contains buttons or action elements.
+</ParamField>
+
+## Styling Notes
+
+- All card components are implemented as `div` elements with forwarded refs
+- Default card has rounded-xl borders and subtle shadow
+- The component uses CSS custom properties for theming via `bg-card` and `text-card-foreground`
+- All sub-components accept `className` for easy customization
+- Card content and footer have coordinated padding to maintain visual consistency

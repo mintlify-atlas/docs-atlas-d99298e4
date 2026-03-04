@@ -1,0 +1,404 @@
+---
+title: Data fetching
+description: Fetch and cache server data with TanStack Query
+---
+
+Poketto Stack uses TanStack Query (React Query) for efficient data fetching, caching, and synchronization with server state.
+
+## Setup
+
+TanStack Query is pre-configured in the admin app with sensible defaults:
+
+```tsx
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+      retry: 1,
+    },
+  },
+})
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {/* Your app */}
+    </QueryClientProvider>
+  )
+}
+```
+
+## Basic query
+
+Fetch data with `useQuery`:
+
+```tsx
+import { useQuery } from "@tanstack/react-query"
+
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+async function fetchUser(id: string): Promise<User> {
+  const response = await fetch(`/api/users/${id}`)
+  if (!response.ok) {
+    throw new Error("Failed to fetch user")
+  }
+  return response.json()
+}
+
+export default function UserProfile({ userId }: { userId: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId),
+  })
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>
+  }
+
+  return (
+    <div>
+      <h2>{data.name}</h2>
+      <p>{data.email}</p>
+    </div>
+  )
+}
+```
+
+## Query keys
+
+Query keys uniquely identify queries and enable caching:
+
+```tsx
+// Simple key
+queryKey: ["users"]
+
+// With ID
+queryKey: ["user", userId]
+
+// With filters
+queryKey: ["users", { status: "active", page: 1 }]
+
+// Nested resources
+queryKey: ["projects", projectId, "tasks"]
+```
+
+## Mutations
+
+Modify data with `useMutation`:
+
+```tsx
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Button } from "@poketto/ui/button"
+import { useToast } from "@poketto/ui/hooks/use-toast"
+
+interface CreateUserInput {
+  name: string
+  email: string
+}
+
+async function createUser(data: CreateUserInput): Promise<User> {
+  const response = await fetch("/api/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  })
+  if (!response.ok) {
+    throw new Error("Failed to create user")
+  }
+  return response.json()
+}
+
+export default function CreateUserButton() {
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
+
+  const mutation = useMutation({
+    mutationFn: createUser,
+    onSuccess: (newUser) => {
+      // Invalidate and refetch users list
+      queryClient.invalidateQueries({ queryKey: ["users"] })
+      
+      toast({
+        title: "User created",
+        description: `${newUser.name} has been created successfully`,
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
+    },
+  })
+
+  return (
+    <Button
+      onClick={() => mutation.mutate({ name: "John Doe", email: "john@example.com" })}
+      disabled={mutation.isPending}
+    >
+      {mutation.isPending ? "Creating..." : "Create user"}
+    </Button>
+  )
+}
+```
+
+## Optimistic updates
+
+Update UI immediately before the server responds:
+
+```tsx
+const mutation = useMutation({
+  mutationFn: updateUser,
+  onMutate: async (newUser) => {
+    // Cancel outgoing refetches
+    await queryClient.cancelQueries({ queryKey: ["users"] })
+
+    // Snapshot the previous value
+    const previousUsers = queryClient.getQueryData(["users"])
+
+    // Optimistically update to the new value
+    queryClient.setQueryData(["users"], (old: User[]) => [
+      ...old.filter((u) => u.id !== newUser.id),
+      newUser,
+    ])
+
+    // Return context with the previous value
+    return { previousUsers }
+  },
+  onError: (err, newUser, context) => {
+    // Rollback on error
+    queryClient.setQueryData(["users"], context?.previousUsers)
+  },
+  onSettled: () => {
+    // Refetch after error or success
+    queryClient.invalidateQueries({ queryKey: ["users"] })
+  },
+})
+```
+
+## Pagination
+
+Implement pagination with `keepPreviousData`:
+
+```tsx
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { Button } from "@poketto/ui/button"
+
+interface PaginatedResponse {
+  users: User[]
+  totalPages: number
+  currentPage: number
+}
+
+async function fetchUsers(page: number): Promise<PaginatedResponse> {
+  const response = await fetch(`/api/users?page=${page}`)
+  return response.json()
+}
+
+export default function UsersList() {
+  const [page, setPage] = useState(1)
+
+  const { data, isLoading, isPlaceholderData } = useQuery({
+    queryKey: ["users", page],
+    queryFn: () => fetchUsers(page),
+    placeholderData: (previousData) => previousData,
+  })
+
+  return (
+    <div>
+      <div className="space-y-2">
+        {data?.users.map((user) => (
+          <div key={user.id}>{user.name}</div>
+        ))}
+      </div>
+      
+      <div className="flex gap-2 mt-4">
+        <Button
+          onClick={() => setPage((old) => Math.max(old - 1, 1))}
+          disabled={page === 1}
+        >
+          Previous
+        </Button>
+        <span className="py-2">Page {page}</span>
+        <Button
+          onClick={() => setPage((old) => old + 1)}
+          disabled={isPlaceholderData || page >= data!.totalPages}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  )
+}
+```
+
+## Infinite scroll
+
+Implement infinite scrolling with `useInfiniteQuery`:
+
+```tsx
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { useEffect, useRef } from "react"
+import { Button } from "@poketto/ui/button"
+
+async function fetchUsers({ pageParam = 1 }) {
+  const response = await fetch(`/api/users?page=${pageParam}`)
+  return response.json()
+}
+
+export default function InfiniteUsersList() {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["users"],
+    queryFn: fetchUsers,
+    getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
+    initialPageParam: 1,
+  })
+
+  return (
+    <div>
+      {data?.pages.map((page, i) => (
+        <div key={i}>
+          {page.users.map((user: User) => (
+            <div key={user.id}>{user.name}</div>
+          ))}
+        </div>
+      ))}
+      
+      {hasNextPage && (
+        <Button
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+        >
+          {isFetchingNextPage ? "Loading..." : "Load more"}
+        </Button>
+      )}
+    </div>
+  )
+}
+```
+
+## Dependent queries
+
+Run queries that depend on other queries:
+
+```tsx
+function UserPosts({ userId }: { userId: string }) {
+  const { data: user } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId),
+  })
+
+  const { data: posts } = useQuery({
+    queryKey: ["posts", user?.id],
+    queryFn: () => fetchUserPosts(user!.id),
+    enabled: !!user, // Only run when user is available
+  })
+
+  return <div>{/* Render posts */}</div>
+}
+```
+
+## Prefetching
+
+Prefetch data before it's needed:
+
+```tsx
+import { useQueryClient } from "@tanstack/react-query"
+
+function UserCard({ userId }: { userId: string }) {
+  const queryClient = useQueryClient()
+
+  const prefetchUser = () => {
+    queryClient.prefetchQuery({
+      queryKey: ["user", userId],
+      queryFn: () => fetchUser(userId),
+    })
+  }
+
+  return (
+    <div onMouseEnter={prefetchUser}>
+      <Link to={`/users/${userId}`}>View profile</Link>
+    </div>
+  )
+}
+```
+
+## Error handling
+
+Handle errors gracefully:
+
+```tsx
+import { useQuery } from "@tanstack/react-query"
+import { Alert, AlertDescription, AlertTitle } from "@poketto/ui/alert"
+import { AlertCircle } from "lucide-react"
+
+export default function UserProfile({ userId }: { userId: string }) {
+  const { data, error, isError, refetch } = useQuery({
+    queryKey: ["user", userId],
+    queryFn: () => fetchUser(userId),
+    retry: 2,
+  })
+
+  if (isError) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          {error.message}
+          <Button onClick={() => refetch()} variant="outline" size="sm" className="ml-2">
+            Try again
+          </Button>
+        </AlertDescription>
+      </Alert>
+    )
+  }
+
+  return <div>{/* Render user */}</div>
+}
+```
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Meaningful query keys" icon="key">
+    Use descriptive, structured keys for easy invalidation
+  </Card>
+  <Card title="Handle loading states" icon="loader">
+    Always show loading indicators for better UX
+  </Card>
+  <Card title="Error boundaries" icon="shield">
+    Wrap components in error boundaries for graceful failures
+  </Card>
+  <Card title="Invalidate wisely" icon="refresh">
+    Invalidate related queries after mutations
+  </Card>
+</CardGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="State management" icon="database" href="/concepts/state-management">
+    Learn about client and server state
+  </Card>
+  <Card title="Forms" icon="square-check" href="/guides/forms">
+    Submit forms with mutations
+  </Card>
+</CardGroup>

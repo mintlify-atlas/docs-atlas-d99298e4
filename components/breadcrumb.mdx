@@ -1,0 +1,247 @@
+---
+title: Breadcrumb
+description: Navigation component that displays the user's location within an application hierarchy.
+---
+
+Breadcrumb navigation helps users understand their current location and provides quick links to navigate back through the hierarchy.
+
+## Installation
+
+```tsx
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+} from "@poketto/ui";
+```
+
+## Basic Usage
+
+```tsx
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">Home</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>
+```
+
+## Examples
+
+### With Custom Separator
+
+```tsx
+import { Slash } from "lucide-react";
+
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">Home</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator>
+      <Slash />
+    </BreadcrumbSeparator>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/docs">Documentation</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator>
+      <Slash />
+    </BreadcrumbSeparator>
+    <BreadcrumbItem>
+      <BreadcrumbPage>Components</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>
+```
+
+### With Dropdown Menu
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@poketto/ui";
+
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">Home</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="flex items-center gap-1">
+          <BreadcrumbEllipsis className="h-4 w-4" />
+          <span className="sr-only">Toggle menu</span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem>
+            <a href="/docs">Documentation</a>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <a href="/themes">Themes</a>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <a href="/examples">Examples</a>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>
+```
+
+### With Next.js Link
+
+Use the `asChild` prop to compose with routing libraries like Next.js:
+
+```tsx
+import Link from "next/link";
+
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink asChild>
+        <Link href="/">Home</Link>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbLink asChild>
+        <Link href="/products">Products</Link>
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>Product Details</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>
+```
+
+### Collapsed Breadcrumb
+
+```tsx
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/">Home</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbEllipsis />
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>
+```
+
+## Component API
+
+### Breadcrumb
+
+The root container element.
+
+**Props:**
+- Extends `React.ComponentPropsWithoutRef<"nav">`
+- `separator?: React.ReactNode` - Default separator to use between items
+
+### BreadcrumbList
+
+Ordered list container for breadcrumb items.
+
+**Props:**
+- Extends `React.ComponentPropsWithoutRef<"ol">`
+
+### BreadcrumbItem
+
+Individual breadcrumb item wrapper.
+
+**Props:**
+- Extends `React.ComponentPropsWithoutRef<"li">`
+
+### BreadcrumbLink
+
+Clickable breadcrumb link.
+
+**Props:**
+- Extends `React.ComponentPropsWithoutRef<"a">`
+- `asChild?: boolean` - Use with Radix UI Slot for composition with routing libraries
+
+### BreadcrumbPage
+
+Represents the current page (not clickable).
+
+**Props:**
+- Extends `React.ComponentPropsWithoutRef<"span">`
+- Automatically sets `aria-current="page"` and `aria-disabled="true"`
+
+### BreadcrumbSeparator
+
+Visual separator between breadcrumb items.
+
+**Props:**
+- Extends `React.ComponentProps<"li">`
+- Default: Renders a `ChevronRight` icon from lucide-react
+- Can be customized by passing children
+
+### BreadcrumbEllipsis
+
+Indicates collapsed/hidden breadcrumb items.
+
+**Props:**
+- Extends `React.ComponentProps<"span">`
+- Renders a `MoreHorizontal` icon from lucide-react
+
+## Composition Pattern
+
+The Breadcrumb component follows a predictable composition pattern:
+
+```
+Breadcrumb (nav)
+  └─ BreadcrumbList (ol)
+      ├─ BreadcrumbItem (li)
+      │   └─ BreadcrumbLink (a)
+      ├─ BreadcrumbSeparator (li)
+      ├─ BreadcrumbItem (li)
+      │   └─ BreadcrumbLink (a)
+      ├─ BreadcrumbSeparator (li)
+      └─ BreadcrumbItem (li)
+          └─ BreadcrumbPage (span)
+```
+
+## Accessibility
+
+- The root `Breadcrumb` component renders a `<nav>` element with `aria-label="breadcrumb"`
+- `BreadcrumbList` uses a semantic `<ol>` element for proper list structure
+- `BreadcrumbPage` sets `aria-current="page"` to indicate the current location
+- `BreadcrumbPage` sets `aria-disabled="true"` and `role="link"` for screen readers
+- `BreadcrumbSeparator` uses `aria-hidden="true"` and `role="presentation"` to hide decorative elements
+- `BreadcrumbEllipsis` includes screen reader text "More" with `sr-only` class
+- Hover states provide clear visual feedback for interactive elements
