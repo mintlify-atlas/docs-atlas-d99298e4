@@ -1,0 +1,186 @@
+{
+  "projectType": "frontend",
+  "projectName": "Poketto Stack",
+  "projectDescription": "A boilerplate built with shadcn/ui for rapid development of modern web applications.",
+  "theme": "palm",
+  "primaryColor": "#050d15",
+  "lightColor": "#7c848c",
+  "darkColor": "#f4f5f5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "installation"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/monorepo-structure",
+              "concepts/components",
+              "concepts/theming",
+              "concepts/state-management",
+              "concepts/routing"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/creating-components",
+              "guides/styling",
+              "guides/forms",
+              "guides/internationalization",
+              "guides/authentication",
+              "guides/data-fetching",
+              "guides/testing"
+            ]
+          },
+          {
+            "group": "Packages",
+            "pages": [
+              "packages/ui",
+              "packages/pro-table",
+              "packages/tiptap",
+              "packages/cli"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Components",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "components/overview"
+            ]
+          },
+          {
+            "group": "Layout",
+            "pages": [
+              "components/accordion",
+              "components/card",
+              "components/separator",
+              "components/tabs",
+              "components/sidebar"
+            ]
+          },
+          {
+            "group": "Forms",
+            "pages": [
+              "components/button",
+              "components/input",
+              "components/select",
+              "components/checkbox",
+              "components/radio-group",
+              "components/textarea",
+              "components/form",
+              "components/calendar",
+              "components/date-picker"
+            ]
+          },
+          {
+            "group": "Feedback",
+            "pages": [
+              "components/alert",
+              "components/toast",
+              "components/dialog",
+              "components/alert-dialog",
+              "components/drawer",
+              "components/progress",
+              "components/skeleton"
+            ]
+          },
+          {
+            "group": "Navigation",
+            "pages": [
+              "components/breadcrumb",
+              "components/dropdown-menu",
+              "components/navigation-menu",
+              "components/pagination",
+              "components/command"
+            ]
+          },
+          {
+            "group": "Data Display",
+            "pages": [
+              "components/table",
+              "components/badge",
+              "components/avatar",
+              "components/chart",
+              "components/carousel"
+            ]
+          },
+          {
+            "group": "Overlay",
+            "pages": [
+              "components/popover",
+              "components/tooltip",
+              "components/hover-card",
+              "components/context-menu",
+              "components/sheet"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Advanced",
+        "groups": [
+          {
+            "group": "Customization",
+            "pages": [
+              "advanced/custom-components",
+              "advanced/tailwind-configuration",
+              "advanced/theme-customization"
+            ]
+          },
+          {
+            "group": "Deployment",
+            "pages": [
+              "advanced/building",
+              "advanced/docker",
+              "advanced/environment-variables"
+            ]
+          },
+          {
+            "group": "Best Practices",
+            "pages": [
+              "advanced/component-patterns",
+              "advanced/performance",
+              "advanced/accessibility"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "40+ customizable shadcn/ui components",
+    "Monorepo structure with Turborepo",
+    "Full TypeScript support",
+    "React Router 7 with type-safe routing",
+    "Storybook component development",
+    "Built-in internationalization (i18next)",
+    "Form handling with React Hook Form and Zod",
+    "State management with Jotai and TanStack Query",
+    "Rich text editor with Tiptap",
+    "Advanced data table component",
+    "Authentication with Better Auth",
+    "Comprehensive testing setup with Vitest",
+    "Docker support for deployment"
+  ],
+  "publicApiSurface": [
+    "@poketto/ui - Button, Input, Select, Dialog, Card, Table, and 40+ more components",
+    "@poketto/pro-table - DataTable, ProTable components",
+    "@poketto/tiptap - Rich text editor component",
+    "@poketto/cli - Monorepo organization rename tool",
+    "Hooks: use-mobile, use-toast",
+    "Utils: cn (class name utility)"
+  ]
+}
