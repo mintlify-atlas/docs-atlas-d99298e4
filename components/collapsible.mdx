@@ -1,0 +1,105 @@
+---
+title: Collapsible
+description: An expandable and collapsible content container
+---
+
+The Collapsible component provides an accessible way to show and hide content, built on Radix UI Collapsible primitive.
+
+## Installation
+
+```tsx
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@poketto/ui/collapsible"
+```
+
+## Usage
+
+### Basic collapsible
+
+```tsx
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@poketto/ui/collapsible"
+import { Button } from "@poketto/ui/button"
+
+export default function Example() {
+  return (
+    <Collapsible>
+      <CollapsibleTrigger asChild>
+        <Button variant="outline">Toggle</Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2">
+        <div className="rounded-md border px-4 py-2">
+          This content can be collapsed
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
+```
+
+### Controlled collapsible
+
+```tsx
+import { useState } from "react"
+import { ChevronsUpDown } from "lucide-react"
+
+export default function Example() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-semibold">
+          @peduarte starred 3 repositories
+        </h4>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <ChevronsUpDown className="h-4 w-4" />
+          </Button>
+        </CollapsibleTrigger>
+      </div>
+      <div className="rounded-md border px-4 py-2 text-sm">
+        @radix-ui/primitives
+      </div>
+      <CollapsibleContent className="space-y-2">
+        <div className="rounded-md border px-4 py-2 text-sm">
+          @radix-ui/colors
+        </div>
+        <div className="rounded-md border px-4 py-2 text-sm">
+          @stitches/react
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
+```
+
+## Props
+
+<ParamField path="open" type="boolean">
+  The controlled open state
+</ParamField>
+
+<ParamField path="defaultOpen" type="boolean">
+  The default open state for uncontrolled usage
+</ParamField>
+
+<ParamField path="onOpenChange" type="(open: boolean) => void">
+  Event handler called when the open state changes
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  Whether the collapsible is disabled
+</ParamField>
+
+## Accessibility
+
+- Full keyboard support
+- Focus management
+- ARIA attributes for screen readers

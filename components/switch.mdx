@@ -1,0 +1,86 @@
+---
+title: Switch
+description: A toggle switch component for binary choices
+---
+
+The Switch component provides an accessible on/off toggle control, built on Radix UI Switch primitive.
+
+## Installation
+
+```tsx
+import { Switch } from "@poketto/ui/switch"
+```
+
+## Usage
+
+### Basic switch
+
+```tsx
+import { Switch } from "@poketto/ui/switch"
+import { Label } from "@poketto/ui/label"
+
+export default function Example() {
+  return (
+    <div className="flex items-center space-x-2">
+      <Switch id="airplane-mode" />
+      <Label htmlFor="airplane-mode">Airplane Mode</Label>
+    </div>
+  )
+}
+```
+
+### Controlled switch
+
+```tsx
+import { useState } from "react"
+import { Switch } from "@poketto/ui/switch"
+
+export default function Example() {
+  const [enabled, setEnabled] = useState(false)
+
+  return (
+    <div>
+      <Switch checked={enabled} onCheckedChange={setEnabled} />
+      <p>Status: {enabled ? "On" : "Off"}</p>
+    </div>
+  )
+}
+```
+
+### With form
+
+```tsx
+<div className="flex items-center justify-between">
+  <div className="space-y-0.5">
+    <Label htmlFor="marketing">Marketing emails</Label>
+    <p className="text-sm text-muted-foreground">
+      Receive emails about new products and features
+    </p>
+  </div>
+  <Switch id="marketing" />
+</div>
+```
+
+## Props
+
+<ParamField path="checked" type="boolean">
+  The controlled checked state of the switch
+</ParamField>
+
+<ParamField path="defaultChecked" type="boolean">
+  The default checked state for uncontrolled usage
+</ParamField>
+
+<ParamField path="onCheckedChange" type="(checked: boolean) => void">
+  Event handler called when the checked state changes
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  Whether the switch is disabled
+</ParamField>
+
+## Accessibility
+
+- Full keyboard navigation support
+- Focus indicator on keyboard interaction
+- ARIA attributes for screen reader compatibility

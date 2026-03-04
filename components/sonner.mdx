@@ -1,0 +1,122 @@
+---
+title: Sonner
+description: Alternative toast notification system with Sonner
+---
+
+Sonner is an opinionated toast component that provides a simple API for displaying notifications.
+
+## Installation
+
+```tsx
+import { toast } from "@poketto/ui/sonner"
+import { Toaster } from "@poketto/ui/sonner"
+```
+
+## Setup
+
+Add the Toaster component to your app root:
+
+```tsx app/root.tsx
+import { Toaster } from "@poketto/ui/sonner"
+
+export default function App() {
+  return (
+    <>
+      {/* Your app */}
+      <Toaster />
+    </>
+  )
+}
+```
+
+## Usage
+
+### Basic toast
+
+```tsx
+import { toast } from "@poketto/ui/sonner"
+import { Button } from "@poketto/ui/button"
+
+export default function Example() {
+  return (
+    <Button onClick={() => toast("Event has been created")}>
+      Show Toast
+    </Button>
+  )
+}
+```
+
+### Toast with description
+
+```tsx
+toast("Event has been created", {
+  description: "Sunday, December 03, 2023 at 9:00 AM",
+})
+```
+
+### Success toast
+
+```tsx
+toast.success("Event created successfully")
+```
+
+### Error toast
+
+```tsx
+toast.error("Something went wrong")
+```
+
+### With action
+
+```tsx
+toast("Event has been created", {
+  action: {
+    label: "Undo",
+    onClick: () => console.log("Undo"),
+  },
+})
+```
+
+### Promise toast
+
+```tsx
+toast.promise(
+  fetch("/api/data"),
+  {
+    loading: "Loading...",
+    success: "Data loaded",
+    error: "Failed to load",
+  }
+)
+```
+
+## API
+
+<ParamField path="toast(message, options)" type="function">
+  Display a toast notification
+</ParamField>
+
+<ParamField path="toast.success(message)" type="function">
+  Display a success toast
+</ParamField>
+
+<ParamField path="toast.error(message)" type="function">
+  Display an error toast
+</ParamField>
+
+<ParamField path="toast.promise(promise, messages)" type="function">
+  Display a toast that updates based on promise state
+</ParamField>
+
+## Comparison with Toast
+
+Sonner provides a simpler API and more opinionated styling compared to the standard Toast component. Use Sonner when you want:
+
+- Simpler API
+- Automatic stacking
+- Built-in promise handling
+- Less configuration
+
+Use standard Toast when you need:
+- More customization
+- Consistent styling with other Radix UI components

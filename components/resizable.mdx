@@ -1,0 +1,109 @@
+---
+title: Resizable
+description: Resizable panel groups with draggable handles
+---
+
+The Resizable component provides resizable panel layouts with draggable handles.
+
+## Installation
+
+```tsx
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@poketto/ui/resizable"
+```
+
+## Usage
+
+### Horizontal panels
+
+```tsx
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@poketto/ui/resizable"
+
+export default function Example() {
+  return (
+    <ResizablePanelGroup direction="horizontal" className="min-h-[200px] rounded-lg border">
+      <ResizablePanel defaultSize={50}>
+        <div className="flex h-full items-center justify-center p-6">
+          <span className="font-semibold">Left</span>
+        </div>
+      </ResizablePanel>
+      <ResizableHandle />
+      <ResizablePanel defaultSize={50}>
+        <div className="flex h-full items-center justify-center p-6">
+          <span className="font-semibold">Right</span>
+        </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
+  )
+}
+```
+
+### Vertical panels
+
+```tsx
+<ResizablePanelGroup direction="vertical" className="min-h-[200px] rounded-lg border">
+  <ResizablePanel defaultSize={25}>
+    <div className="flex h-full items-center justify-center p-6">
+      <span className="font-semibold">Header</span>
+    </div>
+  </ResizablePanel>
+  <ResizableHandle />
+  <ResizablePanel defaultSize={75}>
+    <div className="flex h-full items-center justify-center p-6">
+      <span className="font-semibold">Content</span>
+    </div>
+  </ResizablePanel>
+</ResizablePanelGroup>
+```
+
+### With handle indicator
+
+```tsx
+<ResizablePanelGroup direction="horizontal">
+  <ResizablePanel>One</ResizablePanel>
+  <ResizableHandle withHandle />
+  <ResizablePanel>Two</ResizablePanel>
+</ResizablePanelGroup>
+```
+
+## Props
+
+### ResizablePanelGroup
+
+<ParamField path="direction" type="'horizontal' | 'vertical'" required>
+  The direction of the panel group
+</ParamField>
+
+### ResizablePanel
+
+<ParamField path="defaultSize" type="number">
+  The default size of the panel as a percentage
+</ParamField>
+
+<ParamField path="minSize" type="number">
+  The minimum size of the panel as a percentage
+</ParamField>
+
+<ParamField path="maxSize" type="number">
+  The maximum size of the panel as a percentage
+</ParamField>
+
+### ResizableHandle
+
+<ParamField path="withHandle" type="boolean">
+  Whether to show a visual drag handle
+</ParamField>
+
+## Use cases
+
+- Code editors with split panes
+- Dashboard layouts
+- File explorers
+- Email clients

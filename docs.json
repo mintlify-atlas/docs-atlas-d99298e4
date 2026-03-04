@@ -85,7 +85,11 @@
               "components/card",
               "components/separator",
               "components/tabs",
-              "components/sidebar"
+              "components/sidebar",
+              "components/collapsible",
+              "components/resizable",
+              "components/scroll-area",
+              "components/aspect-ratio"
             ]
           },
           {
@@ -93,11 +97,15 @@
             "pages": [
               "components/button",
               "components/input",
+              "components/input-otp",
               "components/select",
               "components/checkbox",
               "components/radio-group",
               "components/textarea",
               "components/form",
+              "components/label",
+              "components/switch",
+              "components/slider",
               "components/calendar",
               "components/date-picker"
             ]
@@ -111,7 +119,8 @@
               "components/alert-dialog",
               "components/drawer",
               "components/progress",
-              "components/skeleton"
+              "components/skeleton",
+              "components/sonner"
             ]
           },
           {
@@ -121,7 +130,8 @@
               "components/dropdown-menu",
               "components/navigation-menu",
               "components/pagination",
-              "components/command"
+              "components/command",
+              "components/menubar"
             ]
           },
           {
@@ -131,7 +141,9 @@
               "components/badge",
               "components/avatar",
               "components/chart",
-              "components/carousel"
+              "components/carousel",
+              "components/toggle",
+              "components/toggle-group"
             ]
           },
           {

@@ -1,0 +1,66 @@
+---
+title: Scroll Area
+description: Custom scrollable area with styled scrollbars
+---
+
+The Scroll Area component provides a custom scrollable container with styled scrollbars, built on Radix UI Scroll Area primitive.
+
+## Installation
+
+```tsx
+import { ScrollArea } from "@poketto/ui/scroll-area"
+```
+
+## Usage
+
+### Basic scroll area
+
+```tsx
+import { ScrollArea } from "@poketto/ui/scroll-area"
+
+export default function Example() {
+  return (
+    <ScrollArea className="h-[200px] w-[350px] rounded-md border p-4">
+      <div className="space-y-4">
+        {Array.from({ length: 50 }).map((_, i) => (
+          <div key={i}>Item {i + 1}</div>
+        ))}
+      </div>
+    </ScrollArea>
+  )
+}
+```
+
+### Horizontal scrolling
+
+```tsx
+<ScrollArea className="w-96 whitespace-nowrap rounded-md border">
+  <div className="flex w-max space-x-4 p-4">
+    {Array.from({ length: 20 }).map((_, i) => (
+      <div
+        key={i}
+        className="shrink-0 rounded-md bg-muted w-[150px] h-[100px] flex items-center justify-center"
+      >
+        Card {i + 1}
+      </div>
+    ))}
+  </div>
+</ScrollArea>
+```
+
+## Props
+
+<ParamField path="className" type="string">
+  Additional CSS classes
+</ParamField>
+
+<ParamField path="orientation" type="'vertical' | 'horizontal' | 'both'" default="vertical">
+  The scroll orientation
+</ParamField>
+
+## Use cases
+
+- Long lists of content
+- Code viewers
+- Chat message containers
+- Horizontal card carousels

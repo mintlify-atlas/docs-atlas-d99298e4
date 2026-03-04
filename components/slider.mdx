@@ -1,0 +1,107 @@
+---
+title: Slider
+description: An input component for selecting values from a range
+---
+
+The Slider component allows users to select values from a range, built on Radix UI Slider primitive.
+
+## Installation
+
+```tsx
+import { Slider } from "@poketto/ui/slider"
+```
+
+## Usage
+
+### Basic slider
+
+```tsx
+import { Slider } from "@poketto/ui/slider"
+
+export default function Example() {
+  return <Slider defaultValue={[50]} max={100} step={1} />
+}
+```
+
+### With label and value
+
+```tsx
+import { useState } from "react"
+import { Slider } from "@poketto/ui/slider"
+import { Label } from "@poketto/ui/label"
+
+export default function Example() {
+  const [value, setValue] = useState([50])
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <Label>Volume</Label>
+        <span className="text-sm text-muted-foreground">{value[0]}%</span>
+      </div>
+      <Slider
+        value={value}
+        onValueChange={setValue}
+        max={100}
+        step={1}
+      />
+    </div>
+  )
+}
+```
+
+### Range slider
+
+```tsx
+import { Slider } from "@poketto/ui/slider"
+
+export default function Example() {
+  return (
+    <div className="space-y-2">
+      <Label>Price Range</Label>
+      <Slider
+        defaultValue={[25, 75]}
+        max={100}
+        step={1}
+        minStepsBetweenThumbs={1}
+      />
+    </div>
+  )
+}
+```
+
+## Props
+
+<ParamField path="value" type="number[]">
+  The controlled value of the slider
+</ParamField>
+
+<ParamField path="defaultValue" type="number[]">
+  The default value for uncontrolled usage
+</ParamField>
+
+<ParamField path="onValueChange" type="(value: number[]) => void">
+  Event handler called when the value changes
+</ParamField>
+
+<ParamField path="min" type="number" default="0">
+  The minimum value
+</ParamField>
+
+<ParamField path="max" type="number" default="100">
+  The maximum value
+</ParamField>
+
+<ParamField path="step" type="number" default="1">
+  The step increment
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  Whether the slider is disabled
+</ParamField>
+
+## Accessibility
+
+- Full keyboard navigation (Arrow keys to adjust value)
+- Focus management
+- ARIA attributes for screen readers

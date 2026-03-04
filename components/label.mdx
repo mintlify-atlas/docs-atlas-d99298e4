@@ -1,0 +1,65 @@
+---
+title: Label
+description: Accessible label component for form controls
+---
+
+The Label component renders an accessible label for form controls, built on Radix UI Label primitive.
+
+## Installation
+
+```tsx
+import { Label } from "@poketto/ui/label"
+```
+
+## Usage
+
+### Basic label
+
+```tsx
+import { Label } from "@poketto/ui/label"
+import { Input } from "@poketto/ui/input"
+
+export default function Example() {
+  return (
+    <div className="grid w-full max-w-sm items-center gap-1.5">
+      <Label htmlFor="email">Email</Label>
+      <Input type="email" id="email" placeholder="Email" />
+    </div>
+  )
+}
+```
+
+### With description
+
+```tsx
+<div className="grid w-full max-w-sm items-center gap-1.5">
+  <Label htmlFor="username">Username</Label>
+  <Input id="username" placeholder="johndoe" />
+  <p className="text-sm text-muted-foreground">
+    This is your public display name.
+  </p>
+</div>
+```
+
+### Required field
+
+```tsx
+<Label htmlFor="password">
+  Password <span className="text-destructive">*</span>
+</Label>
+<Input type="password" id="password" required />
+```
+
+## Props
+
+<ParamField path="htmlFor" type="string">
+  The id of the form control this label is associated with
+</ParamField>
+
+<ParamField path="className" type="string">
+  Additional CSS classes
+</ParamField>
+
+## Accessibility
+
+The Label component automatically associates with form controls using the `htmlFor` attribute, improving accessibility for screen readers and enabling click-to-focus behavior.

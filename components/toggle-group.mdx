@@ -1,0 +1,122 @@
+---
+title: Toggle Group
+description: A set of two-state buttons that can be toggled
+---
+
+The Toggle Group component provides a group of toggle buttons with single or multiple selection, built on Radix UI Toggle Group primitive.
+
+## Installation
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from "@poketto/ui/toggle-group"
+```
+
+## Usage
+
+### Single selection
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from "@poketto/ui/toggle-group"
+import { Bold, Italic, Underline } from "lucide-react"
+
+export default function Example() {
+  return (
+    <ToggleGroup type="single">
+      <ToggleGroupItem value="bold" aria-label="Toggle bold">
+        <Bold className="h-4 w-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="italic" aria-label="Toggle italic">
+        <Italic className="h-4 w-4" />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="underline" aria-label="Toggle underline">
+        <Underline className="h-4 w-4" />
+      </ToggleGroupItem>
+    </ToggleGroup>
+  )
+}
+```
+
+### Multiple selection
+
+```tsx
+<ToggleGroup type="multiple">
+  <ToggleGroupItem value="bold">
+    <Bold className="h-4 w-4" />
+  </ToggleGroupItem>
+  <ToggleGroupItem value="italic">
+    <Italic className="h-4 w-4" />
+  </ToggleGroupItem>
+  <ToggleGroupItem value="underline">
+    <Underline className="h-4 w-4" />
+  </ToggleGroupItem>
+</ToggleGroup>
+```
+
+### With text
+
+```tsx
+<ToggleGroup type="single">
+  <ToggleGroupItem value="left">Left</ToggleGroupItem>
+  <ToggleGroupItem value="center">Center</ToggleGroupItem>
+  <ToggleGroupItem value="right">Right</ToggleGroupItem>
+</ToggleGroup>
+```
+
+### Controlled
+
+```tsx
+import { useState } from "react"
+
+export default function Example() {
+  const [value, setValue] = useState("left")
+
+  return (
+    <ToggleGroup type="single" value={value} onValueChange={setValue}>
+      <ToggleGroupItem value="left">Left</ToggleGroupItem>
+      <ToggleGroupItem value="center">Center</ToggleGroupItem>
+      <ToggleGroupItem value="right">Right</ToggleGroupItem>
+    </ToggleGroup>
+  )
+}
+```
+
+## Props
+
+### ToggleGroup
+
+<ParamField path="type" type="'single' | 'multiple'" required>
+  Whether single or multiple items can be pressed at a time
+</ParamField>
+
+<ParamField path="value" type="string | string[]">
+  The controlled value (string for single, array for multiple)
+</ParamField>
+
+<ParamField path="defaultValue" type="string | string[]">
+  The default value for uncontrolled usage
+</ParamField>
+
+<ParamField path="onValueChange" type="(value: string | string[]) => void">
+  Event handler called when the value changes
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  Whether the entire group is disabled
+</ParamField>
+
+### ToggleGroupItem
+
+<ParamField path="value" type="string" required>
+  The unique value for this item
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  Whether this specific item is disabled
+</ParamField>
+
+## Use cases
+
+- Text formatting toolbars
+- View mode selectors
+- Filter options
+- Alignment controls

@@ -1,0 +1,107 @@
+---
+title: Toggle
+description: A two-state button for on/off states
+---
+
+The Toggle component provides a two-state button, built on Radix UI Toggle primitive.
+
+## Installation
+
+```tsx
+import { Toggle } from "@poketto/ui/toggle"
+```
+
+## Usage
+
+### Basic toggle
+
+```tsx
+import { Toggle } from "@poketto/ui/toggle"
+import { Bold } from "lucide-react"
+
+export default function Example() {
+  return (
+    <Toggle aria-label="Toggle bold">
+      <Bold className="h-4 w-4" />
+    </Toggle>
+  )
+}
+```
+
+### With text
+
+```tsx
+<Toggle aria-label="Toggle italic">
+  <Italic className="mr-2 h-4 w-4" />
+  Italic
+</Toggle>
+```
+
+### Variants
+
+```tsx
+<div className="flex items-center gap-2">
+  <Toggle variant="default" aria-label="Toggle bold">
+    <Bold className="h-4 w-4" />
+  </Toggle>
+  <Toggle variant="outline" aria-label="Toggle italic">
+    <Italic className="h-4 w-4" />
+  </Toggle>
+</div>
+```
+
+### Sizes
+
+```tsx
+<div className="flex items-center gap-2">
+  <Toggle size="sm" aria-label="Toggle bold">
+    <Bold className="h-3 w-3" />
+  </Toggle>
+  <Toggle size="default" aria-label="Toggle bold">
+    <Bold className="h-4 w-4" />
+  </Toggle>
+  <Toggle size="lg" aria-label="Toggle bold">
+    <Bold className="h-5 w-5" />
+  </Toggle>
+</div>
+```
+
+### Disabled
+
+```tsx
+<Toggle disabled aria-label="Toggle bold">
+  <Bold className="h-4 w-4" />
+</Toggle>
+```
+
+## Props
+
+<ParamField path="pressed" type="boolean">
+  The controlled pressed state
+</ParamField>
+
+<ParamField path="defaultPressed" type="boolean">
+  The default pressed state for uncontrolled usage
+</ParamField>
+
+<ParamField path="onPressedChange" type="(pressed: boolean) => void">
+  Event handler called when the pressed state changes
+</ParamField>
+
+<ParamField path="variant" type="'default' | 'outline'" default="default">
+  The visual variant
+</ParamField>
+
+<ParamField path="size" type="'sm' | 'default' | 'lg'" default="default">
+  The size variant
+</ParamField>
+
+<ParamField path="disabled" type="boolean">
+  Whether the toggle is disabled
+</ParamField>
+
+## Accessibility
+
+- Full keyboard support
+- ARIA pressed state
+- Screen reader compatible
